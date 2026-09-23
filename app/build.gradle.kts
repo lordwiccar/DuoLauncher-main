@@ -32,10 +32,10 @@ val releaseStoreFile = releaseSigningValues["DUO_RELEASE_STORE_FILE"]?.let { con
 }
 
 android {
-    namespace = "com.jake.duolauncher"
+    namespace = "media.whitewhale.iduo"
     compileSdk = 36
     defaultConfig {
-        applicationId = "com.jake.duolauncher"
+        applicationId = "media.whitewhale.iduo"
         minSdk = 31
         targetSdk = 36
         versionCode = 30

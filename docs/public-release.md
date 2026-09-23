@@ -27,7 +27,7 @@ export DUO_RELEASE_KEY_PASSWORD='...'
 ```
 
 The public release key is separate from Android's debug key. Because both variants intentionally
-use `com.jake.duolauncher`, Android will not install one as an update to an installation signed by
+use `media.whitewhale.iduo`, Android will not install one as an update to an installation signed by
 the other key. Preserve an existing configured debug installation; test the public release on a
 separate device or disposable emulator unless a deliberate migration has been planned.
 
