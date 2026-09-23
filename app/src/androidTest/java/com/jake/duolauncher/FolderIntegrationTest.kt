@@ -59,10 +59,11 @@ class FolderIntegrationTest {
             compose.waitUntil(5_000) { model().state.value.folders.size == fixture.folders.size + 1 }
             val folder = model().state.value.folders.first { it.id !in before.folders.map(FolderEntry::id) }
             compose.onNodeWithTag("home-folder-${folder.id}").performClick()
-            compose.onNodeWithTag("folder-name").performTextReplacement("Travel")
+            compose.onNodeWithTag("folder-rename").performClick()
+            compose.onNodeWithTag("folder-name-field").performTextReplacement("Travel")
             compose.activityRule.scenario.recreate(); ready()
-            compose.onNodeWithTag("folder-name").assertTextContains("Travel")
-            compose.onNodeWithText("Done").performClick()
+            compose.onNodeWithTag("folder-name-field").assertTextContains("Travel")
+            compose.onNodeWithTag("folder-name-save").performClick()
             compose.waitUntil(5_000) { model().folder(folder.id)?.title == "Travel" }
 
             compose.activityRule.scenario.recreate(); ready()

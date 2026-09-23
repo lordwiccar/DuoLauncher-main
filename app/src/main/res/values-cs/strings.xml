@@ -182,6 +182,8 @@
     <!-- Folders -->
     <string name="folder_default">Složka</string>
     <string name="folder_name">Název složky</string>
+    <string name="rename_folder">Přejmenovat složku</string>
+    <string name="folder_name_save">Uložit název</string>
     <string name="close_folder">Zavřít složku</string>
     <string name="folder_transparency">Průhlednost pozadí složky</string>
     <plurals name="folder_description">

@@ -182,6 +182,8 @@
     <!-- Folders -->
     <string name="folder_default">Folder</string>
     <string name="folder_name">Nazwa folderu</string>
+    <string name="rename_folder">Zmień nazwę folderu</string>
+    <string name="folder_name_save">Zapisz nazwę</string>
     <string name="close_folder">Zamknij folder</string>
     <string name="folder_transparency">Przezroczystość tła folderu</string>
     <plurals name="folder_description">

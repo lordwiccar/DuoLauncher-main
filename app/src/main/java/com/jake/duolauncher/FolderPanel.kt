@@ -11,6 +11,8 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,7 +22,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -72,7 +81,14 @@ internal fun FolderPanel(
     onMoveOut: (String, DropTarget) -> Unit, transparency: Float = DEFAULT_FOLDER_TRANSPARENCY,
 ) {
     var title by rememberSaveable(folder.id) { mutableStateOf(folder.title) }
-    BackHandler { onDismiss() }
+    var editing by rememberSaveable(folder.id) { mutableStateOf(false) }
+    // A blank name keeps the current one; closing the folder while editing keeps what was typed.
+    fun commitTitle() {
+        if (title.isNotBlank() && title.trim() != folder.title) onRename(title.trim()) else title = folder.title
+        editing = false
+    }
+    val dismiss = { if (editing) commitTitle(); onDismiss() }
+    BackHandler { dismiss() }
     DisposableEffect(drag, folder.id) {
         drag.activeSourceScope = folder.id
         onDispose { if (drag.activeSourceScope == folder.id) drag.activeSourceScope = null }
@@ -83,7 +99,7 @@ internal fun FolderPanel(
             interactionSource = remember { MutableInteractionSource() },
             indication = null,
             onClickLabel = closeLabel,
-            onClick = onDismiss,
+            onClick = dismiss,
         )
         .imePadding().testTag("folder-panel"),
         contentAlignment = Alignment.Center) {
@@ -105,10 +121,26 @@ internal fun FolderPanel(
             color = Glass.copy(alpha = 1f - transparency.coerceIn(0f, MAX_FOLDER_TRANSPARENCY)), shape = RoundedCornerShape(30.dp),
             border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .6f))) {
             Column(Modifier.padding(FolderPadding), horizontalAlignment = Alignment.CenterHorizontally) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    OutlinedTextField(title, { title = it }, Modifier.weight(1f).testTag("folder-name"),
-                        singleLine = true, label = { Text(stringResource(R.string.folder_name)) })
-                    TextButton(onClick = { if (title.isNotBlank()) onRename(title); onDismiss() }) { Text(stringResource(R.string.done)) }
+                if (editing) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    val focus = remember { FocusRequester() }
+                    OutlinedTextField(title, { title = it }, Modifier.weight(1f).focusRequester(focus).testTag("folder-name-field"),
+                        singleLine = true, label = { Text(stringResource(R.string.folder_name)) },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = { commitTitle() }))
+                    IconButton(onClick = ::commitTitle, Modifier.testTag("folder-name-save")) {
+                        Icon(Icons.Rounded.Check, stringResource(R.string.folder_name_save))
+                    }
+                    LaunchedEffect(Unit) { focus.requestFocus() }
+                } else Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically) {
+                    // Balances the pencil so the name itself stays centred.
+                    Spacer(Modifier.width(36.dp))
+                    Text(folder.title, Modifier.weight(1f, fill = false).semantics { heading() }.testTag("folder-name"),
+                        style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    IconButton(onClick = { title = folder.title; editing = true }, Modifier.size(36.dp).testTag("folder-rename")) {
+                        Icon(Icons.Rounded.Edit, stringResource(R.string.rename_folder), Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .6f))
+                    }
                 }
                 HorizontalPager(pager, Modifier.padding(top = 12.dp).size(gridWidth, gridHeight).testTag("folder-pages"),
                     pageSpacing = FolderPadding, key = { it }) { folderPage ->

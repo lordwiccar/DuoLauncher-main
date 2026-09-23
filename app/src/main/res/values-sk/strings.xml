@@ -182,6 +182,8 @@
     <!-- Folders -->
     <string name="folder_default">Priečinok</string>
     <string name="folder_name">Názov priečinka</string>
+    <string name="rename_folder">Premenovať priečinok</string>
+    <string name="folder_name_save">Uložiť názov</string>
     <string name="close_folder">Zavrieť priečinok</string>
     <string name="folder_transparency">Priehľadnosť pozadia priečinka</string>
     <plurals name="folder_description">

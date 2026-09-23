@@ -180,6 +180,8 @@
     <!-- Folders -->
     <string name="folder_default">Folder</string>
     <string name="folder_name">Folder name</string>
+    <string name="rename_folder">Rename folder</string>
+    <string name="folder_name_save">Save name</string>
     <string name="close_folder">Close folder</string>
     <string name="folder_transparency">Folder background transparency</string>
     <plurals name="folder_description">
