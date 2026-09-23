@@ -315,7 +315,21 @@ fun LauncherScreen(
     val blockedDock = drag.moved && target is DropTarget.Dock &&
         if (drag.source?.folderId != null) state.dock.none { it == null }
         else drag.source?.appId?.let { !canPlaceInDock(state.layout, it) } == true
-    val insertionTarget = target.takeIf { drag.moved && !blockedDock }
+    // Resting on another app's icon groups the two into a folder instead of shifting the grid.
+    val mergeRegion = if (drag.active && drag.moved) drag.mergeCandidate(drag.pointer, eligibleDragPages) else null
+    val mergeIndex = (mergeRegion?.target as? DropTarget.Home)?.index
+    val mergeIntoFolder = mergeRegion?.appId?.let(::isReservedFolderId) == true
+    LaunchedEffect(mergeIndex) {
+        drag.mergeArmed = false
+        drag.mergeIndex = mergeIndex
+        if (mergeIndex != null) {
+            // An existing folder accepts the app at once; two apps need a deliberate pause.
+            if (!mergeIntoFolder) delay(FOLDER_MERGE_DELAY_MS)
+            drag.mergeArmed = true
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        }
+    }
+    val insertionTarget = target.takeIf { drag.moved && !blockedDock && mergeIndex == null }
     val widgetRawTarget = widgetSession?.let { session -> drag.regions.values.firstOrNull {
         it.target is DropTarget.Home && it.page in eligibleDragPages && it.bounds.contains(session.pointer)
     }?.target as? DropTarget.Home }
@@ -360,7 +374,13 @@ fun LauncherScreen(
             }
                 ?: rawDestination
         } else rawDestination
+        val merge = drag.mergeCandidate(drag.pointer, eligibleDragPages)
+            ?.takeIf { moved && !cancelled && drag.mergeArmed && (it.target as? DropTarget.Home)?.index == drag.mergeIndex }
         val changed = when {
+            merge != null && source.appId != null && isReservedFolderId(merge.appId!!) ->
+                model.addAppToFolder(merge.appId, source.appId)
+            merge != null && source.appId != null ->
+                model.createFolder(merge.appId!!, source.appId, (merge.target as DropTarget.Home).index) != null
             source.folderId != null && destination is DropTarget.Folder ->
                 model.addAppToFolder(destination.id, source.appId ?: "")
             source.folderId != null && destination != null && source.appId != null ->
@@ -1506,7 +1526,8 @@ private fun SharedHomeGrid(
             val savedApp = appsById[savedId]
             val savedFolder = folders.firstOrNull { it.id == savedId }
             val previewId = previewAt(globalIndex)
-            val highlighted = drag.active && target == cell
+            val merging = drag.active && drag.mergeArmed && drag.mergeIndex == globalIndex
+            val highlighted = drag.active && target == cell && !merging
             val gap = hiddenIndex == globalIndex
             val row = localIndex / GRID_COLUMNS
             val cellHeight = rowTop(row + 1) - rowTop(row)
@@ -1519,6 +1540,10 @@ private fun SharedHomeGrid(
                 .border(if (highlighted) 2.dp else 0.dp,
                     if (highlighted) Color.White.copy(alpha = .8f) else Color.Transparent, RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.TopCenter) {
+                // A folder-shaped backdrop grows behind the resting target to show that dropping groups them.
+                if (merging) Box(Modifier.offset(y = (-iconSize * .1f).dp).size((iconSize * 1.2f).dp).testTag("folder-merge-$globalIndex")
+                    .background(Glass.copy(alpha = .72f), RoundedCornerShape((iconSize * .3f).dp))
+                    .border(2.dp, Color.White.copy(alpha = .85f), RoundedCornerShape((iconSize * .3f).dp)))
                 if (drag.active && drag.source?.appId != null && (gap || previewId == null)) Box(
                     Modifier.size(iconSize.dp).testTag(if (gap) "drag-gap-home-$globalIndex" else "empty-home-slot-$globalIndex")
                         .background(Glass.copy(alpha = if (gap) .16f else .08f), RoundedCornerShape(18.dp))

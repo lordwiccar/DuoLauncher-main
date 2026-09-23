@@ -34,6 +34,8 @@ Hold an app, then drag it to an empty cell, another page, or a vacant dock posit
 
 Dragging between Home and the dock moves the shortcut instead of duplicating it. The dock holds four apps by default; choose four to eight under **Home layout → Apps in dock**. The dock background grows or shrinks with that number. Choosing fewer positions keeps every app: apps from removed positions fill empty dock positions first, then move to free Home cells. When the dock is full, Duo shows **Dock full • Move an app out first** and rejects a new arrival; it never evicts an app automatically. Existing dock apps can still be reordered. Drag a Home or dock shortcut to **Remove** to remove the shortcut without uninstalling the app.
 
+To make a folder, drag an app onto the middle of another Home app and hold it there for a moment: the target gains a folder-shaped backdrop, the other icons stop moving aside, and releasing groups both apps in a new folder in the target's place. Drag an app onto the middle of an existing folder to add it straight away. Releasing near a cell's edge still moves the app between neighbours as usual. Tap a folder to open it, rename it, or move apps back out.
+
 Long press and release an app for options such as **Move on Home**, **Create folder**, **App info**, or **Remove from Home**. **All apps** remains the complete installed-app catalog even when a shortcut is removed.
 
 If Android exposes a managed profile, **All apps** shows **Personal** and **Work** filters. A paused profile shows **Work apps are paused** and **Turn on work apps**. Availability and cross-profile widget access remain controlled by the profile administrator.

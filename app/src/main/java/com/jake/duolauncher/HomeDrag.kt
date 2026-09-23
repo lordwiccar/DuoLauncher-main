@@ -31,6 +31,9 @@ internal class HomeDragState {
     var originPage = 0
     var moved by mutableStateOf(false)
     var activeSourceScope by mutableStateOf<String?>(null)
+    /** Home cell whose app the dragged app is hovering over, and whether the hover has lasted long enough to merge. */
+    var mergeIndex by mutableStateOf<Int?>(null)
+    var mergeArmed by mutableStateOf(false)
     val active get() = source != null
     fun hit(point: Offset, pages: Set<Int>) = regions.values
         .filter { (it.page == null || it.page in pages) && it.bounds.contains(point) &&
@@ -52,7 +55,18 @@ internal class HomeDragState {
             }
         }.maxByOrNull(::dragRegionPriority)
     }
-    fun clear() { source = null; moved = false }
+    /** A Home app or folder under the icon-centred part of [point] that the dragged app could be grouped with. */
+    fun mergeCandidate(point: Offset, pages: Set<Int>): DragRegion? {
+        val dragged = source ?: return null
+        val draggedApp = dragged.appId?.takeUnless(::isReservedFolderId) ?: return null
+        if (dragged.folderId != null || dragged.target is DropTarget.Widget) return null
+        return regions.values.firstOrNull { region ->
+            region.target is DropTarget.Home && (region.page == null || region.page in pages) &&
+                region.scope == activeSourceScope && region.appId != null && region.appId != draggedApp &&
+                folderMergeZone(region.bounds).contains(point)
+        }
+    }
+    fun clear() { source = null; moved = false; mergeIndex = null; mergeArmed = false }
 
     fun register(owner: Any, region: DragRegion) {
         regionOwners[region.target] = owner
@@ -74,6 +88,17 @@ internal class HomeDragState {
         }
     }
 }
+
+/** How long a dragged app must rest on another app before dropping makes a folder. */
+internal const val FOLDER_MERGE_DELAY_MS = 350L
+
+/**
+ * The icon-centred part of a Home cell. Resting here starts a folder; the cell's outer edge and label
+ * area keep the ordinary insertion behaviour so apps can still be moved between neighbours.
+ */
+internal fun folderMergeZone(cell: Rect): Rect = Rect(
+    cell.left + cell.width * .22f, cell.top + cell.height * .04f,
+    cell.right - cell.width * .22f, cell.top + cell.height * .66f)
 
 /** Page turning follows the window edges, including the space beside the fixed dock. */
 internal fun dragEdgeDirection(point: Offset, window: Rect, edgeWidth: Float): Int = when {
