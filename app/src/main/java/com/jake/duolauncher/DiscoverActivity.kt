@@ -69,6 +69,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import org.json.JSONObject
 import java.lang.ref.WeakReference
+import kotlin.concurrent.thread
 
 class DuoApplication : Application() {
     override fun attachBaseContext(newBase: Context) { super.attachBaseContext(AppLanguage.wrap(newBase)) }
@@ -77,6 +78,7 @@ class DuoApplication : Application() {
         super.onCreate()
         DiscoverEmbedding.initialize(this)
         DiscoverBounds.initialize(this)
+        thread(name = "default-wallpaper") { DefaultWallpaper.load(this) }
     }
 }
 

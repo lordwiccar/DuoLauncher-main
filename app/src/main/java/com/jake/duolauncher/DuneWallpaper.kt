@@ -7,10 +7,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.ImageDecoder
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
@@ -46,11 +50,54 @@ internal fun DuneWallpaper(modifier: Modifier = Modifier.fillMaxSize()) {
     Canvas(modifier) { drawLauncherBackground(photo?.asImageBitmap(), palette.dark) }
 }
 
+/** Short edge the bundled landscape is decoded to: the Fold 7's tallest crop (inner display) stays sharp. */
+private const val DEFAULT_WALLPAPER_SHORT_EDGE = 2200
+/** Dims the bundled daylight landscape in the dark appearance. */
+private const val DEFAULT_WALLPAPER_DARK_DIM = .38f
+
+/** The bundled Duo dunes landscape, decoded once per process off the main thread. */
+internal object DefaultWallpaper {
+    /** Snapshot state, so canvases drawn before the decode finishes redraw once it lands. */
+    var bitmap by mutableStateOf<ImageBitmap?>(null)
+        private set
+    @Volatile var failed = false
+        private set
+
+    @Synchronized
+    fun load(context: Context): ImageBitmap? {
+        bitmap?.let { return it }
+        if (failed) return null
+        val decoded = runCatching {
+            ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.resources, R.drawable.default_wallpaper)) { decoder, info, _ ->
+                val width = info.size.width; val height = info.size.height
+                val scale = minOf(1f, DEFAULT_WALLPAPER_SHORT_EDGE.toFloat() / minOf(width, height).coerceAtLeast(1))
+                decoder.setTargetSize(maxOf(1, (width * scale).toInt()), maxOf(1, (height * scale).toInt()))
+                // The wallpaper service draws on a software canvas, which cannot take hardware bitmaps.
+                decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+            }.asImageBitmap()
+        }.getOrNull()
+        if (decoded == null) failed = true else bitmap = decoded
+        return decoded
+    }
+}
+
 internal fun DrawScope.drawLauncherBackground(photo: ImageBitmap?, dark: Boolean = false) {
-    if (photo == null || photo.width <= 0 || photo.height <= 0) {
+    if (photo != null && photo.width > 0 && photo.height > 0) {
+        drawCovering(photo)
+        return
+    }
+    val bundled = DefaultWallpaper.bitmap
+    if (bundled == null) {
+        // Only until the bundled landscape is decoded, or if it cannot be.
         drawDunes(dark)
         return
     }
+    drawCovering(bundled)
+    if (dark) drawRect(Color.Black.copy(alpha = DEFAULT_WALLPAPER_DARK_DIM))
+}
+
+/** Draws [photo] centre-cropped to fill the canvas. */
+private fun DrawScope.drawCovering(photo: ImageBitmap) {
     val destinationWidth = size.width.toInt().coerceAtLeast(1)
     val destinationHeight = size.height.toInt().coerceAtLeast(1)
     val sourceAspect = photo.width.toFloat() / photo.height
@@ -111,6 +158,7 @@ class DuneWallpaperService : WallpaperService() {
         private var photoLoad = 0
         private var photoLoading = false
         private var photoFailed = false
+        private var defaultLoading = false
         private var visible = false
         private var timeReceiverRegistered = false
         private val timeReceiver = object : BroadcastReceiver() {
@@ -192,6 +240,16 @@ class DuneWallpaperService : WallpaperService() {
                 return
             }
             if (!launcherBackgroundEnabled(this@DuneWallpaperService)) { photo = null; photoFailed = false }
+            if (photo == null && DefaultWallpaper.bitmap == null && !DefaultWallpaper.failed) {
+                if (defaultLoading) return
+                defaultLoading = true
+                loader.launch {
+                    withContext(Dispatchers.IO) { DefaultWallpaper.load(this@DuneWallpaperService) }
+                    defaultLoading = false
+                    if (visible) render(holder)
+                }
+                return
+            }
             val canvas = try { holder.lockCanvas() } catch (_: IllegalArgumentException) { null } ?: return
             try {
                 painter.draw(Density(resources.displayMetrics.density), LayoutDirection.Ltr,
