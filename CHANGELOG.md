@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.0
+
+- Rename the app to iDuo Launcher with the package `media.whitewhale.iduo`. Android installs it as a new app beside earlier Duo Launcher builds.
+- Translate the app into Czech, Slovak, Polish and German, with a Language setting that follows the system language by default.
+- Group Home icons into folders by dropping one onto another. Open folders size to their content up to 6 × 6 icons, page beyond that, grow out of their Home icon, blur Home behind them, and offer rename, move to page and ungroup.
+- Add adjustable folder background transparency.
+- Use a bundled dunes landscape as the default launcher background.
+- Allow four to eight dock apps and six or eight Home rows; long press on Home opens settings.
+
 ## 0.15.0-beta01
 
 First public-beta preparation release. Tested scope and APK checksums accompany the release package.

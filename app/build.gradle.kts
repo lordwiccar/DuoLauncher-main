@@ -38,8 +38,8 @@ android {
         applicationId = "media.whitewhale.iduo"
         minSdk = 31
         targetSdk = 36
-        versionCode = 30
-        versionName = "0.15.0-beta01"
+        versionCode = 31
+        versionName = "0.7.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
