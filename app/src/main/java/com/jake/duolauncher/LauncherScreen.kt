@@ -472,6 +472,14 @@ fun LauncherScreen(
                 launcherActivity.backups.preview == null && !launcherActivity.backups.pickerPending &&
                 !launcherActivity.backgrounds.pickerPending && widgets.setupStatus == null &&
                 widgets.reconfigureWidgetId == null
+            val openHomeOptionsAt by rememberUpdatedState { point: Offset, width: Int ->
+                val page = pager.currentPage
+                val targetPage = if (geometry.expanded && point.x < width / 2f) page - 1 else page
+                val overItem = drag.hit(point + gestureOriginInRoot, setOf(page - 1, page))?.movable == true
+                if (pagerInputEnabled && page in 0 until visibleHomePages && !overItem) {
+                    emptyCellIndex = firstEmptyHomeCell(state, targetPage)
+                }
+            }
             Box(Modifier.fillMaxSize().onGloballyPositioned {
                 gestureOriginInRoot = it.boundsInRoot().topLeft
                 gestureOriginInWindow = it.boundsInWindow().topLeft
@@ -495,7 +503,11 @@ fun LauncherScreen(
                 },
                 onDownwardSwipe = launcherActivity::openSystemShade,
                 onLeadingOverscroll = if (firstHome == 0) onDiscover else null,
-            )) {
+            ).pointerInput(Unit) {
+                // Bare wallpaper anywhere on Home opens Home options. Icons, cells, the dock and
+                // controls consume their own presses first, and a page swipe cancels this one.
+                detectTapGestures(onLongPress = { openHomeOptionsAt(it, size.width) })
+            }) {
             val pagerModifier = Modifier.fillMaxHeight().width(pagerWidth)
                 .drawWithContent {
                     homeLayer.record { this@drawWithContent.drawContent() }
@@ -1330,6 +1342,14 @@ private fun ExpandedWorkspace(
     }
 }
 
+/** The cell Home options add to when opened from wallpaper rather than a specific empty cell. */
+private fun firstEmptyHomeCell(state: LauncherState, page: Int): Int {
+    val pageStart = homeCellIndex(page, 0)
+    return (pageStart until pageStart + HOME_CELLS).firstOrNull { index ->
+        state.layout.slotAt(index) == null && state.widgetPlacements.none { index in it.coveredIndices() }
+    } ?: pageStart
+}
+
 @Composable
 private fun HomePagePane(
     page: Int,
@@ -1356,10 +1376,7 @@ private fun HomePagePane(
 ) {
     val homeScroll = rememberScrollState()
     var paneBounds by remember { mutableStateOf(androidx.compose.ui.geometry.Rect.Zero) }
-    val pageStart = homeCellIndex(page, 0)
-    val backgroundTarget = (pageStart until pageStart + HOME_CELLS).firstOrNull { index ->
-        state.layout.slotAt(index) == null && state.widgetPlacements.none { index in it.coveredIndices() }
-    } ?: pageStart
+    val backgroundTarget = firstEmptyHomeCell(state, page)
     val verticalEdge = with(LocalDensity.current) { 42.dp.toPx() }
     LaunchedEffect(drag.active, page, paneBounds) {
         while (drag.active) {

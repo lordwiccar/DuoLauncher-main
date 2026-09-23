@@ -18,7 +18,7 @@ To make Duo the launcher, choose **Set as home app** in customization, or open *
 
 ## Customize Home
 
-Long press an empty Home cell to open **Add to Home**, then choose **Widgets**, **Wallpaper**, or **Customize launcher**. If every cell is occupied, long press the slim wallpaper margin at the left edge of the grid. In **Make it yours** you can open:
+Long press an empty Home cell or any bare wallpaper on Home, such as the space below or beside the grid, to open **Add to Home**, then choose **Widgets**, **Wallpaper**, or **Customize launcher**. In **Make it yours** you can open:
 
 - **Wallpaper & appearance** for launcher photos, Android wallpaper, and color mode.
 - **Home layout** for icon size, row spacing, dock geometry, Home apps, and widgets on the visible page.

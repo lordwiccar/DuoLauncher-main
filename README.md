@@ -29,7 +29,7 @@ Android still controls the lock screen, notification panels, recents, and system
 1. Download the signed APK from this repository's Releases section. Read its tested-device notes and known issues.
 2. Open the APK, allow installation from that source if Android asks, and open **Duo Launcher**.
 3. Try the layout before choosing **Set as home app**. Select Duo Launcher in Android's Home app settings when ready.
-4. Long press an empty Home cell or the narrow wallpaper margin beside a full grid to add widgets or **Customize launcher**. Help is available from customization.
+4. Long press any empty Home space, including the wallpaper around and below the grid, to add widgets or **Customize launcher**. Help is available from customization.
 
 To switch back, open Android **Settings → Apps → Default apps → Home app** and select your previous launcher. Vendor labels may differ. Installing Duo does not automatically select it as Home.
 
@@ -46,7 +46,7 @@ Normal beta updates install over the existing beta with the same signing key. Un
 | Rearrange apps/widgets | Hold, then drag; pause at the screen edge to change or create a page |
 | Add to the dock | Drag into a vacancy; move an app out first when the dock is full |
 | Scroll a widget | Swipe vertically inside its content; hold still to pick it up |
-| Customize | Long press empty Home space or the wallpaper margin beside the grid |
+| Customize | Long press any empty Home space or bare wallpaper |
 | Notifications / Quick Settings | Swipe down from Home's left 70% / right 30%, after enabling optional shade gestures |
 
 The surrounding status ring shows battery, the inner arcs show Wi-Fi strength, and the lower dots show cellular strength. Unknown readings are not displayed as full signal. This rail applies to Home only.
