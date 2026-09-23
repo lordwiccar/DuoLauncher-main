@@ -29,6 +29,8 @@ data class HomeGeometry(
     val dockTop: Float,
     val dockHeight: Float,
     val dockRowHeight: Float,
+    /** Whether every visible row fits without scrolling the page. */
+    val gridFits: Boolean = true,
 )
 
 /** Advance old defaults without changing individually tuned values. */
@@ -42,16 +44,24 @@ fun upgradePreset(preset: LayoutPreset, schema: Int, expanded: Boolean): LayoutP
     else -> preset
 }
 
-fun homeGeometry(width: Float, height: Float, preset: LayoutPreset, labels: Boolean, statusHeight: Float = 0f, labelHeight: Float = 20f, inLibrary: Boolean = false, homeBottomSpace: Float = 44f, dockSlots: Int = MIN_DOCK_SLOTS, statusRailHeight: Float = 0f): HomeGeometry {
+fun homeGeometry(width: Float, height: Float, preset: LayoutPreset, labels: Boolean, statusHeight: Float = 0f, labelHeight: Float = 20f, inLibrary: Boolean = false, homeBottomSpace: Float = 44f, dockSlots: Int = MIN_DOCK_SLOTS, statusRailHeight: Float = 0f, homeRows: Int = DEFAULT_HOME_ROWS): HomeGeometry {
     val p = preset.sanitized()
     val expanded = width >= 650f
     val homeWidth = if (expanded) minOf(460f, width * 0.56f) else width
     val gridWidth = (homeWidth - p.dockWidth - 44f).coerceAtLeast(192f)
     val icon = minOf(p.iconSize, (gridWidth / 4f - 10f).coerceAtLeast(32f))
     // Keep the same icon rhythm when labels are hidden; allow larger system text to fit.
-    val row = maxOf(48f, icon + if (labels) maxOf(20f, labelHeight) else 20f) + p.rowGap
+    val tightRow = maxOf(48f, icon + if (labels) maxOf(20f, labelHeight) else 20f)
     val widget = minOf(176f, gridWidth / 2f - 5f).coerceAtLeast(88f)
-    val contentTop = ((height - widget - 18f - 4f * row - homeBottomSpace) / 2f).coerceIn(16f, 72f)
+    // The first two rows form the widget band; each remaining row is one app row.
+    val appRows = homeRows.coerceIn(DEFAULT_HOME_ROWS, GRID_ROWS) - 2
+    // Extra rows first give up row spacing so the page fits between its 16dp top margin and
+    // 8dp bottom padding without scrolling; icons and labels never shrink.
+    val roomForRows = height - widget - 18f - homeBottomSpace - 24f
+    val row = if (appRows > DEFAULT_HOME_ROWS - 2 && appRows * (tightRow + p.rowGap) > roomForRows)
+        maxOf(tightRow, roomForRows / appRows) else tightRow + p.rowGap
+    val gridSpace = height - widget - 18f - appRows * row - homeBottomSpace
+    val contentTop = (gridSpace / 2f).coerceIn(16f, 72f)
     // Search reclaims the redundant bottom controls' space for all four dock apps.
     // Extremely short windows still scroll rather than reduce touch targets below 48dp.
     // The status rail is drawn from contentTop, so a tall dock must stay below its measured bottom.
@@ -70,7 +80,8 @@ fun homeGeometry(width: Float, height: Float, preset: LayoutPreset, labels: Bool
     val homeDockTop = (if (p.dockAlignToGrid) contentTop + widget + 18f else height * p.dockPosition - homeDockHeight / 2f)
         .coerceIn(topLimit, maxOf(topLimit, height - homeDockHeight - 124f))
     val dockTop = homeDockTop.coerceIn(topLimit, maxOf(topLimit, height - dockHeight - bottomReserve))
-    return HomeGeometry(expanded, homeWidth, gridWidth, icon, row, widget, contentTop, dockTop, dockHeight, dockRowHeight)
+    return HomeGeometry(expanded, homeWidth, gridWidth, icon, row, widget, contentTop, dockTop, dockHeight, dockRowHeight,
+        gridFits = gridSpace >= 24f - .01f)
 }
 
 /** Keep stored order stable across installs, removals and configuration changes. */

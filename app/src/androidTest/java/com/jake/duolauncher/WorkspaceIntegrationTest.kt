@@ -61,9 +61,9 @@ class WorkspaceIntegrationTest {
             val bounds = root().fetchSemanticsNode().boundsInRoot
             root().performTouchInput { moveTo(Offset(bounds.right - 6, bounds.center.y), 250) }
             compose.waitUntil(5000) { page() == "Home page 2 of 2" }
-            compose.onNodeWithTag("home-cell-24").assertIsDisplayed()
-            drop("home-cell-24")
-            assertEquals(app.id, model().state.value.homeSlots[24])
+            compose.onNodeWithTag("home-cell-$HOME_CELLS").assertIsDisplayed()
+            drop("home-cell-$HOME_CELLS")
+            assertEquals(app.id, model().state.value.homeSlots[HOME_CELLS])
             assertEquals(2, model().state.value.homePages)
             assertTrue(model().state.value.apps.any { it.id == app.id })
             undo()
@@ -183,7 +183,7 @@ class WorkspaceIntegrationTest {
             val bounds = root().fetchSemanticsNode().boundsInRoot
             root().performTouchInput { moveTo(Offset(bounds.right - 6, bounds.center.y), 250) }
             compose.waitUntil(5000) { page() == "Home page 2 of 2" }
-            drop("home-cell-24")
+            drop("home-cell-$HOME_CELLS")
             assertEquals(before.placement(0)?.copy(page = 1, column = 0, row = 0), model().placement(0))
             assertEquals(2, model().state.value.homePages)
             assertEquals(before.slots, model().state.value.homeSlots)
@@ -309,7 +309,7 @@ class WorkspaceIntegrationTest {
             root().performTouchInput { moveTo(Offset(bounds.right - 6f, bounds.center.y), 250) }
             compose.waitUntil(5000) { page() == "Home page 2 of 2" }
             compose.waitForIdle()
-            compose.onNodeWithTag("home-cell-24").assertIsDisplayed()
+            compose.onNodeWithTag("home-cell-$HOME_CELLS").assertIsDisplayed()
             root().performTouchInput { moveTo(Offset(bounds.left + 6f, bounds.center.y), 250) }
             compose.waitUntil(5000) { page() == "Home page 1 of 2" }
             root().performTouchInput { moveTo(Offset(4f, 4f), 100); up() }

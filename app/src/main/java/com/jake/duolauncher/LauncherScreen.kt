@@ -95,8 +95,8 @@ internal val Glass: Color
     @Composable get() = LocalDuoPalette.current.glass
 
 private fun findFreeWidgetIndex(layout: HomeLayout, page: Int, spanX: Int, spanY: Int): Int? {
-    val blocked = layout.widgetPlacements.flatMapTo(mutableSetOf()) { it.coveredIndices() }
-    for (row in 0..GRID_ROWS - spanY) for (column in 0..GRID_COLUMNS - spanX) {
+    val blocked = layout.unavailableCells()
+    for (row in 0..layout.rows - spanY) for (column in 0..GRID_COLUMNS - spanX) {
         val cells = buildList {
             repeat(spanY) { y -> repeat(spanX) { x -> add(homeCellIndex(page, (row + y) * GRID_COLUMNS + column + x)) } }
         }
@@ -423,7 +423,11 @@ fun LauncherScreen(
             val geometry = homeGeometry(maxWidth.value, maxHeight.value, preset, state.labels,
                 statusRailHeight = if (state.verticalStatus) statusHeight + 22f else 0f,
                 labelHeight = with(density) { 14.sp.toDp().value } + 6f, inLibrary = inLibrary,
-                homeBottomSpace = if (isDefaultHome) 44f else 88f, dockSlots = state.dock.size)
+                homeBottomSpace = if (isDefaultHome) 44f else 88f, dockSlots = state.dock.size, homeRows = state.homeRows)
+            // Whether this screen can show every row of the larger grid, measured like the page itself.
+            val moreRowsFit = homeGeometry(maxWidth.value, maxHeight.value, preset, state.labels,
+                labelHeight = with(density) { 14.sp.toDp().value } + 6f,
+                homeBottomSpace = if (isDefaultHome) 44f else 88f, homeRows = GRID_ROWS).gridFits
             SideEffect {
                 resizePitchX = with(density) { (geometry.gridWidth / GRID_COLUMNS).dp.toPx() }
                 resizePitchY = with(density) { minOf((geometry.widgetHeight + 18f) / 2f, geometry.rowHeight).dp.toPx() }
@@ -668,7 +672,7 @@ fun LauncherScreen(
                                 onActions = { selectedId = it.id; sheet = "" }, editing = true, modifier = Modifier.weight(1f).fillMaxWidth(),
                                 onTurnOnWork = { model.turnOnWork(it) })
                         }
-                        "settings", "settings:wallpaper" -> CustomizationSheet(state, wide, model, isDefaultHome,
+                        "settings", "settings:wallpaper" -> CustomizationSheet(state, wide, model, isDefaultHome, moreRowsFit,
                             page = activeCustomizationPage, onPage = { customizationPage = it; sheet = "settings" },
                             onMakeDefault = { sheet = ""; onMakeDefault() },
                             onClose = { customizationPage = CustomizationPage.OVERVIEW; sheet = "" }, onEditPins = { sheet = "pins" },
@@ -685,11 +689,11 @@ fun LauncherScreen(
                             onWallpaperPreview = { sheet = ""; onWallpaperPreview() }, homePage = pager.currentPage.coerceIn(0, homePages - 1))
                         "widgetActions" -> model.placement(widgetSlot)?.let { placement ->
                             val topPitch = (geometry.widgetHeight + 18f) / 2f
-                            val gridSizing = WidgetGridSizing(GRID_COLUMNS, GRID_ROWS, geometry.gridWidth / GRID_COLUMNS,
+                            val gridSizing = WidgetGridSizing(GRID_COLUMNS, state.homeRows, geometry.gridWidth / GRID_COLUMNS,
                                 minOf(topPitch, geometry.rowHeight), maxOf(topPitch, geometry.rowHeight), 10f, 18f,
                                 topRowHeightDp = topPitch, appRowHeightDp = geometry.rowHeight)
                             val constraints = widgets.manager.getAppWidgetInfo(placement.id)?.let { widgets.sizing(it, gridSizing) }
-                            WidgetActions(placement, constraints,
+                            WidgetActions(placement, constraints, rows = state.homeRows,
                                 canConfigure = widgets.canReconfigure(placement.id),
                                 onConfigure = { widgets.reconfigure(placement.id); sheet = "" },
                                 isValid = { x, y -> (x == placement.spanX && y == placement.spanY) || resizeWidget(state.layout, widgetSlot, x, y) != state.layout },
@@ -759,7 +763,7 @@ fun LauncherScreen(
                     value = withContext(Dispatchers.IO) { widgetCatalog(launcherActivity, providers, selectedProfile) }
                 }
                 val topPitch = (geometry.widgetHeight + 18f) / 2f
-                val pickerSizing = remember(geometry) { WidgetGridSizing(GRID_COLUMNS, GRID_ROWS,
+                val pickerSizing = remember(geometry, state.homeRows) { WidgetGridSizing(GRID_COLUMNS, state.homeRows,
                     geometry.gridWidth / GRID_COLUMNS, minOf(topPitch, geometry.rowHeight),
                     maxOf(topPitch, geometry.rowHeight), 10f, 18f,
                     topRowHeightDp = topPitch, appRowHeightDp = geometry.rowHeight) }
@@ -1042,8 +1046,8 @@ fun LauncherScreen(
                 val minW = resizeConstraints?.minimum?.width ?: 2
                 val minH = resizeConstraints?.minimum?.height ?: 2
                 val maxW = minOf(GRID_COLUMNS - placement.column, resizeConstraints?.maximum?.width ?: GRID_COLUMNS)
-                val maxH = minOf(GRID_ROWS - placement.row, resizeConstraints?.maximum?.height ?: GRID_ROWS)
-                val feasible = placement.page >= -1 && placement.row in 0 until GRID_ROWS &&
+                val maxH = minOf(state.homeRows - placement.row, resizeConstraints?.maximum?.height ?: state.homeRows)
+                val feasible = placement.page >= -1 && placement.row in 0 until state.homeRows &&
                     !(placement.id >= 0 && resizeConstraints == null) && minW <= maxW && minH <= maxH
                 val candidate = resizeWidget(state.layout, slot, resizeWidth, resizeHeight)
                 val valid = feasible && ((resizeWidth == placement.spanX && resizeHeight == placement.spanY) || candidate != state.layout)
@@ -1128,7 +1132,7 @@ fun LauncherScreen(
                         TextButton(onClick = {
                             val preferredPage = state.layout.indexOfShortcut(firstId)?.let(::homeCellPage)
                                 ?.takeIf { it >= 0 || expandedWorkspace } ?: lastHomePage.coerceIn(0, homePages - 1)
-                            val blocked = state.widgetPlacements.flatMapTo(mutableSetOf()) { it.coveredIndices() }
+                            val blocked = state.layout.unavailableCells()
                             val targetIndex = (0 until HOME_CELLS).map { homeCellIndex(preferredPage, it) }
                                 .firstOrNull { it !in blocked && state.layout.slotAt(it) in listOf(null, firstId, second.id) }
                             if (targetIndex != null) model.createFolder(firstId, second.id, targetIndex)
@@ -1141,7 +1145,7 @@ fun LauncherScreen(
         }
         openFolderId?.let { id ->
             state.folders.firstOrNull { it.id == id }?.let { folder ->
-                val blocked = state.widgetPlacements.flatMapTo(mutableSetOf()) { it.coveredIndices() }
+                val blocked = state.layout.unavailableCells()
                 val destinationPages = (if (expandedWorkspace) listOf(-1) else emptyList()) + (0 until homePages)
                 val homeDestinations = destinationPages.mapNotNull { destinationPage ->
                     (0 until HOME_CELLS).map { homeCellIndex(destinationPage, it) }
@@ -1346,7 +1350,7 @@ private fun ExpandedWorkspace(
 private fun firstEmptyHomeCell(state: LauncherState, page: Int): Int {
     val pageStart = homeCellIndex(page, 0)
     return (pageStart until pageStart + HOME_CELLS).firstOrNull { index ->
-        state.layout.slotAt(index) == null && state.widgetPlacements.none { index in it.coveredIndices() }
+        state.layout.slotAt(index) == null && state.layout.cellVisible(index) && state.widgetPlacements.none { index in it.coveredIndices() }
     } ?: pageStart
 }
 
@@ -1409,7 +1413,7 @@ private fun HomePagePane(
             })
         Column(Modifier.offset(x = 16.dp).width(geometry.gridWidth.dp).fillMaxHeight()
             .verticalScroll(homeScroll).padding(top = geometry.contentTop.dp, bottom = 8.dp)) {
-            SharedHomeGrid(page, state.homeSlots, state.leadingSlots, previewSlots, previewLeadingSlots, previewWidgetPlacements,
+            SharedHomeGrid(page, state.homeRows, state.homeSlots, state.leadingSlots, previewSlots, previewLeadingSlots, previewWidgetPlacements,
                 appsById, geometry, state.labels, widgets, drag, target,
                 folders = state.folders, onLaunch = onLaunch, onActions = onActions, onWidget = onWidget,
                 onFolder = onFolder, onEmptyWidget = onEmptyWidget)
@@ -1433,6 +1437,7 @@ private fun CircleControl(icon: ImageVector, label: String, tag: String, visualS
 @Composable
 private fun SharedHomeGrid(
     page: Int,
+    rows: Int,
     savedSlots: List<String?>,
     savedLeadingSlots: List<String?>,
     previewSlots: List<String?>,
@@ -1475,7 +1480,7 @@ private fun SharedHomeGrid(
     val pending = widgets.pendingPlacement?.takeIf { it.page == page }
     val pendingIsReplacement = pending != null && widgetPlacements.any { it.slot == pending.slot }
     val pageWidgets = widgetPlacements.filter { it.page == page } + listOfNotNull(pending?.takeUnless { pendingIsReplacement })
-    val renderedRows = maxOf(GRID_ROWS, pageWidgets.maxOfOrNull { it.row + it.spanY } ?: GRID_ROWS)
+    val renderedRows = maxOf(rows, pageWidgets.maxOfOrNull { it.row + it.spanY } ?: rows)
     val topPitch = (geometry.widgetHeight + 18f) / 2f
     fun rowTop(row: Int) = if (row <= 2) row * topPitch else geometry.widgetHeight + 18f + (row - 2) * rowHeight
     BoxWithConstraints(Modifier.fillMaxWidth().height(rowTop(renderedRows).dp)) {
@@ -1484,7 +1489,7 @@ private fun SharedHomeGrid(
         val cellWidthPx = with(density) { cellWidth.toPx() }
         val rowHeightPx = with(density) { rowHeight.dp.toPx() }
 
-        repeat(HOME_CELLS) { localIndex ->
+        repeat(rows * GRID_COLUMNS) { localIndex ->
             val globalIndex = pageStart + localIndex
             val cell = DropTarget.Home(globalIndex)
             val savedId = savedAt(globalIndex)
@@ -1989,6 +1994,7 @@ private fun WidgetActions(
     onReplace: () -> Unit,
     onRemove: () -> Unit,
     onClose: () -> Unit,
+    rows: Int = DEFAULT_HOME_ROWS,
 ) {
     val sheetMaxHeight = with(LocalDensity.current) {
         (LocalWindowInfo.current.containerSize.height * .88f).toDp()
@@ -1998,8 +2004,8 @@ private fun WidgetActions(
     val minWidth = constraints?.minimum?.width ?: 2
     val minHeight = constraints?.minimum?.height ?: 2
     val maxWidth = minOf(GRID_COLUMNS - placement.column, constraints?.maximum?.width ?: GRID_COLUMNS)
-    val maxHeight = minOf(GRID_ROWS - placement.row, constraints?.maximum?.height ?: GRID_ROWS)
-    val feasible = placement.page >= -1 && placement.row in 0 until GRID_ROWS &&
+    val maxHeight = minOf(rows - placement.row, constraints?.maximum?.height ?: rows)
+    val feasible = placement.page >= -1 && placement.row in 0 until rows &&
         !(placement.id >= 0 && constraints == null) && minWidth <= maxWidth && minHeight <= maxHeight
     val valid = feasible && isValid(width, height)
     Column(Modifier.fillMaxWidth().heightIn(max = sheetMaxHeight).verticalScroll(rememberScrollState())

@@ -21,8 +21,8 @@ class GridEditingTest {
         val migrated = migrateSchema5Apps(old)
         assertEquals("a", migrated[8])
         assertEquals("p", migrated[23])
-        assertNull(migrated[24])
-        assertEquals("b", migrated[33])
+        assertNull(migrated[HOME_CELLS])
+        assertEquals("b", migrated[HOME_CELLS + 9])
         assertEquals(2, homePageCount(migrated.size))
     }
 
@@ -30,12 +30,12 @@ class GridEditingTest {
         val migrated = migrateSchema5Widgets(listOf(101, DATE_WIDGET, 102, 201, EMPTY_WIDGET, 202))
         assertEquals(WidgetPlacement(0, 101, 0, 0, 0, 2, 2), migrated[0])
         assertEquals(WidgetPlacement(2, 102, -1, 0, 0, 4, 6), migrated[2])
-        assertEquals(WidgetPlacement(5, 202, 1, 0, 6, 4, 4), migrated.last())
+        assertEquals(WidgetPlacement(5, 202, 1, 0, GRID_ROWS, 4, 4), migrated.last())
         assertEquals(2, HomeLayout(emptyList(), emptyList(), migrated).pageCount)
     }
 
     @Test fun `legacy overflow does not block the following page`() {
-        val overflow = WidgetPlacement(5, 202, 1, 0, 6, 4, 4)
+        val overflow = WidgetPlacement(5, 202, 1, 0, GRID_ROWS, 4, 4)
         val before = HomeLayout(emptyList(), emptyList(), listOf(overflow))
         val next = dropApp(before, "app", DropTarget.Home(2 * HOME_CELLS))
         assertEquals("app", next.slots[2 * HOME_CELLS])
@@ -62,13 +62,14 @@ class GridEditingTest {
         assertEquals(listOf("new", "a", "b", "c", "d"), listOf(4, 7, 8, 11, 12).map { next.slots[it] })
     }
 
-    @Test fun `full page insertion spills past widget cells at start of next page`() {
+    @Test fun `full page insertion spills past hidden rows and widget cells at start of next page`() {
         val pageOneWidget = WidgetPlacement(0, 101, 1, 0, 0, 4, 1)
-        val before = HomeLayout((0 until HOME_CELLS).map(Int::toString), emptyList(), listOf(pageOneWidget))
-        val next = dropApp(before, "new", DropTarget.Home(HOME_CELLS - 1))
-        assertEquals("new", next.slots[23])
-        assertEquals("23", next.slots[28])
-        assertTrue((24..27).all { next.slots[it] == null })
+        val visibleCells = DEFAULT_HOME_ROWS * GRID_COLUMNS
+        val before = HomeLayout((0 until visibleCells).map(Int::toString), emptyList(), listOf(pageOneWidget))
+        val next = dropApp(before, "new", DropTarget.Home(visibleCells - 1))
+        assertEquals("new", next.slots[visibleCells - 1])
+        assertEquals("${visibleCells - 1}", next.slots[HOME_CELLS + GRID_COLUMNS])
+        assertTrue((visibleCells until HOME_CELLS + GRID_COLUMNS).all { next.slots[it] == null })
     }
 
     @Test fun `widget movement and resize reject app and widget collisions`() {
@@ -104,7 +105,7 @@ class GridEditingTest {
 
     @Test fun `legacy overflow replacement is exact while bounded leading panels remain editable`() {
         val leading = WidgetPlacement(2, INFO_WIDGET, -1, 0, 0, 4, 6)
-        val overflow = WidgetPlacement(5, 101, 1, 0, 6, 4, 4)
+        val overflow = WidgetPlacement(5, 101, 1, 0, GRID_ROWS, 4, 4)
         val before = HomeLayout(emptyList(), emptyList(), listOf(leading, overflow))
         assertEquals(202, placeWidget(before, overflow.copy(id = 202)).placement(5)?.id)
         assertEquals(303, placeWidget(before, leading.copy(id = 303)).placement(2)?.id)

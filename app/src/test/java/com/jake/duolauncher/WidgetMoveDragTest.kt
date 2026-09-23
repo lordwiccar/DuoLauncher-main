@@ -19,10 +19,10 @@ class WidgetMoveDragTest {
     @Test fun `leading widget preview does not shadow its signed home cell`() {
         val drag = HomeDragState()
         drag.source = DragRegion(DropTarget.Widget(4), Rect(0f, 0f, 300f, 300f), null, 1, widgetId = 26)
-        drag.register(Any(), DragRegion(DropTarget.Home(-24), Rect(0f, 0f, 100f, 100f), null, -1))
+        drag.register(Any(), DragRegion(DropTarget.Home(-HOME_CELLS), Rect(0f, 0f, 100f, 100f), null, -1))
         drag.register(Any(), DragRegion(DropTarget.Widget(2), Rect(0f, 0f, 100f, 100f), null, -1, widgetId = INFO_WIDGET))
 
-        assertEquals(DropTarget.Home(-24), drag.destination(Offset(50f, 50f), setOf(-1, 0))?.target)
+        assertEquals(DropTarget.Home(-HOME_CELLS), drag.destination(Offset(50f, 50f), setOf(-1, 0))?.target)
     }
 
     @Test fun `regular widget region does not steal its underlying home destination`() {

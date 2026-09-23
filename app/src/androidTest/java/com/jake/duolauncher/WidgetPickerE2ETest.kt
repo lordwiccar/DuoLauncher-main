@@ -73,10 +73,10 @@ class WidgetPickerE2ETest {
         compose.runOnIdle { model().applyDrop(app.id, DropTarget.Home(47)) }
         compose.onNodeWithContentDescription("Home page 2").performClick()
         compose.waitForIdle()
-        assertNull(model().state.value.homeSlots[24])
+        assertNull(model().state.value.homeSlots[HOME_CELLS])
     }
 
-    private fun openCatalogAt(index: Int = 24) {
+    private fun openCatalogAt(index: Int = HOME_CELLS) {
         compose.onNodeWithTag("home-cell-$index").performTouchInput { longClick() }
         compose.onNodeWithText("Add widget").performClick()
         compose.onNodeWithTag("visual-widget-picker").assertIsDisplayed()
@@ -218,7 +218,7 @@ class WidgetPickerE2ETest {
             placeByTap("OptionalConfigWidgetProvider")
             compose.waitUntil(10_000) { model().placement(slot)?.id?.let { it >= 0 } == true }
             val placed = requireNotNull(model().placement(slot))
-            assertEquals(24, placed.page * HOME_CELLS + placed.row * GRID_COLUMNS + placed.column)
+            assertEquals(HOME_CELLS, placed.page * HOME_CELLS + placed.row * GRID_COLUMNS + placed.column)
             assertNull("Optional + reconfigurable must not leave a configuration transaction", controller().pendingPlacement)
             assertEquals(provider("OptionalConfigWidgetProvider").provider,
                 controller().manager.getAppWidgetInfo(placed.id)?.provider)
@@ -288,7 +288,7 @@ class WidgetPickerE2ETest {
                 cardBounds.top + 40f * compose.activity.resources.displayMetrics.density) + screenOffset
             val root = compose.onNodeWithTag("launcher-root")
             val right = root.fetchSemanticsNode().boundsInRoot.right + screenOffset.x - 3f
-            val destination = compose.onNodeWithTag("home-cell-24").fetchSemanticsNode().boundsInRoot.center + screenOffset
+            val destination = compose.onNodeWithTag("home-cell-$HOME_CELLS").fetchSemanticsNode().boundsInRoot.center + screenOffset
             val edge = Offset(right, start.y)
             val outcome = java.util.concurrent.atomic.AtomicReference<Result<Unit>>()
             val stage = java.util.concurrent.atomic.AtomicInteger(0)

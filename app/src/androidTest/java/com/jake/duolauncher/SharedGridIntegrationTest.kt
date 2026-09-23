@@ -189,7 +189,7 @@ class SharedGridIntegrationTest {
             compose.runOnIdle { model().applyDrop(pageAnchor, DropTarget.Home(47)) }
             compose.onNodeWithContentDescription("Home page 2").performClick()
             compose.waitForIdle()
-            compose.onNodeWithTag("home-cell-24").performTouchInput { longClick() }
+            compose.onNodeWithTag("home-cell-$HOME_CELLS").performTouchInput { longClick() }
             compose.onNodeWithTag("empty-space-widgets").performClick()
             compose.onNode(hasText("Search widgets") and hasSetTextAction())
                 .performTextInput(provider.loadLabel(compose.activity.packageManager).toString())
@@ -200,7 +200,7 @@ class SharedGridIntegrationTest {
             compose.waitUntil(10_000) { model().placement(slot)?.id?.let { it >= 0 } == true }
             val placed = requireNotNull(model().placement(slot))
             createdId = placed.id
-            assertEquals("The requested cell remains the widget's anchor", 24,
+            assertEquals("The requested cell remains the widget's anchor", HOME_CELLS,
                 placed.page * HOME_CELLS + placed.row * GRID_COLUMNS + placed.column)
             assertEquals(provider.provider, manager.getAppWidgetInfo(placed.id)?.provider)
         } finally {
@@ -263,23 +263,23 @@ class SharedGridIntegrationTest {
             val apps = model().state.value.apps.filter { it.id !in before.dock }.take(2)
             assertEquals(2, apps.size)
             compose.runOnIdle {
-                assertTrue(model().applyDrop(apps[0].id, DropTarget.Home(24)))
-                assertTrue(model().applyDrop(apps[1].id, DropTarget.Home(25)))
+                assertTrue(model().applyDrop(apps[0].id, DropTarget.Home(HOME_CELLS)))
+                assertTrue(model().applyDrop(apps[1].id, DropTarget.Home(HOME_CELLS + 1)))
             }
             val folderId = compose.runOnIdle {
                 requireNotNull(model().createFolder(apps[0].id, apps[1].id, 24, "Weather"))
             }
             val arranged = model().state.value.layout
-            assertEquals(folderId, arranged.slots[24])
+            assertEquals(folderId, arranged.slots[HOME_CELLS])
             assertEquals(listOf(apps[0].id, apps[1].id), arranged.folder(folderId)?.appIds)
 
             compose.runOnIdle { model().refresh() }
             compose.waitUntil(15_000) { !model().state.value.loading }
-            assertEquals("Refresh must retain the folder as a Home entity", folderId, model().state.value.homeSlots[24])
+            assertEquals("Refresh must retain the folder as a Home entity", folderId, model().state.value.homeSlots[HOME_CELLS])
             assertEquals(arranged.folder(folderId), model().state.value.layout.folder(folderId))
 
             compose.activityRule.scenario.recreate(); ready()
-            assertEquals(folderId, model().state.value.homeSlots[24])
+            assertEquals(folderId, model().state.value.homeSlots[HOME_CELLS])
             assertEquals(arranged.folder(folderId), model().state.value.layout.folder(folderId))
         } finally { compose.runOnIdle { model().restoreLayout(before) } }
     }
@@ -552,7 +552,7 @@ class SharedGridIntegrationTest {
             base().put("widgets", JSONArray().put(widget(slot = 4, page = 1, row = 6, spanX = 4, spanY = 4))),
             base().put("widgets", JSONArray().put(widget(slot = 5, page = 0, row = 6, spanX = 4, spanY = 4))),
             base().put("widgets", JSONArray().put(widget(slot = 5, page = 1, column = 1, row = 6, spanX = 3, spanY = 4))),
-            base().put("schema", 9).put("widgets", JSONArray()),
+            base().put("schema", 10).put("widgets", JSONArray()),
             base().put("schema", 8).put("widgets", JSONArray()).put("folders", JSONArray()).put("leadingSlots", JSONArray()),
             base().put("schema", 8).put("widgets", JSONArray()).put("folders", JSONArray())
                 .put("leadingSlots", leading(0 to "duplicate", 1 to "duplicate")),

@@ -1,8 +1,14 @@
 package com.jake.duolauncher
 
 const val GRID_COLUMNS = 4
-const val GRID_ROWS = 6
+/** Stored rows per page. Pages always reserve the largest grid so cell indices never shift. */
+const val GRID_ROWS = 8
 const val HOME_CELLS = GRID_COLUMNS * GRID_ROWS
+/** Rows shown by default: the top widget band (two rows) plus four app rows. */
+const val DEFAULT_HOME_ROWS = 6
+/** Saved layouts before schema 9 and backups before version 3 stored six rows per page. */
+const val LEGACY_GRID_ROWS = 6
+const val LEGACY_HOME_CELLS = GRID_COLUMNS * LEGACY_GRID_ROWS
 const val MIN_DOCK_SLOTS = 4
 const val MAX_DOCK_SLOTS = 8
 const val EMPTY_WIDGET = -1
@@ -46,7 +52,17 @@ data class HomeLayout(
     val folders: List<FolderEntry> = emptyList(),
     val widgetRestores: List<WidgetRestore> = emptyList(),
     val leadingSlots: List<String?> = List(HOME_CELLS) { null },
+    /** Visible rows per page; stored rows below this stay empty. */
+    val rows: Int = DEFAULT_HOME_ROWS,
 ) {
+    fun cellVisible(index: Int) = homeCellLocal(index) / GRID_COLUMNS < rows
+    /** Cells that cannot take a shortcut: widget footprints plus hidden rows on every reachable page. */
+    fun unavailableCells(exceptSlot: Int? = null): Set<Int> = buildSet {
+        widgetPlacements.filter { it.slot != exceptSlot }.forEach { addAll(it.coveredIndices()) }
+        for (page in -1..pageCount + 1) for (row in rows until GRID_ROWS) repeat(GRID_COLUMNS) { column ->
+            add(homeCellIndex(page, row * GRID_COLUMNS + column))
+        }
+    }
     val widgets: List<Int> get() {
         val last = widgetPlacements.maxOfOrNull { it.slot } ?: -1
         return List(maxOf(3, last + 1)) { slot -> placement(slot)?.id ?: EMPTY_WIDGET }
@@ -106,9 +122,6 @@ private fun WidgetPlacement.valid() =
         spanX in 1..GRID_COLUMNS && spanY in 1..GRID_ROWS && column + spanX <= GRID_COLUMNS &&
         row + spanY <= GRID_ROWS
 
-private fun widgetCells(layout: HomeLayout, exceptSlot: Int? = null) = layout.widgetPlacements
-    .filter { it.slot != exceptSlot }.flatMapTo(mutableSetOf()) { it.coveredIndices() }
-
 private fun overlaps(a: WidgetPlacement, b: WidgetPlacement) = a.page == b.page &&
     a.column < b.column + b.spanX && b.column < a.column + a.spanX &&
     a.row < b.row + b.spanY && b.row < a.row + a.spanY
@@ -120,8 +133,8 @@ fun widgetCandidate(layout: HomeLayout, slot: Int, targetIndex: Int, spanX: Int,
     val local = homeCellLocal(targetIndex)
     val candidate = WidgetPlacement(slot, EMPTY_WIDGET, page,
         local % GRID_COLUMNS, local / GRID_COLUMNS, spanX, spanY)
-    if (spanX !in 1..GRID_COLUMNS || spanY !in 1..GRID_ROWS ||
-        candidate.column + spanX > GRID_COLUMNS || candidate.row + spanY > GRID_ROWS) return null
+    if (spanX !in 1..GRID_COLUMNS || spanY !in 1..layout.rows ||
+        candidate.column + spanX > GRID_COLUMNS || candidate.row + spanY > layout.rows) return null
     if (layout.widgetPlacements.any { it.slot != slot && overlaps(it, candidate) }) return null
     if (candidate.coveredIndices().any { layout.slotAt(it) != null }) return null
     return candidate
@@ -132,7 +145,7 @@ fun dropApp(layout: HomeLayout, id: String, target: DropTarget): HomeLayout {
     if (id.isBlank() || layout.folders.any { id in it.appIds }) return layout
     return when (target) {
         is DropTarget.Home -> {
-            val blocked = widgetCells(layout)
+            val blocked = layout.unavailableCells()
             val targetPage = homeCellPage(target.index)
             if (targetPage !in -1..layout.pageCount || target.index in blocked) return layout
             if (targetPage == -1) {
@@ -241,11 +254,11 @@ fun resizeDock(layout: HomeLayout, count: Int): HomeLayout {
     val dock = layout.dock.take(size).toMutableList()
     val displaced = ArrayDeque(layout.dock.drop(size).filterNotNull())
     for (index in dock.indices) if (dock[index] == null && displaced.isNotEmpty()) dock[index] = displaced.removeFirst()
-    val blocked = widgetCells(layout)
+    val blocked = layout.unavailableCells()
     val slots = layout.slots.toMutableList()
     var cell = 0
     while (displaced.isNotEmpty()) {
-        if (cell !in blocked && slots.getOrNull(cell) == null) {
+        if (cell !in blocked && layout.cellVisible(cell) && slots.getOrNull(cell) == null) {
             while (slots.size <= cell) slots.add(null)
             slots[cell] = displaced.removeFirst()
         }
@@ -259,7 +272,7 @@ fun placeWidget(layout: HomeLayout, placement: WidgetPlacement): HomeLayout {
     if (placement.id == NEEDS_BINDING_WIDGET && layout.widgetRestore(placement.slot) == null) return layout
     val without = layout.widgetPlacements.filterNot { it.slot == placement.slot }
     if (without.any { overlaps(it, placement) }) return layout
-    if (placement.coveredIndices().any { layout.slotAt(it) != null }) return layout
+    if (placement.coveredIndices().any { layout.slotAt(it) != null || !layout.cellVisible(it) }) return layout
     return layout.copy(widgetPlacements = (without + placement).sortedBy { it.slot },
         widgetRestores = if (placement.id == NEEDS_BINDING_WIDGET) layout.widgetRestores
             else layout.widgetRestores.filterNot { it.slot == placement.slot })
@@ -285,7 +298,7 @@ fun moveWidget(layout: HomeLayout, slot: Int, index: Int): HomeLayout {
     if (page !in -1..layout.pageCount) return layout
     val local = homeCellLocal(index)
     return placeWidget(layout, old.copy(page = page, column = local % GRID_COLUMNS,
-        row = local / GRID_COLUMNS, spanY = old.spanY.coerceAtMost(GRID_ROWS)))
+        row = local / GRID_COLUMNS, spanY = old.spanY.coerceAtMost(layout.rows)))
 }
 
 fun resizeWidget(layout: HomeLayout, slot: Int, spanX: Int, spanY: Int): HomeLayout {
@@ -328,7 +341,78 @@ fun migrateSchema5Widgets(widgets: List<Int>): List<WidgetPlacement> = buildList
             0 -> add(WidgetPlacement(slot, id, page, 0, 0, 2, 2))
             1 -> add(WidgetPlacement(slot, id, page, 2, 0, 2, 2))
             2 -> if (page == 0) add(WidgetPlacement(slot, id, -1, 0, 0, 4, 6))
-                else add(WidgetPlacement(slot, id, page, 0, 6, 4, 4))
+                else add(WidgetPlacement(slot, id, page, 0, GRID_ROWS, 4, 4))
         }
     }
+}
+
+/** Maps a pre-schema-9 cell index (six stored rows per page) to the current eight-row storage. */
+fun upgradeLegacyCellIndex(index: Int): Int =
+    homeCellIndex(Math.floorDiv(index, LEGACY_HOME_CELLS), Math.floorMod(index, LEGACY_HOME_CELLS))
+
+fun upgradeLegacySlots(slots: List<String?>): List<String?> {
+    val result = mutableListOf<String?>()
+    slots.forEachIndexed { index, id ->
+        if (id == null) return@forEachIndexed
+        val target = upgradeLegacyCellIndex(index)
+        while (result.size <= target) result.add(null)
+        result[target] = id
+    }
+    return result
+}
+
+fun upgradeLegacyLeadingSlots(slots: List<String?>): List<String?> =
+    slots.take(HOME_CELLS) + List(HOME_CELLS - slots.size.coerceAtMost(HOME_CELLS)) { null }
+
+/** Retained overflow widgets sat just below the old six-row grid; keep them below the stored grid. */
+fun upgradeLegacyPlacement(placement: WidgetPlacement): WidgetPlacement =
+    if (placement.row == LEGACY_GRID_ROWS && placement.spanX == GRID_COLUMNS && placement.spanY == 4)
+        placement.copy(row = GRID_ROWS) else placement
+
+/** Rows a layout needs so that nothing it holds is hidden. */
+fun HomeLayout.requiredRows(): Int {
+    val shortcutRows = (slots.indices.filter { slots[it] != null } +
+        leadingSlots.indices.filter { leadingSlots[it] != null }.map { homeCellIndex(-1, it) })
+        .maxOfOrNull { homeCellLocal(it) / GRID_COLUMNS + 1 } ?: 0
+    val widgetRows = widgetPlacements.filter { it.row < GRID_ROWS }.maxOfOrNull { minOf(GRID_ROWS, it.row + it.spanY) } ?: 0
+    return maxOf(DEFAULT_HOME_ROWS, shortcutRows, widgetRows)
+}
+
+/**
+ * Changes the visible rows per page. Showing fewer rows never drops anything: widgets reaching
+ * into the hidden rows move to the first free space (same page first, shortened if taller than
+ * the grid), then shortcuts move to the first free visible cells.
+ */
+fun resizeHomeRows(layout: HomeLayout, rows: Int): HomeLayout {
+    val size = rows.coerceIn(DEFAULT_HOME_ROWS, GRID_ROWS)
+    if (size >= layout.rows) return layout.copy(rows = size)
+    val displacedWidgets = layout.widgetPlacements.filter { it.row < GRID_ROWS && it.row + it.spanY > size }
+    val displacedLeading = layout.leadingSlots.indices.filter { layout.leadingSlots[it] != null && it / GRID_COLUMNS >= size }
+    val displacedHome = layout.slots.indices.filter { layout.slots[it] != null && homeCellLocal(it) / GRID_COLUMNS >= size }
+    var next = layout.copy(rows = size,
+        widgetPlacements = layout.widgetPlacements - displacedWidgets.toSet(),
+        leadingSlots = layout.leadingSlots.mapIndexed { index, id -> id.takeUnless { index in displacedLeading } },
+        slots = layout.slots.mapIndexed { index, id -> id.takeUnless { index in displacedHome } }.dropLastWhile { it == null })
+    for (widget in displacedWidgets) {
+        val spanY = minOf(widget.spanY, size)
+        val pages = listOf(widget.page) + (0..next.pageCount).filter { it != widget.page }
+        val candidate = pages.asSequence().flatMap { page -> (0 until HOME_CELLS).asSequence().map { homeCellIndex(page, it) } }
+            .firstNotNullOfOrNull { widgetCandidate(next, widget.slot, it, widget.spanX, spanY) }
+            ?: error("A new page always has room for a widget")
+        next = next.copy(widgetPlacements = (next.widgetPlacements + candidate.copy(id = widget.id)).sortedBy { it.slot })
+    }
+    fun firstFree(cells: Sequence<Int>): Int {
+        val blocked = next.unavailableCells()
+        return cells.first { it !in blocked && next.cellVisible(it) && next.slotAt(it) == null }
+    }
+    val homeCells = generateSequence(0) { it + 1 }
+    displacedLeading.forEach { local ->
+        val id = layout.leadingSlots[local]
+        next = next.withSlot(firstFree((0 until HOME_CELLS).asSequence().map { homeCellIndex(-1, it) } + homeCells), id)
+    }
+    displacedHome.forEach { index ->
+        val pageStart = homeCellIndex(homeCellPage(index), 0)
+        next = next.withSlot(firstFree(generateSequence(pageStart) { it + 1 } + homeCells), layout.slots[index])
+    }
+    return next
 }

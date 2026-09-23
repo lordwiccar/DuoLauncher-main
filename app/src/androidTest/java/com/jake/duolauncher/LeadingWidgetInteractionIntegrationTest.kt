@@ -93,10 +93,10 @@ class LeadingWidgetInteractionIntegrationTest {
                 compose.activity.windowManager.currentWindowMetrics.bounds.let { it.width() == 2448 && it.height() == 1848 }
             }
             compose.onNodeWithTag("expanded-leading-home").assertIsDisplayed()
-            compose.onNodeWithTag("home-cell--24").assertIsDisplayed()
-            compose.onNodeWithTag("home-cell--1").assertIsDisplayed()
+            compose.onNodeWithTag("home-cell-${-HOME_CELLS}").assertIsDisplayed()
+            compose.onNodeWithTag("home-cell-${-HOME_CELLS + 23}").assertIsDisplayed()
 
-            val first = placeOptionalAt(-24)
+            val first = placeOptionalAt(-HOME_CELLS)
             assertEquals(WidgetPlacement(first.slot, first.id, -1, 0, 0, 2, 2), first)
             assertEquals(provider().provider, AppWidgetManager.getInstance(compose.activity).getAppWidgetInfo(first.id)?.provider)
             compose.onNodeWithTag("widget-slot-${first.slot}").assertIsDisplayed()
@@ -216,7 +216,7 @@ class LeadingWidgetInteractionIntegrationTest {
                 compose.waitForIdle()
             }
 
-            drag("widget-slot-$slot", "home-cell--24")
+            drag("widget-slot-$slot", "home-cell-${-HOME_CELLS}")
             val leadingWidget = WidgetPlacement(slot, id, -1, 0, 0, 2, 2)
             assertEquals(leadingWidget, model().placement(slot))
             assertEquals(provider().provider, controller().manager.getAppWidgetInfo(id)?.provider)
@@ -224,10 +224,10 @@ class LeadingWidgetInteractionIntegrationTest {
             assertEquals(WidgetPlacement(slot, id, 0, 0, 2, 2, 2), model().placement(slot))
             assertEquals(provider().provider, controller().manager.getAppWidgetInfo(id)?.provider)
 
-            drag("home-cell-23", "home-cell--1")
+            drag("home-cell-23", "home-cell-${-HOME_CELLS + 23}")
             assertEquals(chosenApp.id, model().state.value.layout.slotAt(-1))
             assertNull(model().state.value.layout.slotAt(23))
-            drag("home-cell--1", "home-cell-23")
+            drag("home-cell-${-HOME_CELLS + 23}", "home-cell-23")
             assertEquals(chosenApp.id, model().state.value.layout.slotAt(23))
             assertNull(model().state.value.layout.slotAt(-1))
             assertEquals(id, model().placement(slot)?.id)
@@ -273,7 +273,7 @@ class LeadingWidgetInteractionIntegrationTest {
             shell("wm size 2448x1848")
             compose.waitUntil(15_000) { compose.activity.windowManager.currentWindowMetrics.bounds.width() == 2448 }
 
-            openCatalogAt(-24)
+            openCatalogAt(-HOME_CELLS)
             compose.onNodeWithTag("widget-catalog-search").performTextInput("Instant Conditions")
             compose.onNodeWithTag(providerTag()).performScrollTo().performClick()
             compose.onNodeWithTag("widget-placement-mode").assertExists()

@@ -52,11 +52,11 @@ class LeadingLayoutBackupIntegrationTest {
             widgetPlacements = placements, widgetRestores = restores, loading = false)
     }
 
-    @Test fun version2RoundTripsMixedLeadingAppsFoldersWidgetsAndProfiles() {
+    @Test fun currentVersionRoundTripsMixedLeadingAppsFoldersWidgetsAndProfiles() {
         val state = mixedState()
         val raw = encodeLayoutBackup(state, emptyList(), "same-scope")
         val json = JSONObject(raw)
-        assertEquals(2, json.getInt("version"))
+        assertEquals(LAYOUT_BACKUP_VERSION, json.getInt("version"))
         assertEquals(HOME_CELLS, json.getJSONArray("leadingSlots").length())
 
         val preview = decodeLayoutBackup(raw, state.apps, profiles, "same-scope")

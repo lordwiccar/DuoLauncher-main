@@ -5,7 +5,7 @@ import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
 
-const val LAYOUT_BACKUP_VERSION = 2
+const val LAYOUT_BACKUP_VERSION = 3
 const val MAX_LAYOUT_BACKUP_BYTES = 2 * 1024 * 1024
 private const val MAX_BACKUP_HOME_CELLS = HOME_CELLS * 100
 
@@ -69,7 +69,7 @@ fun encodeLayoutBackup(state: LauncherState, widgetDescriptors: List<BackupWidge
     return JSONObject().put("version", LAYOUT_BACKUP_VERSION).put("sourceScope", sourceScope).put("apps", apps)
         .put("homeSlots", JSONArray(state.homeSlots)).put("leadingSlots", JSONArray(state.leadingSlots))
         .put("dock", JSONArray(state.dock)).put("folders", folders).put("widgets", widgets)
-        .put("labels", state.labels).put("googleSearch", state.googleSearch).put("verticalStatus", state.verticalStatus)
+        .put("labels", state.labels).put("googleSearch", state.googleSearch).put("verticalStatus", state.verticalStatus).put("homeRows", state.homeRows)
         .put("compact", preset(state.compact)).put("expanded", preset(state.expanded)).toString(2)
 }
 
@@ -102,11 +102,15 @@ fun decodeLayoutBackup(raw: String, currentApps: List<AppEntry>, currentProfiles
     }
     val slotsArray = root.getJSONArray("homeSlots")
     require(slotsArray.length() <= MAX_BACKUP_HOME_CELLS)
-    val rawSlots = List(slotsArray.length()) { index -> if (slotsArray.isNull(index)) null else slotsArray.getString(index) }
+    // Versions 1 and 2 stored six rows per page; version 3 stores the current eight-row pages.
+    val legacyCells = version < 3
+    val storedSlots = List(slotsArray.length()) { index -> if (slotsArray.isNull(index)) null else slotsArray.getString(index) }
+    val rawSlots = if (legacyCells) upgradeLegacySlots(storedSlots) else storedSlots
     val rawLeadingSlots = if (version == 1) List(HOME_CELLS) { null } else {
         val array = root.getJSONArray("leadingSlots")
-        require(array.length() == HOME_CELLS) { "Unfolded-only page must contain exactly $HOME_CELLS cells" }
-        List(HOME_CELLS) { index -> if (array.isNull(index)) null else array.getString(index) }
+        val cells = if (legacyCells) LEGACY_HOME_CELLS else HOME_CELLS
+        require(array.length() == cells) { "Unfolded-only page must contain exactly $cells cells" }
+        upgradeLegacyLeadingSlots(List(cells) { index -> if (array.isNull(index)) null else array.getString(index) })
     }
     val folderArray = root.getJSONArray("folders")
     val importedFolders = List(folderArray.length()) { index ->
@@ -142,7 +146,7 @@ fun decodeLayoutBackup(raw: String, currentApps: List<AppEntry>, currentProfiles
         else -> importedApp(value)
     } }
     val dock = rawDock.map { value -> value?.also { require(!isReservedFolderId(it)) }?.let(::importedApp) }
-    var layout = HomeLayout(slots.dropLastWhile { it == null }, dock, folders = folders, leadingSlots = leadingSlots)
+    var layout = HomeLayout(slots.dropLastWhile { it == null }, dock, folders = folders, leadingSlots = leadingSlots, rows = GRID_ROWS)
     val profileSerials = currentProfiles.mapTo(mutableSetOf(), AppProfile::userSerial)
     val profileIssues = linkedSetOf<String>()
     val widgetArray = root.getJSONArray("widgets")
@@ -157,9 +161,11 @@ fun decodeLayoutBackup(raw: String, currentApps: List<AppEntry>, currentProfiles
         val id = if (builtin != null) {
             require(builtin in setOf(CLOCK_WIDGET, DATE_WIDGET, INFO_WIDGET)); builtin
         } else NEEDS_BINDING_WIDGET
-        val placement = WidgetPlacement(slot, id, item.strictInt("page"), item.strictInt("column"), item.strictInt("row"),
+        val stored = WidgetPlacement(slot, id, item.strictInt("page"), item.strictInt("column"), item.strictInt("row"),
             item.strictInt("spanX"), item.strictInt("spanY"))
-        require(validBackupPlacement(placement) && layout.widgetPlacements.none { backupOverlaps(it, placement) })
+        require(validBackupPlacement(stored, if (legacyCells) LEGACY_GRID_ROWS else GRID_ROWS))
+        val placement = if (legacyCells) upgradeLegacyPlacement(stored) else stored
+        require(layout.widgetPlacements.none { backupOverlaps(it, placement) })
         require(placement.coveredIndices().none { layout.slotAt(it) != null })
         val restore = if (id == NEEDS_BINDING_WIDGET) {
             require(provider != null && ComponentName.unflattenFromString(provider) != null)
@@ -186,6 +192,8 @@ fun decodeLayoutBackup(raw: String, currentApps: List<AppEntry>, currentProfiles
     val compact = preset("compact"); val expanded = preset("expanded")
     val labels = root.strictBoolean("labels"); val googleSearch = root.strictBoolean("googleSearch")
     val verticalStatus = root.strictBoolean("verticalStatus")
+    val homeRows = if (legacyCells) DEFAULT_HOME_ROWS else root.strictInt("homeRows").also { require(it in DEFAULT_HOME_ROWS..GRID_ROWS) }
+    layout = layout.copy(rows = maxOf(homeRows, layout.requiredRows()))
     return LayoutImportPreview(layout, missing.toList(), profileIssues.toList(),
         appCount = (slots + leadingSlots).count { it != null && !isReservedFolderId(it) } +
             dock.count { it != null } + folders.sumOf { it.appIds.size },
@@ -193,12 +201,12 @@ fun decodeLayoutBackup(raw: String, currentApps: List<AppEntry>, currentProfiles
         compact = compact, expanded = expanded, labels = labels, googleSearch = googleSearch, verticalStatus = verticalStatus)
 }
 
-internal fun validBackupPlacement(value: WidgetPlacement): Boolean {
+internal fun validBackupPlacement(value: WidgetPlacement, rows: Int = GRID_ROWS): Boolean {
     val base = value.slot in 0..10_000 && value.page in -1..99 && value.column >= 0 && value.row >= 0 &&
-        value.spanX in 1..GRID_COLUMNS && value.spanY in 1..GRID_ROWS && value.column + value.spanX <= GRID_COLUMNS
-    val inside = value.row + value.spanY <= GRID_ROWS
+        value.spanX in 1..GRID_COLUMNS && value.spanY in 1..rows && value.column + value.spanX <= GRID_COLUMNS
+    val inside = value.row + value.spanY <= rows
     val overflow = value.page > 0 && value.slot / 3 == value.page && value.slot % 3 == 2 && value.column == 0 &&
-        value.row == GRID_ROWS && value.spanX == GRID_COLUMNS && value.spanY == 4
+        value.row == rows && value.spanX == GRID_COLUMNS && value.spanY == 4
     return base && (inside || overflow)
 }
 

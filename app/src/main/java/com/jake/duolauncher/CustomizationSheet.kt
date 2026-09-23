@@ -26,7 +26,7 @@ internal enum class CustomizationPage { OVERVIEW, WALLPAPER, HOME, GESTURES, BAC
 
 @Composable
 internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, model: LauncherModel,
-    isDefaultHome: Boolean, page: CustomizationPage, onPage: (CustomizationPage) -> Unit,
+    isDefaultHome: Boolean, moreRowsFit: Boolean, page: CustomizationPage, onPage: (CustomizationPage) -> Unit,
     onMakeDefault: () -> Unit, onClose: () -> Unit, onEditPins: () -> Unit, onWidget: (Int) -> Unit,
     onAddWidget: (Int) -> Unit, onRemoveWidget: (Int) -> Unit, onWallpaperPreview: () -> Unit,
     onExportLayout: () -> Unit, onImportLayout: () -> Unit,
@@ -108,7 +108,7 @@ internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, mo
                     HorizontalDivider(Modifier.padding(vertical = 6.dp))
                     AppearanceSettings(appearance, onAppearanceMode, onAppearanceManual, onAppearanceDeviceLocation, onAppearanceClear)
                 }
-                CustomizationPage.HOME -> HomeLayoutSettings(state, wide, { wide = it }, model, homePage,
+                CustomizationPage.HOME -> HomeLayoutSettings(state, wide, { wide = it }, model, homePage, moreRowsFit,
                     onEditPins, onWidget, onAddWidget, onRemoveWidget)
                 CustomizationPage.GESTURES -> {
                     SettingsSwitch("Show app names", state.labels, model::setLabels, "label-switch")
@@ -230,7 +230,7 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
 }
 
 @Composable private fun HomeLayoutSettings(state: LauncherState, wide: Boolean, onWide: (Boolean) -> Unit,
-    model: LauncherModel, homePage: Int, onEditPins: () -> Unit, onWidget: (Int) -> Unit,
+    model: LauncherModel, homePage: Int, moreRowsFit: Boolean, onEditPins: () -> Unit, onWidget: (Int) -> Unit,
     onAddWidget: (Int) -> Unit, onRemoveWidget: (Int) -> Unit) {
     val p = if (wide) state.expanded else state.compact
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -245,6 +245,18 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
                 modifier = Modifier.testTag("dock-slots-$count"))
         }
     }
+    fun fits(rows: Int) = rows <= DEFAULT_HOME_ROWS || moreRowsFit
+    Text("Home rows · cover and inner", style = MaterialTheme.typography.bodyMedium)
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        listOf(DEFAULT_HOME_ROWS, GRID_ROWS).forEach { rows ->
+            FilterChip(state.homeRows == rows, { model.setHomeRows(rows) },
+                label = { Text("${GRID_COLUMNS} × ${rows - 2} apps") },
+                enabled = state.homeRows == rows || fits(rows),
+                modifier = Modifier.testTag("home-rows-$rows"))
+        }
+    }
+    if (state.homeRows < GRID_ROWS && !fits(GRID_ROWS)) Text("More rows need a smaller icon size or less row spacing on this screen.",
+        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     CustomizationSlider("App icon size", "${p.iconSize.toInt()} dp", p.iconSize, 40f..68f) { model.setPreset(wide, p.copy(iconSize = it)) }
     CustomizationSlider("Space between rows", "${p.rowGap.toInt()} dp", p.rowGap, 0f..28f) { model.setPreset(wide, p.copy(rowGap = it)) }
     CustomizationSlider("Dock width", "${p.dockWidth.toInt()} dp", p.dockWidth, 56f..84f) { model.setPreset(wide, p.copy(dockWidth = it)) }

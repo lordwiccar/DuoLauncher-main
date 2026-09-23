@@ -143,7 +143,7 @@ class ExpandedWorkspaceIntegrationTest {
             assertDisplayedCount("home-page-0", 1)
             assertDisplayedCount("home-page-1", 1)
             assertDisplayedCount("home-cell-0", 1)
-            assertDisplayedCount("home-cell-24", 1)
+            assertDisplayedCount("home-cell-$HOME_CELLS", 1)
             assertTrue(center("home-page-0").x < center("home-page-1").x)
             // home-page includes 16 dp of leading padding; measure the grid itself so this
             // stays an assertion about the visible icons/cells rather than its wrapper.
@@ -164,8 +164,8 @@ class ExpandedWorkspaceIntegrationTest {
             assertEquals("Home page 3 of 3", page())
             assertDisplayedCount("home-page-1", 1)
             assertDisplayedCount("home-page-2", 1)
-            assertDisplayedCount("home-cell-24", 1)
-            assertDisplayedCount("home-cell-48", 1)
+            assertDisplayedCount("home-cell-$HOME_CELLS", 1)
+            assertDisplayedCount("home-cell-${2 * HOME_CELLS}", 1)
             longSwipe(left = false)
             assertEquals("A long reversal moves only one page", "Home page 2 of 3", page())
             val restoredRightPane = compose.onNodeWithTag("home-page-1").fetchSemanticsNode().boundsInRoot
@@ -212,8 +212,8 @@ class ExpandedWorkspaceIntegrationTest {
             assertEquals("Left pane fixture app", fixture.ids[0], model().state.value.homeSlots[8])
             assertEquals("Right pane fixture app", fixture.ids[1], model().state.value.homeSlots[HOME_CELLS])
             val leftToRight = dropApp(fixture.layout, fixture.ids[0], DropTarget.Home(HOME_CELLS))
-            beginDrag("home-cell-8", fixture.ids[0]); dropOn("home-cell-24")
-            assertEquals("left=${center("home-cell-8")} right=${center("home-cell-24")} pager=${page()}",
+            beginDrag("home-cell-8", fixture.ids[0]); dropOn("home-cell-$HOME_CELLS")
+            assertEquals("left=${center("home-cell-8")} right=${center("home-cell-$HOME_CELLS")} pager=${page()}",
                 leftToRight, model().state.value.layout)
             assertEquals("Home page 2 of 3", page())
             undo()
@@ -221,7 +221,7 @@ class ExpandedWorkspaceIntegrationTest {
             assertEquals("Home page 2 of 3", page())
 
             val rightToLeft = dropApp(fixture.layout, fixture.ids[1], DropTarget.Home(8))
-            beginDrag("home-cell-24", fixture.ids[1]); dropOn("home-cell-8")
+            beginDrag("home-cell-$HOME_CELLS", fixture.ids[1]); dropOn("home-cell-8")
             assertEquals(rightToLeft, model().state.value.layout)
             assertEquals("A drop onto the visible left pane keeps the pair selected", "Home page 2 of 3", page())
             undo()

@@ -27,7 +27,7 @@ fun createFolder(
     if (!isFolderId(folder.id) || layout.indexOfShortcut(folder.id) != null || layout.folder(folder.id) != null ||
         folder.title.isBlank() || firstAppId == secondAppId || listOf(firstAppId, secondAppId).any { it.isBlank() || isReservedFolderId(it) } ||
         layout.folders.any { existing -> firstAppId in existing.appIds || secondAppId in existing.appIds } ||
-        homeCellPage(targetIndex) !in -1..layout.pageCount || targetIndex in widgetCellsForFolders(layout)) return layout
+        homeCellPage(targetIndex) !in -1..layout.pageCount || targetIndex in layout.unavailableCells()) return layout
     val target = layout.slotAt(targetIndex)
     if (target != null && target != firstAppId && target != secondAppId) return layout
     var next = layout.withoutShortcut(firstAppId).withoutShortcut(secondAppId)
@@ -91,6 +91,3 @@ fun reconcileFolders(layout: HomeLayout, removedAppIds: Set<String>): HomeLayout
     // more after all folder transitions so iteration order cannot resurrect a shortcut.
     return removedAppIds.fold(next) { current, appId -> current.withoutShortcut(appId) }
 }
-
-private fun widgetCellsForFolders(layout: HomeLayout) = layout.widgetPlacements
-    .flatMapTo(mutableSetOf()) { it.coveredIndices() }
