@@ -15,7 +15,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
@@ -47,14 +49,19 @@ fun StatusRail(
         }
     }
     val format = if (android.text.format.DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "h:mm"
+    val locale = LocalConfiguration.current.locales[0]
     val timeFormatter = remember(format) { DateTimeFormatter.ofPattern(format) }
-    val dateFormatter = remember { DateTimeFormatter.ofPattern("MMM d") }
+    val dateFormatter = remember(locale) { localizedDateFormatter(locale, "MMMd") }
+    val spokenDateFormatter = remember(locale) { localizedDateFormatter(locale, "EEEEMMMMd") }
     val description = listOfNotNull(
-        if (locationInUse) "Location in use" else null,
-        now.format(DateTimeFormatter.ofPattern("EEEE, MMMM d, $format")),
-        status.battery?.let { "Battery $it percent${if (status.charging) ", charging" else ""}" } ?: "Battery unavailable",
-        if (status.wifiConnected) "Wi-Fi connected${status.wifiLevel?.let { ", signal $it of 4" } ?: ""}" else "Wi-Fi disconnected",
-        if (status.airplane) "Airplane mode" else status.cellularLevel?.let { "Cellular signal $it of 4" } ?: "Cellular signal unavailable",
+        if (locationInUse) stringResource(R.string.status_location) else null,
+        "${now.format(spokenDateFormatter)}, ${now.format(timeFormatter)}",
+        status.battery?.let { stringResource(if (status.charging) R.string.status_battery_charging else R.string.status_battery, it) }
+            ?: stringResource(R.string.status_battery_unavailable),
+        if (status.wifiConnected) status.wifiLevel?.let { stringResource(R.string.status_wifi_level, it) } ?: stringResource(R.string.status_wifi)
+        else stringResource(R.string.status_wifi_off),
+        if (status.airplane) stringResource(R.string.status_airplane) else status.cellularLevel?.let { stringResource(R.string.status_cellular, it) }
+            ?: stringResource(R.string.status_cellular_unavailable),
     ).joinToString(". ")
     val fontScale = LocalDensity.current.fontScale
     val labelStyle = TextStyle(shadow = Shadow(Color.Black.copy(alpha = .3f), Offset(0f, 1f), 3f))
@@ -119,7 +126,7 @@ fun StatusRail(
                     drawCircle(Color.White.copy(alpha = if (lit) 1f else .3f), w * .043f, dotCenter)
                 }
             }
-            if (!compact) Text(if (status.airplane) "Airplane" else status.battery?.let { "$it%${if (status.charging) " +" else ""}" } ?: "—",
+            if (!compact) Text(if (status.airplane) stringResource(R.string.status_airplane_short) else status.battery?.let { "$it%${if (status.charging) " +" else ""}" } ?: "—",
                 color = Color.White.copy(alpha = .94f), fontSize = detailSize, fontWeight = FontWeight.Medium,
                 maxLines = 1, softWrap = false, overflow = TextOverflow.Clip, style = labelStyle)
         }

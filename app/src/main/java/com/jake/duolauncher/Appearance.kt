@@ -63,11 +63,11 @@ class AppearanceStore(private val context: Context) {
         AppearanceMode.SYSTEM -> value.copy(dark = systemDark, fallback = null)
         AppearanceMode.SUNRISE_SUNSET -> {
             val lat = value.latitude; val lon = value.longitude
-            if (lat == null || lon == null) value.copy(dark = systemDark, fallback = "Using system theme until a location is set")
+            if (lat == null || lon == null) value.copy(dark = systemDark, fallback = context.getString(R.string.appearance_fallback_no_location))
             else if (value.deviceLocation && System.currentTimeMillis() - value.locationTime > 30L * 24 * 60 * 60 * 1000)
-                value.copy(dark = systemDark, fallback = "Using system theme because the device location is stale")
+                value.copy(dark = systemDark, fallback = context.getString(R.string.appearance_fallback_stale))
             else runCatching { val now = ZonedDateTime.now(); value.copy(dark = solarSchedule(now.toLocalDate(), lat, lon, now.zone).isDark(now), fallback = null) }
-                .getOrElse { value.copy(dark = systemDark, fallback = "Using system theme because this location is unavailable") }
+                .getOrElse { value.copy(dark = systemDark, fallback = context.getString(R.string.appearance_fallback_unavailable)) }
         }
     }
 }

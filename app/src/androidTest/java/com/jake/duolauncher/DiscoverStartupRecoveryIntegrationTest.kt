@@ -77,7 +77,7 @@ class DiscoverStartupRecoveryIntegrationTest {
 
             if (blockBothAttempts) {
                 await { monitor.blocked >= 2 }
-                await { LiveDiscover.message.value == "Discover couldn't start. Tap Retry to reconnect." }
+                await { LiveDiscover.message.value == R.string.discover_start_failed }
                 instrumentation.runOnMainSync { LiveDiscover.retry() }
             }
             await { LiveDiscover.host.get()?.let { !it.isFinishing && !it.isDestroyed } == true }

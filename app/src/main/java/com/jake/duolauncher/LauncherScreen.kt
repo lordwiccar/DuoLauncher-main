@@ -71,6 +71,8 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -530,7 +532,9 @@ fun LauncherScreen(
                                 (bounds.right - 16 * density.density).toInt(), (bounds.bottom - padding).toInt()), bounds.width)
                     }
                 }
-                .semantics { stateDescription = if (pager.currentPage == -1) "Discover" else if (pager.currentPage == visibleHomePages) "All apps" else "Home page ${pager.currentPage + 1} of $visibleHomePages" }
+                .semantics { stateDescription = if (pager.currentPage == -1) launcherActivity.getString(R.string.discover)
+                    else if (pager.currentPage == visibleHomePages) launcherActivity.getString(R.string.all_apps)
+                    else launcherActivity.getString(R.string.home_page_of, pager.currentPage + 1, visibleHomePages) }
             if (geometry.expanded) {
                 Box(pagerModifier) {
                     // PagerState remains the source of truth for native Discover progress,
@@ -605,21 +609,22 @@ fun LauncherScreen(
             }
             Column(Modifier.align(Alignment.BottomStart).width(pagerWidth).padding(start = 16.dp, bottom = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 if (!isDefaultHome) FilledTonalButton(onClick = { sheet = ""; onMakeDefault() }, Modifier.heightIn(min = 48.dp).testTag("home-setup")) {
-                    Icon(Icons.Rounded.Home, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Set as home app")
+                    Icon(Icons.Rounded.Home, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.set_as_home_app))
                 }
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
                     if (!drag.active) IconButton(onClick = openDiscover, Modifier.size(32.dp).testTag("discover-page-link")) {
-                        Icon(Icons.Rounded.Explore, "Discover", tint = Color.White.copy(alpha = .65f), modifier = Modifier.size(17.dp))
+                        Icon(Icons.Rounded.Explore, stringResource(R.string.discover), tint = Color.White.copy(alpha = .65f), modifier = Modifier.size(17.dp))
                     }
                     if (visibleHomePages <= 6) repeat(visibleHomePages) { index ->
                         Box(Modifier.size(28.dp).clip(CircleShape).clickable { scope.launch { pager.animateScrollToPage(index) } }
-                            .semantics { contentDescription = if (index == homePages) "New home page" else "Home page ${index + 1}" }, contentAlignment = Alignment.Center) {
+                            .semantics { contentDescription = if (index == homePages) launcherActivity.getString(R.string.new_home_page)
+                                else launcherActivity.getString(R.string.home_page, index + 1) }, contentAlignment = Alignment.Center) {
                             if (index == homePages) Icon(Icons.Rounded.Add, null, tint = Color.White, modifier = Modifier.size(14.dp))
                             else Box(Modifier.size(if (index == pager.currentPage) 6.dp else 4.dp).background(Color.White.copy(alpha = if (index == pager.currentPage) 1f else .4f), CircleShape))
                         }
                     } else Text("${minOf(pager.currentPage + 1, homePages)} / $homePages", color = Color.White, fontSize = 12.sp)
                     IconButton(onClick = openLibrary, Modifier.size(32.dp).testTag("library-page-link")) {
-                        Icon(Icons.AutoMirrored.Rounded.FormatListBulleted, "All apps page", tint = Color.White.copy(alpha = if (pager.currentPage == homePages) 1f else .6f), modifier = Modifier.size(17.dp))
+                        Icon(Icons.AutoMirrored.Rounded.FormatListBulleted, stringResource(R.string.all_apps_page), tint = Color.White.copy(alpha = if (pager.currentPage == homePages) 1f else .6f), modifier = Modifier.size(17.dp))
                     }
                 }
             }
@@ -627,10 +632,10 @@ fun LauncherScreen(
                 .width(preset.dockWidth.dp), horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 val controlSize = dockIconSize(geometry.iconSize).dp
-                if (pager.currentPage == -1) CircleControl(Icons.Rounded.ArrowForward, "Back to home", "discover-home", controlSize) { scope.launch { pager.animateScrollToPage(0) } }
+                if (pager.currentPage == -1) CircleControl(Icons.Rounded.ArrowForward, stringResource(R.string.back_to_home), "discover-home", controlSize) { scope.launch { pager.animateScrollToPage(0) } }
                 val searchBounds = remember { android.graphics.Rect() }
                 Box(Modifier.onGloballyPositioned { searchBounds.set(it.boundsInWindow().toAndroidBounds()) }) {
-                    CircleControl(Icons.Rounded.Search, if (state.googleSearch) "Search Google" else "Search apps", "search", controlSize) {
+                    CircleControl(Icons.Rounded.Search, stringResource(if (state.googleSearch) R.string.search_google else R.string.search_apps), "search", controlSize) {
                         if (!state.googleSearch || !onGoogleSearch(searchBounds)) openLibrary()
                     }
                 }
@@ -663,10 +668,10 @@ fun LauncherScreen(
                             onClear = { model.removePlacement(DropTarget.Dock(dockSlot)) },
                             onLongClick = { selectedId = it.id; sheet = "" },
                             canSelect = { canPlaceInDock(state.layout, it.id) },
-                            blockedHint = if (state.dock.none { it == null }) "Dock full • Move an app out first" else null)
+                            blockedHint = if (state.dock.none { it == null }) stringResource(R.string.dock_full) else null)
                         "pins" -> Column(Modifier.fillMaxHeight(.9f).imePadding()) {
                             Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp), horizontalArrangement = Arrangement.End) {
-                                TextButton(onClick = { sheet = "" }) { Text("Done") }
+                                TextButton(onClick = { sheet = "" }) { Text(stringResource(R.string.done)) }
                             }
                             AppLibrary(state, pinQuery, { pinQuery = it }, onLaunch, model::setPinned,
                                 onActions = { selectedId = it.id; sheet = "" }, editing = true, modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -808,7 +813,7 @@ fun LauncherScreen(
                             widgetSession = WidgetPickerSession(provider, widgetSlot, span, Offset.Zero,
                                 dragging = false, targetIndex = targetIndex)
                             widgetPlacementMessage = if (freeIndex == null)
-                                "There isn’t room for this size. Choose another page or move an item first." else null
+                                launcherActivity.getString(R.string.widget_no_room_size) else null
                             scope.launch { pager.scrollToPage(homeCellPage(targetIndex).coerceIn(0, homePages)) }
                         }
                     },
@@ -837,7 +842,7 @@ fun LauncherScreen(
                         widgetSession = WidgetPickerSession(null, widgetSlot, span, Offset.Zero,
                             dragging = false, targetIndex = free ?: requested, builtinId = builtinId)
                         widgetPlacementMessage = if (free == null)
-                            "There isn’t room for this card. Choose another page or move an item first." else null
+                            launcherActivity.getString(R.string.widget_no_room_card) else null
                         scope.launch { pager.scrollToPage(homeCellPage(free ?: requested).coerceIn(0, homePages)) }
                     },
                     onDragStart = { provider, point ->
@@ -856,7 +861,7 @@ fun LauncherScreen(
                             widgetSession = null; sheet = ""; widgetPackage = null
                         } else {
                             leaveTemporaryWidgetPage(); widgetSession = null
-                            widgetPlacementMessage = "There isn’t room there. Try another space or page."
+                            widgetPlacementMessage = launcherActivity.getString(R.string.widget_no_room_there)
                         }
                     },
                     onCancelDrag = {
@@ -889,8 +894,8 @@ fun LauncherScreen(
                         Row(Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(top = 8.dp)
                             .background(Glass.copy(alpha = .97f), RoundedCornerShape(22.dp))
                             .testTag("widget-placement-toolbar"), verticalAlignment = Alignment.CenterVertically) {
-                            TextButton(onClick = widgetPickerBack) { Text("Back to widgets") }
-                            if (session.candidate != null) Text("Replace here", color = Ink,
+                            TextButton(onClick = widgetPickerBack) { Text(stringResource(R.string.back_to_widgets)) }
+                            if (session.candidate != null) Text(stringResource(R.string.replace_here), color = Ink,
                                 modifier = Modifier.testTag("widget-replacement-locked"))
                             val targetPage = homeCellPage(session.targetIndex ?: 0)
                             if (!session.dragging && session.candidate == null) IconButton(
@@ -899,14 +904,14 @@ fun LauncherScreen(
                                 val page = targetPage - 1
                                 widgetSession = session.copy(targetIndex = homeCellIndex(page, local))
                                 scope.launch { pager.animateScrollToPage(page.coerceAtLeast(0)) }
-                            }) { Icon(Icons.Rounded.ChevronLeft, "Previous home page") }
+                            }) { Icon(Icons.Rounded.ChevronLeft, stringResource(R.string.previous_home_page)) }
                             Text("${session.span.width} × ${session.span.height}", color = Ink)
                             if (!session.dragging && session.candidate == null) IconButton(enabled = targetPage < homePages, onClick = {
                                 val local = homeCellLocal(session.targetIndex ?: 0)
                                 val page = (targetPage + 1).coerceAtMost(homePages)
                                 widgetSession = session.copy(targetIndex = homeCellIndex(page, local))
                                 scope.launch { pager.animateScrollToPage(page.coerceAtLeast(0)) }
-                            }) { Icon(Icons.Rounded.ChevronRight, "Next home page") }
+                            }) { Icon(Icons.Rounded.ChevronRight, stringResource(R.string.next_home_page)) }
                             if (!session.dragging) TextButton(enabled = widgetDraft != null, onClick = {
                                 widgetDraft?.let { draft ->
                                     val contentSize = specialAnchor?.let { bounds -> with(placementDensity) {
@@ -916,9 +921,9 @@ fun LauncherScreen(
                                         ?: session.builtinId?.let { widgets.setBuiltin(draft.copy(id = it)) }
                                     widgetSession = null; sheet = ""; widgetPackage = null
                                 }
-                            }, modifier = Modifier.testTag("widget-placement-apply")) { Text("Place") }
+                            }, modifier = Modifier.testTag("widget-placement-apply")) { Text(stringResource(R.string.place)) }
                             TextButton(onClick = { leaveTemporaryWidgetPage(); widgetSession = null; sheet = ""; widgetPackage = null },
-                                modifier = Modifier.testTag("widget-placement-cancel")) { Text("Cancel") }
+                                modifier = Modifier.testTag("widget-placement-cancel")) { Text(stringResource(R.string.cancel)) }
                         }
                         if (anchor != null) {
                             val density = LocalDensity.current
@@ -935,7 +940,7 @@ fun LauncherScreen(
                                 else anchor.left + with(density) { 5.dp.toPx() }
                             Surface(Modifier.offset { IntOffset(previewX.roundToInt(), anchor.top.roundToInt()) }
                                 .size(previewWidth, previewHeight).testTag("widget-placement-preview")
-                                .semantics { stateDescription = if (widgetDraft != null) "Ready to place" else "No room here" },
+                                .semantics { stateDescription = launcherActivity.getString(if (widgetDraft != null) R.string.ready_to_place else R.string.no_room_here) },
                                 color = if (widgetDraft != null) Glass.copy(alpha = .82f) else Color(0xFFE7B6B6).copy(alpha = .9f),
                                 shape = RoundedCornerShape(24.dp), border = androidx.compose.foundation.BorderStroke(3.dp,
                                     if (widgetDraft != null) Color.White else Color(0xFFFF6B6B))) {
@@ -945,30 +950,30 @@ fun LauncherScreen(
                                     else Column(Modifier.align(Alignment.Center).padding(12.dp),
                                         horizontalAlignment = Alignment.CenterHorizontally) {
                                         Text(session.provider?.loadLabel(launcherActivity.packageManager)?.toString()
-                                            ?: when (session.builtinId) {
-                                                CLOCK_WIDGET -> "Clock"
-                                                DATE_WIDGET -> "Date"
-                                                else -> "Widget panel"
-                                            }, color = Ink,
+                                            ?: stringResource(when (session.builtinId) {
+                                                CLOCK_WIDGET -> R.string.widget_clock
+                                                DATE_WIDGET -> R.string.widget_date
+                                                else -> R.string.widget_panel
+                                            }), color = Ink,
                                             textAlign = TextAlign.Center)
                                         Text("${session.span.width} × ${session.span.height}", color = Ink)
                                     }
                                     if (widgetDraft == null) Box(Modifier.matchParentSize()
                                         .background(Color(0xFFB83B3B).copy(alpha = .34f)), contentAlignment = Alignment.Center) {
-                                        Text("No room here", color = Color.White, fontWeight = FontWeight.SemiBold)
+                                        Text(stringResource(R.string.no_room_here), color = Color.White, fontWeight = FontWeight.SemiBold)
                                     }
                                 }
                             }
                         } else if (session.dragging) {
                             Surface(Modifier.offset { IntOffset((session.pointer.x - 90.dp.toPx()).roundToInt(),
                                 (session.pointer.y - 60.dp.toPx()).roundToInt()) }.size(180.dp, 120.dp)
-                                .testTag("widget-placement-preview").semantics { stateDescription = "No room here" },
+                                .testTag("widget-placement-preview").semantics { stateDescription = launcherActivity.getString(R.string.no_room_here) },
                                 color = Color(0xFFE7B6B6).copy(alpha = .9f), shape = RoundedCornerShape(24.dp)) {
                                 Box(contentAlignment = Alignment.Center) {
                                     if (sessionEntry != null) WidgetProviderPreview(sessionEntry, session.span,
                                         Modifier.fillMaxSize().padding(5.dp).clip(RoundedCornerShape(18.dp)))
                                     Box(Modifier.matchParentSize().background(Color(0xFFB83B3B).copy(alpha = .34f)),
-                                        contentAlignment = Alignment.Center) { Text("No room here", color = Color.White) }
+                                        contentAlignment = Alignment.Center) { Text(stringResource(R.string.no_room_here), color = Color.White) }
                                 }
                             }
                         }
@@ -990,7 +995,7 @@ fun LauncherScreen(
             appsById[drag.source?.appId]?.let { app ->
                 val size = 66.dp
                 val px = with(LocalDensity.current) { size.toPx() }
-                Image(app.icon.asImageBitmap(), "Moving ${app.label}", Modifier
+                Image(app.icon.asImageBitmap(), stringResource(R.string.moving_app, app.label), Modifier
                     .offset { IntOffset((drag.pointer.x - drag.rootOrigin.x - px / 2).roundToInt(), (drag.pointer.y - drag.rootOrigin.y - px * .65f).roundToInt()) }
                     .size(size).shadow(16.dp, RoundedCornerShape(16.dp)).clip(RoundedCornerShape(16.dp)).testTag("drag-ghost"))
             }
@@ -1012,7 +1017,7 @@ fun LauncherScreen(
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(Icons.Rounded.Widgets, null, tint = Ink)
                         Spacer(Modifier.height(8.dp))
-                        Text(remember(id, widgets) { widgetLabel(id, widgets) }, color = Ink, maxLines = 2, textAlign = TextAlign.Center)
+                        Text(widgetLabel(id, widgets), color = Ink, maxLines = 2, textAlign = TextAlign.Center)
                     }
                 }
             }
@@ -1021,7 +1026,7 @@ fun LauncherScreen(
                     .padding(top = 10.dp, start = 20.dp, end = 100.dp),
                 color = Glass.copy(alpha = .96f), shape = RoundedCornerShape(18.dp)
             ) {
-                Text("Dock full • Move an app out first",
+                Text(stringResource(R.string.dock_full),
                     Modifier.padding(horizontal = 16.dp, vertical = 12.dp), color = Ink, fontSize = 13.sp)
             }
             if (drag.moved && drag.source?.target !is DropTarget.Library &&
@@ -1035,7 +1040,7 @@ fun LauncherScreen(
                 Column(Modifier.fillMaxSize().padding(vertical = 6.dp), verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Rounded.DeleteOutline, null)
-                    Text("Remove", fontSize = 11.sp, maxLines = 1)
+                    Text(stringResource(R.string.remove), fontSize = 11.sp, maxLines = 1)
                 }
             }
         }
@@ -1075,16 +1080,16 @@ fun LauncherScreen(
                                     resizeHeight = (startHeight + (dy / resizePitchY).roundToInt()).coerceIn(minH, maxH)
                             })
                         }, contentAlignment = Alignment.Center) {
-                        Icon(Icons.Rounded.OpenInFull, "Drag to resize widget", tint = Ink, modifier = Modifier.size(22.dp))
+                        Icon(Icons.Rounded.OpenInFull, stringResource(R.string.drag_to_resize), tint = Ink, modifier = Modifier.size(22.dp))
                     }
                     Row(Modifier.align(Alignment.TopCenter).padding(top = 8.dp)
                         .background(Glass.copy(alpha = .96f), RoundedCornerShape(20.dp))) {
-                        TextButton(onClick = { resizeSlot = null }) { Text("Cancel") }
+                        TextButton(onClick = { resizeSlot = null }) { Text(stringResource(R.string.cancel)) }
                         TextButton(enabled = valid, onClick = {
                             model.resizeWidget(slot, resizeWidth, resizeHeight); resizeSlot = null
-                        }) { Text("Apply") }
+                        }) { Text(stringResource(R.string.apply)) }
                     }
-                    if (!feasible) Text("Move this widget into the six-row grid before resizing.",
+                    if (!feasible) Text(stringResource(R.string.widget_resize_outside),
                         color = Color.White, modifier = Modifier.align(Alignment.Center).background(Color.Black.copy(alpha = .65f)).padding(8.dp))
                 }
             }
@@ -1126,7 +1131,7 @@ fun LauncherScreen(
         }
         createFolderFirstId?.let { firstId ->
             val first = appsById[firstId]
-            AlertDialog(onDismissRequest = { createFolderFirstId = null }, title = { Text("Create folder with ${first?.label ?: "app"}") },
+            AlertDialog(onDismissRequest = { createFolderFirstId = null }, title = { Text(first?.let { stringResource(R.string.create_folder_with, it.label) } ?: stringResource(R.string.create_folder)) },
                 text = { LazyColumn(Modifier.heightIn(max = 420.dp).testTag("folder-app-picker")) {
                     items(state.apps.filter { it.id != firstId && it.available }, key = { it.id }) { second ->
                         TextButton(onClick = {
@@ -1141,7 +1146,7 @@ fun LauncherScreen(
                             Text(second.label, Modifier.fillMaxWidth())
                         }
                     }
-                } }, confirmButton = { TextButton(onClick = { createFolderFirstId = null }) { Text("Cancel") } })
+                } }, confirmButton = { TextButton(onClick = { createFolderFirstId = null }) { Text(stringResource(R.string.cancel)) } })
         }
         openFolderId?.let { id ->
             state.folders.firstOrNull { it.id == id }?.let { folder ->
@@ -1166,44 +1171,46 @@ fun LauncherScreen(
             }, onCancel = launcherActivity.backups::cancelImport)
         }
         if (launcherActivity.backups.pickerPending) AlertDialog(onDismissRequest = {},
-            title = { Text("Layout document") },
-            text = { Text("The system document picker is still open. Return to it to finish, or cancel this operation.") },
+            title = { Text(stringResource(R.string.backup_picker_title)) },
+            text = { Text(stringResource(R.string.backup_picker_detail)) },
             confirmButton = { TextButton(onClick = { launcherActivity.backups.resumePendingPicker() },
-                modifier = Modifier.testTag("backup-picker-resume")) { Text("Resume") } },
+                modifier = Modifier.testTag("backup-picker-resume")) { Text(stringResource(R.string.resume)) } },
             dismissButton = { TextButton(onClick = launcherActivity.backups::cancelImport,
-                modifier = Modifier.testTag("backup-picker-cancel")) { Text("Cancel") } })
+                modifier = Modifier.testTag("backup-picker-cancel")) { Text(stringResource(R.string.cancel)) } })
         if (launcherActivity.backgrounds.pickerPending && !launcherActivity.backgrounds.loading) AlertDialog(
-            onDismissRequest = {}, title = { Text("Background photo") },
-            text = { Text("The photo picker was interrupted. Resume choosing a photo, or cancel and keep the current background.") },
+            onDismissRequest = {}, title = { Text(stringResource(R.string.photo_picker_title)) },
+            text = { Text(stringResource(R.string.photo_picker_detail)) },
             confirmButton = { TextButton(onClick = launcherActivity.backgrounds::choosePhoto,
-                modifier = Modifier.testTag("background-picker-resume")) { Text("Resume") } },
+                modifier = Modifier.testTag("background-picker-resume")) { Text(stringResource(R.string.resume)) } },
             dismissButton = { TextButton(onClick = launcherActivity.backgrounds::cancelPendingSelection,
-                modifier = Modifier.testTag("background-picker-cancel")) { Text("Cancel") } })
+                modifier = Modifier.testTag("background-picker-cancel")) { Text(stringResource(R.string.cancel)) } })
         (launcherActivity.backups.errorMessage ?: launcherActivity.backups.successMessage)?.let { message ->
             AlertDialog(onDismissRequest = launcherActivity.backups::clearMessage,
-                title = { Text(if (launcherActivity.backups.errorMessage != null) "Layout backup problem" else "Layout backup") },
-                text = { Text(message) }, confirmButton = { TextButton(onClick = launcherActivity.backups::clearMessage) { Text("OK") } })
+                title = { Text(stringResource(if (launcherActivity.backups.errorMessage != null) R.string.backup_problem else R.string.backup_title)) },
+                text = { Text(message) }, confirmButton = { TextButton(onClick = launcherActivity.backups::clearMessage) { Text(stringResource(android.R.string.ok)) } })
         }
         widgets.failureMessage?.let { message ->
-            AlertDialog(onDismissRequest = widgets::clearFailure, title = { Text("Widget not added") },
+            AlertDialog(onDismissRequest = widgets::clearFailure, title = { Text(stringResource(R.string.widget_not_added)) },
                 text = { Text(message, Modifier.testTag("widget-bind-error")) },
-                confirmButton = { TextButton(onClick = widgets::clearFailure) { Text("OK") } })
+                confirmButton = { TextButton(onClick = widgets::clearFailure) { Text(stringResource(android.R.string.ok)) } })
         }
         if (widgets.pendingPlacement != null && widgets.setupStatus != null) {
-            AlertDialog(onDismissRequest = {}, title = { Text("Finish widget setup") },
-                text = { Text("The widget is waiting at its chosen spot. Finish setup to add it, or cancel to remove the placeholder.") },
+            val continueSetup = stringResource(R.string.widget_setup_continue)
+            val cancelSetup = stringResource(R.string.widget_setup_cancel)
+            AlertDialog(onDismissRequest = {}, title = { Text(stringResource(R.string.widget_setup_title)) },
+                text = { Text(stringResource(R.string.widget_setup_detail)) },
                 confirmButton = { Button(onClick = widgets::finishPendingSetup,
-                    modifier = Modifier.semantics { contentDescription = "Continue widget setup" }) { Text("Finish setup") } },
+                    modifier = Modifier.semantics { contentDescription = continueSetup }) { Text(stringResource(R.string.widget_setup_finish)) } },
                 dismissButton = { TextButton(onClick = { leaveTemporaryWidgetPage(); widgets.cancelPendingSetup() },
-                    modifier = Modifier.semantics { contentDescription = "Cancel widget setup" }) { Text("Cancel") } })
+                    modifier = Modifier.semantics { contentDescription = cancelSetup }) { Text(stringResource(R.string.cancel)) } })
         }
         widgets.reconfigureWidgetId?.let {
-            AlertDialog(onDismissRequest = {}, title = { Text("Widget settings") },
-                text = { Text("Widget settings were interrupted. Resume configuration, or cancel and keep the widget unchanged.") },
+            AlertDialog(onDismissRequest = {}, title = { Text(stringResource(R.string.widget_settings)) },
+                text = { Text(stringResource(R.string.widget_settings_interrupted)) },
                 confirmButton = { Button(onClick = widgets::finishPendingReconfigure,
-                    modifier = Modifier.testTag("widget-reconfigure-resume")) { Text("Resume") } },
+                    modifier = Modifier.testTag("widget-reconfigure-resume")) { Text(stringResource(R.string.resume)) } },
                 dismissButton = { TextButton(onClick = widgets::cancelPendingReconfigure,
-                    modifier = Modifier.testTag("widget-reconfigure-cancel")) { Text("Cancel") } })
+                    modifier = Modifier.testTag("widget-reconfigure-cancel")) { Text(stringResource(R.string.cancel)) } })
         }
         }
     }
@@ -1395,9 +1402,10 @@ private fun HomePagePane(
             delay(16)
         }
     }
+    val homeOptions = stringResource(R.string.home_options)
     Box(modifier.testTag("home-page-$page")
         .semantics {
-            onLongClick("Home options") {
+            onLongClick(homeOptions) {
                 if (!drag.active) onEmptyWidget(backgroundTarget)
                 !drag.active
             }
@@ -1477,6 +1485,8 @@ private fun SharedHomeGrid(
         else -> null
     }
     val dimDragged = drag.active && !drag.moved && source != null
+    val resources = LocalContext.current.resources
+    val chooseDockApp = stringResource(R.string.dock_choose_app)
     val pending = widgets.pendingPlacement?.takeIf { it.page == page }
     val pendingIsReplacement = pending != null && widgetPlacements.any { it.slot == pending.slot }
     val pageWidgets = widgetPlacements.filter { it.page == page } + listOfNotNull(pending?.takeUnless { pendingIsReplacement })
@@ -1560,15 +1570,16 @@ private fun SharedHomeGrid(
                 val width = (cellWidth * placement.spanX - 10.dp).coerceAtLeast(1.dp)
                 val y = rowTop(placement.row)
                 val height = (rowTop(placement.row + placement.spanY) - y - 18f).coerceAtLeast(48f)
+                val pendingDescription = stringResource(R.string.widget_pending, widgets.pendingProvider?.shortClassName ?: stringResource(R.string.widget))
                 if (placement == pending) Surface(Modifier.offset(x = x, y = y.dp).width(width).height(height.dp)
                     .testTag("widget-pending-${placement.slot}").semantics(mergeDescendants = true) {
-                        contentDescription = "Pending ${widgets.pendingProvider?.shortClassName ?: "widget"}"
+                        contentDescription = pendingDescription
                     }, color = Glass.copy(alpha = .72f),
                     shape = RoundedCornerShape(24.dp), border = androidx.compose.foundation.BorderStroke(2.dp, Color.White)) {
                     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator(Modifier.size(28.dp), strokeWidth = 3.dp)
-                        Spacer(Modifier.height(8.dp)); Text("Finish widget setup", color = Ink)
+                        Spacer(Modifier.height(8.dp)); Text(stringResource(R.string.widget_setup_title), color = Ink)
                     }
                 } else MovableWidget(placement.id, placement.slot, widgets, drag, target,
                     Modifier.offset(x = x, y = y.dp).width(width).height(height.dp), page = page) { onWidget(placement.slot) }
@@ -1600,6 +1611,8 @@ private fun DockAppColumn(
         else -> null
     }
     val dimDragged = drag.active && !drag.moved && source != null
+    val resources = LocalContext.current.resources
+    val chooseDockApp = stringResource(R.string.dock_choose_app)
     val launchBounds = remember(savedDock.size) { List(savedDock.size) { android.graphics.Rect() } }
     val interactions = remember(savedDock.size) { List(savedDock.size) { MutableInteractionSource() } }
     val slotScales = savedDock.indices.map { index ->
@@ -1628,11 +1641,11 @@ private fun DockAppColumn(
             }
             Box(Modifier.fillMaxWidth().height(rowHeight.dp).offset(y = (rowHeight * index).dp)
                 .testTag("dock-slot-$index").dropRegion(drag, cell, savedApp?.id)
-                .semantics(mergeDescendants = true) { contentDescription = savedApp?.label ?: "Choose dock app ${index + 1}" }
+                .semantics(mergeDescendants = true) { contentDescription = savedApp?.label ?: resources.getString(R.string.dock_choose_slot, index + 1) }
                 .combinedClickable(interactionSource = interactions[index], indication = LocalIndication.current, role = Role.Button, onClick = {
                     if (savedApp != null) onLaunch(savedApp, launchBounds[index]) else onChoose(index)
                 }, onLongClick = null)
-                .semantics { onLongClick("Choose dock app") { onChoose(index); true } })
+                .semantics { onLongClick(chooseDockApp) { onChoose(index); true } })
         }
 
         val ids = (savedDock + previewDock).filterNotNull().distinct()
@@ -1667,8 +1680,9 @@ private fun <T> List<T>.slicePage(range: IntRange): List<T> =
 @Composable
 private fun FolderTile(folder: FolderEntry, apps: Map<String, AppEntry>, size: Float, labels: Boolean,
     drag: HomeDragState, page: Int, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    val description = androidx.compose.ui.res.pluralStringResource(R.plurals.folder_description, folder.appIds.size, folder.title, folder.appIds.size)
     Column(modifier.clickable(onClick = onClick).semantics(mergeDescendants = true) {
-        contentDescription = "Folder ${folder.title}, ${folder.appIds.size} apps"
+        contentDescription = description
     }, horizontalAlignment = Alignment.CenterHorizontally) {
         Box(Modifier.size(size.dp).clip(RoundedCornerShape((size * .24f).dp))
             .background(Glass.copy(alpha = .72f)).border(1.dp, Color.White.copy(alpha = .55f), RoundedCornerShape((size * .24f).dp))
@@ -1694,10 +1708,11 @@ private fun AppTile(app: AppEntry, size: Float, labels: Boolean, modifier: Modif
     val scale by animateFloatAsState(if (pressed) .92f else 1f, label = "app press")
     val iconSize by animateDpAsState(size.dp, label = "icon size")
     val bounds = remember { android.graphics.Rect() }
+    val appOptions = stringResource(R.string.app_options)
     Column(modifier.fillMaxWidth().heightIn(min = 48.dp).semantics(mergeDescendants = true) { contentDescription = app.label }
         .clickable(interactionSource = interaction, indication = LocalIndication.current,
             role = Role.Button, onClick = { onClick(bounds) })
-        .semantics { onLongClick("App options") { onLongClick(); true } }.padding(horizontal = 2.dp),
+        .semantics { onLongClick(appOptions) { onLongClick(); true } }.padding(horizontal = 2.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
         Image(app.icon.asImageBitmap(), null, Modifier.size(iconSize).onGloballyPositioned { bounds.set(it.boundsInWindow().toAndroidBounds()) }
             .graphicsLayer { scaleX = scale; scaleY = scale }.clip(RoundedCornerShape((size * .24f).dp)))
@@ -1726,38 +1741,40 @@ private fun ClockCard(onClick: () -> Unit) {
     val time = currentTime()
     val format = if (android.text.format.DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "h:mm"
     GlassCard(onClick = onClick) {
-        Icon(Icons.Rounded.Schedule, "Clock widget; tap to replace", tint = Color.White, modifier = Modifier.size(20.dp))
+        Icon(Icons.Rounded.Schedule, stringResource(R.string.clock_widget_description), tint = Color.White, modifier = Modifier.size(20.dp))
         Text(time.format(DateTimeFormatter.ofPattern(format)), color = Color.White, fontWeight = FontWeight.Light, fontSize = 30.sp, maxLines = 1)
-        Text("Local time", color = Color.White.copy(alpha = .8f), fontSize = 11.sp)
+        Text(stringResource(R.string.local_time), color = Color.White.copy(alpha = .8f), fontSize = 11.sp)
     }
 }
 
 @Composable
 private fun DateCard(onClick: () -> Unit) {
     val date = currentTime()
+    val locale = LocalConfiguration.current.locales[0]
     GlassCard(onClick = onClick) {
-        Text(date.format(DateTimeFormatter.ofPattern("EEEE")), color = Color.White, fontSize = 12.sp, maxLines = 1)
+        Text(date.format(localizedDateFormatter(locale, "EEEE")), color = Color.White, fontSize = 12.sp, maxLines = 1)
         Text(date.dayOfMonth.toString(), color = Color.White, fontWeight = FontWeight.Light, fontSize = 40.sp, lineHeight = 42.sp)
-        Text(date.format(DateTimeFormatter.ofPattern("MMMM")), color = Color.White.copy(alpha = .8f), fontSize = 12.sp)
+        Text(date.format(localizedDateFormatter(locale, "LLLL")), color = Color.White.copy(alpha = .8f), fontSize = 12.sp)
     }
 }
 
 @Composable
 private fun ExpandedCard(onClick: () -> Unit) {
     val date = currentTime()
+    val locale = LocalConfiguration.current.locales[0]
     GlassCard(onClick = onClick) {
         Column {
-            Text(date.format(DateTimeFormatter.ofPattern("EEEE")), color = Color.White, fontSize = 22.sp)
-            Text(date.format(DateTimeFormatter.ofPattern("MMMM d")), color = Color.White.copy(alpha = .8f), fontSize = 16.sp)
+            Text(date.format(localizedDateFormatter(locale, "EEEE")), color = Color.White, fontSize = 22.sp)
+            Text(date.format(localizedDateFormatter(locale, "MMMMd")), color = Color.White.copy(alpha = .8f), fontSize = 16.sp)
         }
         Column {
             Icon(Icons.Rounded.Widgets, null, tint = Color.White, modifier = Modifier.size(32.dp))
             Spacer(Modifier.height(16.dp))
-            Text("A little more room.", color = Color.White, fontSize = 28.sp, lineHeight = 32.sp, fontWeight = FontWeight.Light)
+            Text(stringResource(R.string.info_card_title), color = Color.White, fontSize = 28.sp, lineHeight = 32.sp, fontWeight = FontWeight.Light)
             Spacer(Modifier.height(12.dp))
-            Text("Add a calendar, photos, or another widget.", color = Color.White.copy(alpha = .85f), fontSize = 14.sp)
+            Text(stringResource(R.string.info_card_detail), color = Color.White.copy(alpha = .85f), fontSize = 14.sp)
             Spacer(Modifier.height(20.dp))
-            FilledTonalButton(onClick = onClick) { Icon(Icons.Rounded.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Add widget") }
+            FilledTonalButton(onClick = onClick) { Icon(Icons.Rounded.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.add_widget)) }
         }
     }
 }
@@ -1765,6 +1782,7 @@ private fun ExpandedCard(onClick: () -> Unit) {
 @Composable
 private fun WidgetSlot(id: Int, slot: Int, controller: WidgetController, modifier: Modifier, onAdd: () -> Unit, fallback: @Composable () -> Unit) {
     var restoreMessage by remember(slot) { mutableStateOf<String?>(null) }
+    val restoreUnavailable = stringResource(R.string.widget_restore_unavailable)
     BoxWithConstraints(modifier.clip(RoundedCornerShape(24.dp)).testTag("widget-slot-$slot")) {
         val displayedContentSize = WidgetContentSize(maxWidth.value, maxHeight.value)
         if (id == NEEDS_BINDING_WIDGET) {
@@ -1773,18 +1791,18 @@ private fun WidgetSlot(id: Int, slot: Int, controller: WidgetController, modifie
                 shape = RoundedCornerShape(24.dp), border = androidx.compose.foundation.BorderStroke(2.dp, Color.White.copy(alpha = .7f))) {
                 Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(restore?.title ?: "Saved widget", color = Ink, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
-                    Text(restore?.profileLabel ?: "Unavailable profile", color = Ink.copy(alpha = .72f),
+                    Text(restore?.title ?: stringResource(R.string.saved_widget), color = Ink, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
+                    Text(restore?.profileLabel?.let { profileName(it) } ?: stringResource(R.string.unavailable_profile), color = Ink.copy(alpha = .72f),
                         style = MaterialTheme.typography.bodySmall)
                     restoreMessage?.let { Text(it, color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center) }
                     Row {
                         TextButton(onClick = {
                             if (!controller.rebindRestoredWidget(slot, contentSize = displayedContentSize))
-                                restoreMessage = "That provider or profile isn’t available. Choose a replacement."
+                                restoreMessage = restoreUnavailable
                         },
-                            modifier = Modifier.testTag("widget-restore-reconnect-$slot")) { Text("Reconnect") }
-                        TextButton(onClick = onAdd, modifier = Modifier.testTag("widget-restore-replace-$slot")) { Text("Replace") }
+                            modifier = Modifier.testTag("widget-restore-reconnect-$slot")) { Text(stringResource(R.string.reconnect)) }
+                        TextButton(onClick = onAdd, modifier = Modifier.testTag("widget-restore-replace-$slot")) { Text(stringResource(R.string.replace)) }
                     }
                 }
             }
@@ -1801,36 +1819,38 @@ private fun WidgetSlot(id: Int, slot: Int, controller: WidgetController, modifie
     }
 }
 
+@Composable
 private fun widgetLabel(id: Int, controller: WidgetController) = when (id) {
-    CLOCK_WIDGET -> "Clock"
-    DATE_WIDGET -> "Date"
-    INFO_WIDGET -> "Widget panel"
-    EMPTY_WIDGET -> "Add widget"
-    else -> controller.label(id)
+    CLOCK_WIDGET -> stringResource(R.string.widget_clock)
+    DATE_WIDGET -> stringResource(R.string.widget_date)
+    INFO_WIDGET -> stringResource(R.string.widget_panel)
+    EMPTY_WIDGET -> stringResource(R.string.add_widget)
+    else -> remember(id, controller) { controller.label(id) }
 }
 
 @Composable
 private fun MovableWidget(id: Int, slot: Int, controller: WidgetController, drag: HomeDragState,
     target: DropTarget?, modifier: Modifier, page: Int, onAdd: () -> Unit) {
     val cell = DropTarget.Widget(slot)
+    val moveOrReplace = stringResource(R.string.move_or_replace_widget)
     WidgetSlot(id, slot, controller, modifier.dropRegion(drag, cell, page = page, widgetId = id)
         .alpha(if (drag.source?.target == cell) .3f else 1f)
         .border(if (drag.active && target == cell) 2.dp else 0.dp,
             if (drag.active && target == cell) Color.White else Color.Transparent, RoundedCornerShape(24.dp))
-        .semantics { onLongClick("Move or replace widget") { onAdd(); true } }, onAdd) {
+        .semantics { onLongClick(moveOrReplace) { onAdd(); true } }, onAdd) {
         when (id) {
             CLOCK_WIDGET -> ClockCard(onAdd)
             DATE_WIDGET -> DateCard(onAdd)
             INFO_WIDGET -> if (slot % 3 == 2) ExpandedCard(onAdd) else GlassCard(onClick = onAdd) {
                 Icon(Icons.Rounded.Widgets, null, tint = Color.White, modifier = Modifier.size(28.dp))
-                Text("Your widgets", color = Color.White, fontSize = 15.sp, maxLines = 1)
-                Text("Tap to choose", color = Color.White.copy(alpha = .8f), fontSize = 12.sp)
+                Text(stringResource(R.string.your_widgets), color = Color.White, fontSize = 15.sp, maxLines = 1)
+                Text(stringResource(R.string.tap_to_choose), color = Color.White.copy(alpha = .8f), fontSize = 12.sp)
             }
             else -> Surface(Modifier.fillMaxSize().clickable(onClick = onAdd), color = Glass.copy(alpha = .18f),
                 shape = RoundedCornerShape(24.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .25f))) {
                 Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Rounded.Add, null, tint = Color.White)
-                    Text(if (id >= 0) "Widget unavailable" else "Add widget", color = Color.White, fontSize = 12.sp)
+                    Text(stringResource(if (id >= 0) R.string.widget_unavailable else R.string.add_widget), color = Color.White, fontSize = 12.sp)
                 }
             }
         }
@@ -1843,15 +1863,15 @@ private fun AppPicker(apps: List<AppEntry>, dockSlot: Int?, onSelect: (AppEntry)
     var query by rememberSaveable { mutableStateOf("") }
     val filtered = remember(apps, query) { apps.filter { it.label.contains(query.trim(), ignoreCase = true) } }
     Column(Modifier.fillMaxWidth().fillMaxHeight(.88f).padding(horizontal = 20.dp).imePadding()) {
-        Text(if (dockSlot == null) "Your apps" else "Dock position ${dockSlot + 1}", style = MaterialTheme.typography.headlineSmall)
+        Text(if (dockSlot == null) stringResource(R.string.your_apps) else stringResource(R.string.dock_position_label, dockSlot + 1), style = MaterialTheme.typography.headlineSmall)
         OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth().padding(vertical = 16.dp).testTag("search-field"),
-            placeholder = { Text("Search apps") }, leadingIcon = { Icon(Icons.Rounded.Search, null) }, singleLine = true,
-            trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(Icons.Rounded.Close, "Clear search") } }, shape = RoundedCornerShape(20.dp))
-        if (dockSlot != null) TextButton(onClick = onClear) { Text("Leave this position empty") }
+            placeholder = { Text(stringResource(R.string.search_apps)) }, leadingIcon = { Icon(Icons.Rounded.Search, null) }, singleLine = true,
+            trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(Icons.Rounded.Close, stringResource(R.string.clear_search)) } }, shape = RoundedCornerShape(20.dp))
+        if (dockSlot != null) TextButton(onClick = onClear) { Text(stringResource(R.string.dock_leave_empty)) }
         if (blockedHint != null) Text(blockedHint, color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom = 8.dp).testTag("dock-full-guidance"))
         LazyColumn(Modifier.weight(1f)) {
-            if (filtered.isEmpty()) item { Text("No apps found", Modifier.padding(vertical = 24.dp)) }
+            if (filtered.isEmpty()) item { Text(stringResource(R.string.no_apps_found), Modifier.padding(vertical = 24.dp)) }
             items(filtered, key = { it.id }) { app ->
                 val enabled = canSelect(app)
                 Row(Modifier.fillMaxWidth().testTag("picker-app-${app.id}")
@@ -1860,123 +1880,10 @@ private fun AppPicker(apps: List<AppEntry>, dockSlot: Int?, onSelect: (AppEntry)
                     .padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                     Image(app.icon.asImageBitmap(), null, Modifier.size(44.dp).clip(RoundedCornerShape(12.dp)))
                     Text(app.label, Modifier.padding(start = 16.dp).weight(1f), maxLines = 2)
-                    if (dockSlot != null && enabled) Icon(Icons.Rounded.Add, "Choose ${app.label}")
+                    if (dockSlot != null && enabled) Icon(Icons.Rounded.Add, stringResource(R.string.choose_app, app.label))
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun SettingsPanel(state: LauncherState, initiallyWide: Boolean, model: LauncherModel, isDefaultHome: Boolean,
-    onMakeDefault: () -> Unit, onClose: () -> Unit, onEditPins: () -> Unit, onWidget: (Int) -> Unit,
-    onAddWidget: (Int) -> Unit, onRemoveWidget: (Int) -> Unit, onWallpaperPreview: () -> Unit,
-    onExportLayout: () -> Unit, onImportLayout: () -> Unit,
-    appearance: AppearanceState, onAppearanceMode: (AppearanceMode) -> Unit,
-    onAppearanceManual: (String, Double, Double) -> Unit, onAppearanceDeviceLocation: () -> Unit,
-    onAppearanceClear: () -> Unit,
-    backgrounds: LauncherBackgroundController,
-    homePage: Int = 0) {
-    var wide by rememberSaveable { mutableStateOf(initiallyWide) }
-    val p = if (wide) state.expanded else state.compact
-    Column(Modifier.fillMaxWidth().fillMaxHeight(.92f).padding(horizontal = 24.dp).padding(bottom = 16.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Make it yours", Modifier.weight(1f), style = MaterialTheme.typography.headlineSmall)
-            IconButton(onClick = onClose) { Icon(Icons.Rounded.Close, "Close customization") }
-        }
-        Button(onClick = onMakeDefault, modifier = Modifier.fillMaxWidth().testTag("default-home-settings")) {
-            Text(if (isDefaultHome) "Change home app" else "Set as home app")
-        }
-        TextButton(onClick = onEditPins, modifier = Modifier.fillMaxWidth()) { Text("Choose home apps") }
-        if (state.canUndoEdit) TextButton(onClick = { model.undoEdit(); onClose() }, modifier = Modifier.fillMaxWidth()) {
-            Text("Undo last layout change")
-        }
-        Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(!wide, { wide = false }, label = { Text("Cover / compact") })
-            FilterChip(wide, { wide = true }, label = { Text("Inner / expanded") })
-        }
-        SettingSlider("App icon size", "${p.iconSize.toInt()} dp", p.iconSize, 40f..68f) { model.setPreset(wide, p.copy(iconSize = it)) }
-        SettingSlider("Space between rows", "${p.rowGap.toInt()} dp", p.rowGap, 0f..28f) { model.setPreset(wide, p.copy(rowGap = it)) }
-        SettingSlider("Dock width", "${p.dockWidth.toInt()} dp", p.dockWidth, 56f..84f) { model.setPreset(wide, p.copy(dockWidth = it)) }
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("Align dock with app rows", Modifier.weight(1f))
-            Switch(p.dockAlignToGrid, { model.setPreset(wide, p.copy(dockAlignToGrid = it)) })
-        }
-        if (!p.dockAlignToGrid) SettingSlider("Dock height on screen", "${(p.dockPosition * 100).toInt()}%", p.dockPosition, .25f.. .75f) { model.setPreset(wide, p.copy(dockPosition = it)) }
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("Show app names", Modifier.weight(1f)); Switch(state.labels, model::setLabels, Modifier.testTag("label-switch"))
-        }
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("Status at upper right", Modifier.weight(1f)); Switch(state.verticalStatus, model::setVerticalStatus, Modifier.testTag("status-switch"))
-        }
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("Search button opens Google", Modifier.weight(1f))
-            Switch(state.googleSearch, model::setGoogleSearch, Modifier.testTag("google-search-switch"))
-        }
-        Text("Opens Google’s search screen. All apps keeps local app search.",
-            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        TextButton(onClick = { model.setPreset(wide, LayoutPreset()) }) { Text("Reset this layout") }
-        HorizontalDivider(Modifier.padding(vertical = 12.dp))
-        TextButton(onClick = onWallpaperPreview, modifier = Modifier.fillMaxWidth().testTag("wallpaper-preview")) {
-            Icon(Icons.Rounded.Wallpaper, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text("Apply matching wallpaper")
-        }
-        Text("Preview the current launcher background in Android’s wallpaper picker, then choose where to apply it.", style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text("Launcher background", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 12.dp))
-        Button(onClick = backgrounds::choosePhoto, enabled = !backgrounds.loading,
-            modifier = Modifier.fillMaxWidth().testTag("background-choose")) { Text("Choose background photo") }
-        if (backgrounds.photoSelected) OutlinedButton(onClick = backgrounds::reset,
-            modifier = Modifier.fillMaxWidth().testTag("background-reset")) { Text("Reset to Duo dunes") }
-        if (backgrounds.loading) LinearProgressIndicator(Modifier.fillMaxWidth().testTag("background-loading"))
-        (backgrounds.errorMessage ?: backgrounds.successMessage)?.let { message ->
-            TextButton(onClick = backgrounds::clearMessage, Modifier.fillMaxWidth().testTag("background-message")) { Text(message) }
-        }
-        Text("The selected photo stays on this device and is not included in layout backups.",
-            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        HorizontalDivider(Modifier.padding(vertical = 12.dp))
-        AppearanceSettings(appearance, onAppearanceMode, onAppearanceManual, onAppearanceDeviceLocation, onAppearanceClear)
-        HorizontalDivider(Modifier.padding(vertical = 12.dp))
-        Text("Layout backup", style = MaterialTheme.typography.titleMedium)
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = onExportLayout, modifier = Modifier.weight(1f).testTag("layout-export")) { Text("Save") }
-            OutlinedButton(onClick = onImportLayout, modifier = Modifier.weight(1f).testTag("layout-import")) { Text("Restore") }
-        }
-        Text("Restore always shows a review before changing Home.", style = MaterialTheme.typography.bodySmall)
-        HorizontalDivider(Modifier.padding(vertical = 12.dp))
-        Text("Widgets · Page ${homePage + 1}", style = MaterialTheme.typography.titleMedium)
-        state.widgetPlacements.filter { it.page == homePage }.forEach { placement ->
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text("${placement.spanX} × ${placement.spanY} widget · row ${placement.row + 1}", Modifier.weight(1f))
-                IconButton(onClick = { onRemoveWidget(placement.slot) },
-                    modifier = Modifier.semantics { contentDescription = "Remove widget" }) {
-                    Icon(Icons.Rounded.DeleteOutline, null)
-                }
-                TextButton(onClick = { onWidget(placement.slot) }) { Text("Replace") }
-            }
-        }
-        if (wide) state.widgetPlacements.filter { it.page == -1 }.forEach { placement ->
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text("Unfolded-only page", Modifier.weight(1f))
-                IconButton(onClick = { onRemoveWidget(placement.slot) },
-                    modifier = Modifier.semantics { contentDescription = "Remove widget from Unfolded-only page" }) {
-                    Icon(Icons.Rounded.DeleteOutline, null)
-                }
-                TextButton(onClick = { onWidget(placement.slot) }) { Text("Replace") }
-            }
-        }
-        TextButton(onClick = { onAddWidget(homePage) }, Modifier.fillMaxWidth()) { Text("Add widget to this page") }
-        Text("Hold and drag an app to move it. Pause at the screen edge to turn pages. Release without moving for options.", style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 20.dp))
-        }
-    }
-}
-
-@Composable
-private fun SettingSlider(label: String, valueLabel: String, value: Float, range: ClosedFloatingPointRange<Float>, onChange: (Float) -> Unit) {
-    Column(Modifier.padding(top = 14.dp)) {
-        Row { Text(label, Modifier.weight(1f)); Text(valueLabel, color = MaterialTheme.colorScheme.secondary) }
-        Slider(value, onChange, valueRange = range, modifier = Modifier.semantics { contentDescription = label })
     }
 }
 
@@ -2012,49 +1919,49 @@ private fun WidgetActions(
         .padding(horizontal = 24.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("Widget options", Modifier.weight(1f), style = MaterialTheme.typography.headlineSmall)
-            IconButton(onClick = onClose) { Icon(Icons.Rounded.Close, "Close widget options") }
+            Text(stringResource(R.string.widget_options), Modifier.weight(1f), style = MaterialTheme.typography.headlineSmall)
+            IconButton(onClick = onClose) { Icon(Icons.Rounded.Close, stringResource(R.string.close_widget_options)) }
         }
-        if (canConfigure) ActionRow(Icons.Rounded.Settings, "Widget settings", onConfigure,
+        if (canConfigure) ActionRow(Icons.Rounded.Settings, stringResource(R.string.widget_settings), onConfigure,
             Modifier.testTag("widget-settings-${placement.slot}"))
-        Text("Resize", style = MaterialTheme.typography.titleMedium)
-        Button(enabled = feasible, onClick = { onStartResize(width, height) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Resize on Home") }
-        if (!feasible) Text("Move this widget into the six-row grid before resizing.", color = MaterialTheme.colorScheme.error)
+        Text(stringResource(R.string.resize), style = MaterialTheme.typography.titleMedium)
+        Button(enabled = feasible, onClick = { onStartResize(width, height) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(stringResource(R.string.resize_on_home)) }
+        if (!feasible) Text(stringResource(R.string.widget_resize_outside), color = MaterialTheme.colorScheme.error)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
             repeat(homePages) { page -> TextButton(onClick = { onMoveToPage(page) },
-                modifier = Modifier.testTag("widget-move-${placement.slot}-page-$page")) { Text("Move to page ${page + 1}") } }
+                modifier = Modifier.testTag("widget-move-${placement.slot}-page-$page")) { Text(stringResource(R.string.move_to_page, page + 1)) } }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Width", Modifier.weight(1f))
+            Text(stringResource(R.string.width), Modifier.weight(1f))
             IconButton(enabled = constraints?.canResizeHorizontally != false,
                 onClick = { if (feasible) width = (width - 1).coerceAtLeast(minWidth) }) {
-                Icon(Icons.Rounded.Remove, "Decrease widget width")
+                Icon(Icons.Rounded.Remove, stringResource(R.string.decrease_width))
             }
-            Text("$width columns", Modifier.width(88.dp), textAlign = TextAlign.Center)
+            Text(androidx.compose.ui.res.pluralStringResource(R.plurals.columns, width, width), Modifier.width(88.dp), textAlign = TextAlign.Center)
             IconButton(enabled = constraints?.canResizeHorizontally != false,
                 onClick = { if (feasible) width = (width + 1).coerceAtMost(maxWidth) }) {
-                Icon(Icons.Rounded.Add, "Increase widget width")
+                Icon(Icons.Rounded.Add, stringResource(R.string.increase_width))
             }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Height", Modifier.weight(1f))
+            Text(stringResource(R.string.height), Modifier.weight(1f))
             IconButton(enabled = constraints?.canResizeVertically != false,
                 onClick = { if (feasible) height = (height - 1).coerceAtLeast(minHeight) }) {
-                Icon(Icons.Rounded.Remove, "Decrease widget height")
+                Icon(Icons.Rounded.Remove, stringResource(R.string.decrease_height))
             }
-            Text("$height rows", Modifier.width(88.dp), textAlign = TextAlign.Center)
+            Text(androidx.compose.ui.res.pluralStringResource(R.plurals.rows, height, height), Modifier.width(88.dp), textAlign = TextAlign.Center)
             IconButton(enabled = constraints?.canResizeVertically != false,
                 onClick = { if (feasible) height = (height + 1).coerceAtMost(maxHeight) }) {
-                Icon(Icons.Rounded.Add, "Increase widget height")
+                Icon(Icons.Rounded.Add, stringResource(R.string.increase_height))
             }
         }
-        Text("Sizes that overlap another item are ignored.", style = MaterialTheme.typography.bodySmall)
-        if (!valid) Text("That size overlaps another item or extends beyond the page.", color = MaterialTheme.colorScheme.error)
+        Text(stringResource(R.string.resize_overlap_note), style = MaterialTheme.typography.bodySmall)
+        if (!valid) Text(stringResource(R.string.resize_invalid), color = MaterialTheme.colorScheme.error)
         Button(enabled = valid, onClick = { onResize(width, height); onClose() },
-            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Apply size") }
-        ActionRow(Icons.Rounded.FindReplace, "Replace", onReplace)
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(stringResource(R.string.apply_size)) }
+        ActionRow(Icons.Rounded.FindReplace, stringResource(R.string.replace), onReplace)
         HorizontalDivider()
-        ActionRow(Icons.Rounded.DeleteOutline, "Remove", onRemove, tint = MaterialTheme.colorScheme.error)
+        ActionRow(Icons.Rounded.DeleteOutline, stringResource(R.string.remove), onRemove, tint = MaterialTheme.colorScheme.error)
         Spacer(Modifier.height(12.dp))
     }
 }

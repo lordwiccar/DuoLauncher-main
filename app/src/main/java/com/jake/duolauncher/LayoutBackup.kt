@@ -19,10 +19,13 @@ data class BackupWidgetDescriptor(
     val isWork: Boolean = false,
 )
 
+/** A widget whose saved profile must be mapped by hand; shown in the restore review. */
+data class ProfileIssue(val title: String, val profileLabel: String)
+
 data class LayoutImportPreview(
     val layout: HomeLayout,
     val missingApps: List<String>,
-    val profileIssues: List<String>,
+    val profileIssues: List<ProfileIssue>,
     val appCount: Int,
     val folderCount: Int,
     val widgetCount: Int,
@@ -148,7 +151,7 @@ fun decodeLayoutBackup(raw: String, currentApps: List<AppEntry>, currentProfiles
     val dock = rawDock.map { value -> value?.also { require(!isReservedFolderId(it)) }?.let(::importedApp) }
     var layout = HomeLayout(slots.dropLastWhile { it == null }, dock, folders = folders, leadingSlots = leadingSlots, rows = GRID_ROWS)
     val profileSerials = currentProfiles.mapTo(mutableSetOf(), AppProfile::userSerial)
-    val profileIssues = linkedSetOf<String>()
+    val profileIssues = linkedSetOf<ProfileIssue>()
     val widgetArray = root.getJSONArray("widgets")
     require(widgetArray.length() <= 500)
     val widgetSlots = mutableSetOf<Int>()
@@ -175,7 +178,7 @@ fun decodeLayoutBackup(raw: String, currentApps: List<AppEntry>, currentProfiles
             val work = item.strictBoolean("work")
             val widgetScope = item.optString("sourceScope").takeIf { it.isNotBlank() } ?: sourceScope
             val serial = if (work) savedSerial else currentProfiles.firstOrNull { it.isPersonal }?.userSerial ?: savedSerial
-            if ((work && widgetScope != currentScope) || serial !in profileSerials) profileIssues += "$title ($profileLabel profile requires explicit mapping)"
+            if ((work && widgetScope != currentScope) || serial !in profileSerials) profileIssues += ProfileIssue(title, profileLabel)
             WidgetRestore(slot, provider, serial, title, profileLabel, work, widgetScope)
         } else null
         layout = layout.copy(widgetPlacements = (layout.widgetPlacements + placement).sortedBy { it.slot },

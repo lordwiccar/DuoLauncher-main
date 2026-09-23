@@ -56,6 +56,10 @@ In **Wallpaper & appearance**, **Choose a photo** creates a private preview. It 
 
 Appearance choices are **Light**, **Dark**, **Follow system**, and **Sunrise / sunset**. Sunrise/sunset accepts coordinates through **Use this place**, or requests approximate location only when you choose **Use device location**. If location is unavailable, Duo visibly falls back to the system theme. **Clear location** removes saved coordinates; Duo does not request location in the background.
 
+## Language
+
+**Language** in the customization sheet lists **System language** first, which follows Android and shows the language it currently resolves to. The other choices are English, Čeština, Slovenčina, Polski, and Deutsch, each shown in its own language. On Android 13 and later the same choice also appears in Android Settings under the app's language.
+
 ## Optional shade gestures
 
 On Home, swipe down from the left 70% to open Notifications or from the right 30% to open Quick Settings. The first attempt offers **Turn on shade gestures** because Android requires you to enable Duo Launcher in Accessibility settings. This is optional and must be enabled by you; **Not now** leaves it off. The service only requests the system panel actions.

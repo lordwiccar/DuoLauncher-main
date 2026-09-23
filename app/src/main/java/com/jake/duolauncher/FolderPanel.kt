@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
@@ -37,11 +38,12 @@ internal fun FolderPanel(
         drag.activeSourceScope = folder.id
         onDispose { if (drag.activeSourceScope == folder.id) drag.activeSourceScope = null }
     }
+    val closeLabel = stringResource(R.string.close_folder)
     Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = .28f))
         .clickable(
             interactionSource = remember { MutableInteractionSource() },
             indication = null,
-            onClickLabel = "Close folder",
+            onClickLabel = closeLabel,
             onClick = onDismiss,
         )
         .imePadding().testTag("folder-panel"),
@@ -58,8 +60,8 @@ internal fun FolderPanel(
             Column(Modifier.padding(18.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     OutlinedTextField(title, { title = it }, Modifier.weight(1f).testTag("folder-name"),
-                        singleLine = true, label = { Text("Folder name") })
-                    TextButton(onClick = { if (title.isNotBlank()) onRename(title); onDismiss() }) { Text("Done") }
+                        singleLine = true, label = { Text(stringResource(R.string.folder_name)) })
+                    TextButton(onClick = { if (title.isNotBlank()) onRename(title); onDismiss() }) { Text(stringResource(R.string.done)) }
                 }
                 LazyVerticalGrid(GridCells.Adaptive(88.dp), Modifier.fillMaxWidth().weight(1f).padding(top = 12.dp),
                     contentPadding = PaddingValues(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -90,25 +92,25 @@ private fun FolderChild(
                 Image(app.icon.asImageBitmap(), null, Modifier.size(46.dp).clip(RoundedCornerShape(12.dp)))
                 Text(app.label, Modifier.padding(top = 6.dp), maxLines = 2, overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.labelMedium)
-                if (app.isWork || !app.available) Text(if (app.available) app.profileLabel else "${app.profileLabel} unavailable",
+                if (app.isWork || !app.available) Text(if (app.available) profileName(app.profileLabel) else stringResource(R.string.profile_unavailable, profileName(app.profileLabel)),
                     maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall)
             }
             IconButton(onClick = { menu = true }, Modifier.align(Alignment.TopEnd).size(36.dp)
-                .testTag("folder-options-${app.id}")) { Icon(Icons.Rounded.MoreVert, "Move ${app.label}") }
+                .testTag("folder-options-${app.id}")) { Icon(Icons.Rounded.MoreVert, stringResource(R.string.move_app, app.label)) }
             DropdownMenu(menu, onDismissRequest = { menu = false }) {
                 homeDestinations.distinctBy(::homeCellPage).forEach { destination ->
                     val destinationPage = homeCellPage(destination)
-                    val label = if (destinationPage == -1) "Move to Unfolded-only page" else "Move to page ${destinationPage + 1}"
+                    val label = if (destinationPage == -1) stringResource(R.string.move_to_leading_page) else stringResource(R.string.move_to_page, destinationPage + 1)
                     DropdownMenuItem(text = { Text(label) }, onClick = {
                         menu = false; onMoveOut(app.id, DropTarget.Home(destination))
                     }, modifier = Modifier.testTag("folder-move-${app.id}-page-$destinationPage"))
                 }
                 dockVacancies.firstOrNull()?.let { dock ->
-                    DropdownMenuItem(text = { Text("Move to dock") }, onClick = {
+                    DropdownMenuItem(text = { Text(stringResource(R.string.move_to_dock)) }, onClick = {
                         menu = false; onMoveOut(app.id, DropTarget.Dock(dock))
                     }, modifier = Modifier.testTag("folder-move-${app.id}-dock"))
                 }
-                DropdownMenuItem(text = { Text("Remove shortcut") }, onClick = {
+                DropdownMenuItem(text = { Text(stringResource(R.string.remove_shortcut)) }, onClick = {
                     menu = false; onMoveOut(app.id, DropTarget.Remove)
                 }, modifier = Modifier.testTag("folder-remove-${app.id}"))
             }

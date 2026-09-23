@@ -17,12 +17,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
-internal enum class CustomizationPage { OVERVIEW, WALLPAPER, HOME, GESTURES, BACKUP, HELP }
+internal enum class CustomizationPage { OVERVIEW, WALLPAPER, HOME, GESTURES, LANGUAGE, BACKUP, HELP }
 
 @Composable
 internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, model: LauncherModel,
@@ -36,97 +40,103 @@ internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, mo
     onShadeSetup: () -> Unit = {},
 ) {
     var wide by rememberSaveable { mutableStateOf(initiallyWide) }
-    val title = when (page) {
-        CustomizationPage.OVERVIEW -> "Make it yours"
-        CustomizationPage.WALLPAPER -> "Wallpaper & appearance"
-        CustomizationPage.HOME -> "Home layout"
-        CustomizationPage.GESTURES -> "Gestures & search"
-        CustomizationPage.BACKUP -> "Backup"
-        CustomizationPage.HELP -> "Help & setup"
-    }
+    val title = stringResource(when (page) {
+        CustomizationPage.OVERVIEW -> R.string.customize_title
+        CustomizationPage.WALLPAPER -> R.string.customize_wallpaper
+        CustomizationPage.HOME -> R.string.customize_home
+        CustomizationPage.GESTURES -> R.string.customize_gestures
+        CustomizationPage.LANGUAGE -> R.string.customize_language
+        CustomizationPage.BACKUP -> R.string.customize_backup
+        CustomizationPage.HELP -> R.string.customize_help
+    })
     val bodyScroll = rememberScrollState()
     LaunchedEffect(page) { bodyScroll.scrollTo(0) }
     Column(Modifier.fillMaxWidth().fillMaxHeight(.92f).padding(horizontal = 20.dp).padding(bottom = 12.dp)) {
         Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
             if (page != CustomizationPage.OVERVIEW) IconButton(onClick = { onPage(CustomizationPage.OVERVIEW) },
-                Modifier.testTag("customization-back")) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Back") }
+                Modifier.testTag("customization-back")) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.back)) }
             Text(title, Modifier.weight(1f), style = MaterialTheme.typography.headlineSmall)
-            IconButton(onClick = onClose) { Icon(Icons.Rounded.Close, "Close customization") }
+            IconButton(onClick = onClose) { Icon(Icons.Rounded.Close, stringResource(R.string.customize_close)) }
         }
         Column(Modifier.weight(1f).verticalScroll(bodyScroll).padding(bottom = 20.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)) {
             when (page) {
                 CustomizationPage.OVERVIEW -> {
                     if (!isDefaultHome) Button(onClick = onMakeDefault, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                        .testTag("default-home-settings")) { Text("Set as home app") }
+                        .testTag("default-home-settings")) { Text(stringResource(R.string.set_as_home_app)) }
                     if (state.canUndoEdit) OutlinedButton(onClick = { model.undoEdit(); onClose() },
-                        Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Undo last layout change") }
+                        Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(stringResource(R.string.undo_layout_change)) }
                     MiniHomePreview(backgrounds.previewBitmap, state, 176.dp)
-                    CustomizationDestination(Icons.Rounded.Wallpaper, "Wallpaper & appearance",
-                        if (backgrounds.previewPending) "Photo ready to review" else "Background, colors, and light",
+                    CustomizationDestination(Icons.Rounded.Wallpaper, stringResource(R.string.customize_wallpaper),
+                        stringResource(if (backgrounds.previewPending) R.string.customize_wallpaper_pending else R.string.customize_wallpaper_detail),
                         "customization-wallpaper") { onPage(CustomizationPage.WALLPAPER) }
-                    CustomizationDestination(Icons.Rounded.GridView, "Home layout",
-                        "Icons, spacing, dock, and widgets", "customization-home") { onPage(CustomizationPage.HOME) }
-                    CustomizationDestination(Icons.Rounded.Search, "Gestures & search",
-                        "Labels, status, and search behavior", "customization-gestures") { onPage(CustomizationPage.GESTURES) }
-                    CustomizationDestination(Icons.Rounded.Save, "Backup",
-                        "Save or restore this layout", "customization-backup") { onPage(CustomizationPage.BACKUP) }
-                    CustomizationDestination(Icons.Rounded.HelpOutline, "Help & setup",
-                        "Home app, widgets, gestures, and Discover", "customization-help") {
+                    CustomizationDestination(Icons.Rounded.GridView, stringResource(R.string.customize_home),
+                        stringResource(R.string.customize_home_detail), "customization-home") { onPage(CustomizationPage.HOME) }
+                    CustomizationDestination(Icons.Rounded.Search, stringResource(R.string.customize_gestures),
+                        stringResource(R.string.customize_gestures_detail), "customization-gestures") { onPage(CustomizationPage.GESTURES) }
+                    val languageTag = AppLanguage.current(LocalContext.current)
+                    CustomizationDestination(Icons.Rounded.Language, stringResource(R.string.customize_language),
+                        if (languageTag.isEmpty()) stringResource(R.string.language_system) else AppLanguage.nativeName(languageTag),
+                        "customization-language") { onPage(CustomizationPage.LANGUAGE) }
+                    CustomizationDestination(Icons.Rounded.Save, stringResource(R.string.customize_backup),
+                        stringResource(R.string.customize_backup_detail), "customization-backup") { onPage(CustomizationPage.BACKUP) }
+                    CustomizationDestination(Icons.Rounded.HelpOutline, stringResource(R.string.customize_help),
+                        stringResource(R.string.customize_help_detail), "customization-help") {
                         onPage(CustomizationPage.HELP)
                     }
                     if (isDefaultHome) TextButton(onClick = onMakeDefault, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                        .testTag("default-home-settings")) { Text("Change home app") }
+                        .testTag("default-home-settings")) { Text(stringResource(R.string.change_home_app)) }
                 }
                 CustomizationPage.WALLPAPER -> {
                     MiniHomePreview(backgrounds.previewBitmap, state, 228.dp)
-                    Text("Launcher background", style = MaterialTheme.typography.titleMedium)
-                    Text("Changes the image behind Duo’s Home screens.", style = MaterialTheme.typography.bodySmall,
+                    Text(stringResource(R.string.launcher_background), style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.launcher_background_detail), style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Button(onClick = backgrounds::choosePhoto, enabled = !backgrounds.loading,
                         modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("background-choose")) {
-                        Text(if (backgrounds.previewPending) "Choose a different photo" else "Choose a photo")
+                        Text(stringResource(if (backgrounds.previewPending) R.string.choose_different_photo else R.string.choose_photo))
                     }
                     if (backgrounds.previewPending) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(onClick = backgrounds::cancelPreview, Modifier.weight(1f).heightIn(min = 48.dp)
-                            .testTag("background-preview-cancel")) { Text("Cancel") }
+                            .testTag("background-preview-cancel")) { Text(stringResource(R.string.cancel)) }
                         Button(onClick = backgrounds::applyPreview, enabled = backgrounds.previewBitmap != null,
-                            modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("background-preview-apply")) { Text("Apply") }
+                            modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("background-preview-apply")) { Text(stringResource(R.string.apply)) }
                     }
                     if (backgrounds.photoSelected && !backgrounds.previewPending) OutlinedButton(onClick = backgrounds::reset,
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("background-reset")) { Text("Reset to Duo dunes") }
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("background-reset")) { Text(stringResource(R.string.reset_to_dunes)) }
                     if (backgrounds.loading) LinearProgressIndicator(Modifier.fillMaxWidth().testTag("background-loading"))
                     (backgrounds.errorMessage ?: backgrounds.successMessage)?.let { message ->
                         TextButton(onClick = backgrounds::clearMessage, Modifier.fillMaxWidth().testTag("background-message")) { Text(message) }
                     }
                     HorizontalDivider(Modifier.padding(vertical = 6.dp))
-                    Text("Android wallpaper", style = MaterialTheme.typography.titleMedium)
-                    Text("Opens Android’s preview to change the phone wallpaper. It does not change Duo’s launcher background.",
+                    Text(stringResource(R.string.android_wallpaper), style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.android_wallpaper_detail),
                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     OutlinedButton(onClick = onWallpaperPreview, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                        .testTag("wallpaper-preview")) { Icon(Icons.Rounded.Wallpaper, null); Spacer(Modifier.width(8.dp)); Text("Preview Android wallpaper") }
+                        .testTag("wallpaper-preview")) { Icon(Icons.Rounded.Wallpaper, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.preview_android_wallpaper)) }
                     HorizontalDivider(Modifier.padding(vertical = 6.dp))
                     AppearanceSettings(appearance, onAppearanceMode, onAppearanceManual, onAppearanceDeviceLocation, onAppearanceClear)
                 }
                 CustomizationPage.HOME -> HomeLayoutSettings(state, wide, { wide = it }, model, homePage, moreRowsFit,
                     onEditPins, onWidget, onAddWidget, onRemoveWidget)
                 CustomizationPage.GESTURES -> {
-                    SettingsSwitch("Show app names", state.labels, model::setLabels, "label-switch")
-                    SettingsSwitch("Show status at upper right", state.verticalStatus, model::setVerticalStatus, "status-switch")
-                    SettingsSwitch("Search button opens Google", state.googleSearch, model::setGoogleSearch, "google-search-switch")
-                    Text("All apps always keeps local app search.", style = MaterialTheme.typography.bodySmall,
+                    SettingsSwitch(stringResource(R.string.show_app_names), state.labels, model::setLabels, "label-switch")
+                    SettingsSwitch(stringResource(R.string.show_status), state.verticalStatus, model::setVerticalStatus, "status-switch")
+                    SettingsSwitch(stringResource(R.string.search_opens_google), state.googleSearch, model::setGoogleSearch, "google-search-switch")
+                    Text(stringResource(R.string.search_local_note), style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("Swipe sideways anywhere on Home to change pages. Swipe down for notifications or quick settings.",
+                    Text(stringResource(R.string.gestures_note),
                         style = MaterialTheme.typography.bodyMedium)
                 }
+                CustomizationPage.LANGUAGE -> LanguageSettings()
                 CustomizationPage.BACKUP -> {
-                    Text("Save the current Home layout, folders, widgets, and layout settings.",
+                    Text(stringResource(R.string.backup_detail),
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        OutlinedButton(onClick = onExportLayout, Modifier.weight(1f).heightIn(min = 48.dp).testTag("layout-export")) { Text("Save") }
-                        Button(onClick = onImportLayout, Modifier.weight(1f).heightIn(min = 48.dp).testTag("layout-import")) { Text("Restore") }
+                        OutlinedButton(onClick = onExportLayout, Modifier.weight(1f).heightIn(min = 48.dp).testTag("layout-export")) { Text(stringResource(R.string.save)) }
+                        Button(onClick = onImportLayout, Modifier.weight(1f).heightIn(min = 48.dp).testTag("layout-import")) { Text(stringResource(R.string.restore)) }
                     }
-                    Text("Restore shows a review before changing Home.", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.backup_restore_note), style = MaterialTheme.typography.bodySmall)
                 }
                 CustomizationPage.HELP -> LauncherHelp(
                     isDefaultHome = isDefaultHome,
@@ -146,28 +156,23 @@ private fun LauncherHelp(
     onAddWidget: () -> Unit,
     onShadeSetup: () -> Unit,
 ) {
-    HelpSection(Icons.Rounded.Home, "Home app",
-        if (isDefaultHome) "Duo is your Home app. You can switch launchers in Android’s Home settings."
-        else "Choose Duo in Android’s Home settings to use it when you press Home.")
+    HelpSection(Icons.Rounded.Home, stringResource(R.string.help_home_title),
+        stringResource(if (isDefaultHome) R.string.help_home_default else R.string.help_home_not_default))
     Button(onClick = onHomeSettings, Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("help-home-settings")) {
-        Text(if (isDefaultHome) "Change home app" else "Set Duo as Home")
+        Text(stringResource(if (isDefaultHome) R.string.change_home_app else R.string.set_duo_as_home))
     }
     HorizontalDivider(Modifier.padding(vertical = 4.dp))
-    HelpSection(Icons.Rounded.TouchApp, "Customize any page",
-        "Long-press empty space, then choose Customize launcher. If a page is full, long-press the slim area at its left edge.")
-    HelpSection(Icons.Rounded.Widgets, "Widgets",
-        "Add Android widgets to empty Home cells. Hold a widget to move or remove it.")
+    HelpSection(Icons.Rounded.TouchApp, stringResource(R.string.help_customize_title), stringResource(R.string.help_customize))
+    HelpSection(Icons.Rounded.Widgets, stringResource(R.string.widgets), stringResource(R.string.help_widgets))
     OutlinedButton(onClick = onAddWidget, Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("help-add-widget")) {
-        Text("Add widget to this page")
+        Text(stringResource(R.string.add_widget_to_page))
     }
     HorizontalDivider(Modifier.padding(vertical = 4.dp))
-    HelpSection(Icons.Rounded.SwipeDown, "Notifications and quick settings",
-        "Swipe down on Home. The first time, Duo explains Android’s optional Accessibility setting. The service only opens the system panels.")
+    HelpSection(Icons.Rounded.SwipeDown, stringResource(R.string.help_shade_title), stringResource(R.string.help_shade))
     TextButton(onClick = onShadeSetup, Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("help-shade-setup")) {
-        Text("Set up shade gestures")
+        Text(stringResource(R.string.help_shade_setup))
     }
-    HelpSection(Icons.Rounded.Explore, "Discover",
-        "Swipe right from the first Home page. If Google can’t provide the feed, Duo keeps a Home return and recovery actions available.")
+    HelpSection(Icons.Rounded.Explore, stringResource(R.string.discover), stringResource(R.string.help_discover))
 }
 
 @Composable
@@ -234,11 +239,11 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
     onAddWidget: (Int) -> Unit, onRemoveWidget: (Int) -> Unit) {
     val p = if (wide) state.expanded else state.compact
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        FilterChip(!wide, { onWide(false) }, label = { Text("Cover") })
-        FilterChip(wide, { onWide(true) }, label = { Text("Inner") })
+        FilterChip(!wide, { onWide(false) }, label = { Text(stringResource(R.string.display_cover)) })
+        FilterChip(wide, { onWide(true) }, label = { Text(stringResource(R.string.display_inner)) })
     }
-    OutlinedButton(onClick = onEditPins, Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Choose Home apps") }
-    Text("Apps in dock · cover and inner", style = MaterialTheme.typography.bodyMedium)
+    OutlinedButton(onClick = onEditPins, Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(stringResource(R.string.choose_home_apps)) }
+    Text(stringResource(R.string.dock_apps_setting), style = MaterialTheme.typography.bodyMedium)
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         (MIN_DOCK_SLOTS..MAX_DOCK_SLOTS).forEach { count ->
             FilterChip(state.dock.size == count, { model.setDockSlots(count) }, label = { Text("$count") },
@@ -246,33 +251,55 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
         }
     }
     fun fits(rows: Int) = rows <= DEFAULT_HOME_ROWS || moreRowsFit
-    Text("Home rows · cover and inner", style = MaterialTheme.typography.bodyMedium)
+    Text(stringResource(R.string.home_rows_setting), style = MaterialTheme.typography.bodyMedium)
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         listOf(DEFAULT_HOME_ROWS, GRID_ROWS).forEach { rows ->
             FilterChip(state.homeRows == rows, { model.setHomeRows(rows) },
-                label = { Text("${GRID_COLUMNS} × ${rows - 2} apps") },
+                label = { Text(stringResource(R.string.home_rows_option, GRID_COLUMNS, rows - 2)) },
                 enabled = state.homeRows == rows || fits(rows),
                 modifier = Modifier.testTag("home-rows-$rows"))
         }
     }
-    if (state.homeRows < GRID_ROWS && !fits(GRID_ROWS)) Text("More rows need a smaller icon size or less row spacing on this screen.",
+    if (state.homeRows < GRID_ROWS && !fits(GRID_ROWS)) Text(stringResource(R.string.home_rows_no_room),
         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    CustomizationSlider("App icon size", "${p.iconSize.toInt()} dp", p.iconSize, 40f..68f) { model.setPreset(wide, p.copy(iconSize = it)) }
-    CustomizationSlider("Space between rows", "${p.rowGap.toInt()} dp", p.rowGap, 0f..28f) { model.setPreset(wide, p.copy(rowGap = it)) }
-    CustomizationSlider("Dock width", "${p.dockWidth.toInt()} dp", p.dockWidth, 56f..84f) { model.setPreset(wide, p.copy(dockWidth = it)) }
-    SettingsSwitch("Align dock with app rows", p.dockAlignToGrid, { model.setPreset(wide, p.copy(dockAlignToGrid = it)) })
-    if (!p.dockAlignToGrid) CustomizationSlider("Dock height on screen", "${(p.dockPosition * 100).toInt()}%", p.dockPosition, .25f.. .75f) { model.setPreset(wide, p.copy(dockPosition = it)) }
-    TextButton(onClick = { model.setPreset(wide, LayoutPreset()) }, Modifier.fillMaxWidth()) { Text("Reset this layout") }
+    CustomizationSlider(stringResource(R.string.icon_size), stringResource(R.string.value_dp, p.iconSize.toInt()), p.iconSize, 40f..68f) { model.setPreset(wide, p.copy(iconSize = it)) }
+    CustomizationSlider(stringResource(R.string.row_spacing), stringResource(R.string.value_dp, p.rowGap.toInt()), p.rowGap, 0f..28f) { model.setPreset(wide, p.copy(rowGap = it)) }
+    CustomizationSlider(stringResource(R.string.dock_width), stringResource(R.string.value_dp, p.dockWidth.toInt()), p.dockWidth, 56f..84f) { model.setPreset(wide, p.copy(dockWidth = it)) }
+    SettingsSwitch(stringResource(R.string.dock_align), p.dockAlignToGrid, { model.setPreset(wide, p.copy(dockAlignToGrid = it)) })
+    if (!p.dockAlignToGrid) CustomizationSlider(stringResource(R.string.dock_height), stringResource(R.string.value_percent, (p.dockPosition * 100).toInt()), p.dockPosition, .25f.. .75f) { model.setPreset(wide, p.copy(dockPosition = it)) }
+    TextButton(onClick = { model.setPreset(wide, LayoutPreset()) }, Modifier.fillMaxWidth()) { Text(stringResource(R.string.reset_layout)) }
     HorizontalDivider(Modifier.padding(vertical = 6.dp))
-    Text("Widgets · Page ${homePage + 1}", style = MaterialTheme.typography.titleMedium)
+    Text(stringResource(R.string.widgets_on_page, homePage + 1), style = MaterialTheme.typography.titleMedium)
+    val removeWidget = stringResource(R.string.remove_widget)
+    val removeLeadingWidget = stringResource(R.string.remove_widget_leading)
     state.widgetPlacements.filter { it.page == homePage || (wide && it.page == -1) }.forEach { placement ->
         Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(if (placement.page == -1) "Unfolded-only page" else "${placement.spanX} × ${placement.spanY} widget · row ${placement.row + 1}", Modifier.weight(1f))
-            IconButton(onClick = { onRemoveWidget(placement.slot) }, modifier = Modifier.semantics { contentDescription = if (placement.page == -1) "Remove widget from Unfolded-only page" else "Remove widget" }) { Icon(Icons.Rounded.DeleteOutline, null) }
-            TextButton(onClick = { onWidget(placement.slot) }) { Text("Replace") }
+            Text(if (placement.page == -1) stringResource(R.string.unfolded_only_page)
+                else stringResource(R.string.widget_size_row, placement.spanX, placement.spanY, placement.row + 1), Modifier.weight(1f))
+            IconButton(onClick = { onRemoveWidget(placement.slot) }, modifier = Modifier.semantics { contentDescription = if (placement.page == -1) removeLeadingWidget else removeWidget }) { Icon(Icons.Rounded.DeleteOutline, null) }
+            TextButton(onClick = { onWidget(placement.slot) }) { Text(stringResource(R.string.replace)) }
         }
     }
-    TextButton(onClick = { onAddWidget(homePage) }, Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Add widget to this page") }
+    TextButton(onClick = { onAddWidget(homePage) }, Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(stringResource(R.string.add_widget_to_page)) }
+}
+
+@Composable private fun LanguageSettings() {
+    val context = LocalContext.current
+    val current = remember { AppLanguage.current(context) }
+    val system = remember { AppLanguage.systemLocale(context) }
+    AppLanguage.tags.forEach { tag ->
+        Row(Modifier.fillMaxWidth().heightIn(min = 56.dp)
+            .selectable(tag == current, role = Role.RadioButton) { context.findActivity()?.let { AppLanguage.set(it, tag) } }
+            .testTag("language-${tag.ifEmpty { "system" }}"), verticalAlignment = Alignment.CenterVertically) {
+            RadioButton(tag == current, null); Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(if (tag.isEmpty()) stringResource(R.string.language_system) else AppLanguage.nativeName(tag))
+                // Name the language "system" currently resolves to, in that language.
+                if (tag.isEmpty()) Text(system.getDisplayLanguage(system).replaceFirstChar { it.titlecase(system) },
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
 }
 
 @Composable private fun SettingsSwitch(label: String, checked: Boolean, onChecked: (Boolean) -> Unit, tag: String? = null) {

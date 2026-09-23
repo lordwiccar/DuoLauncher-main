@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
 internal enum class SetupEntryDecision { SHOW, ALREADY_FINISHED, EXISTING_INSTALL }
@@ -91,15 +92,15 @@ internal fun FirstRunSetupSheet(
             }
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
-                Text("Welcome to Duo", style = MaterialTheme.typography.headlineSmall)
+                Text(stringResource(R.string.setup_welcome), style = MaterialTheme.typography.headlineSmall)
                 Text(
-                    "A quiet Home screen built for both sides of your foldable.",
+                    stringResource(R.string.setup_tagline),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             IconButton(onClick = onSkip, Modifier.testTag("setup-close")) {
-                Icon(Icons.Rounded.Close, "Close welcome")
+                Icon(Icons.Rounded.Close, stringResource(R.string.setup_close))
             }
         }
 
@@ -110,35 +111,34 @@ internal fun FirstRunSetupSheet(
             Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 SetupGuideRow(
                     icon = if (isDefaultHome) Icons.Rounded.Check else Icons.Rounded.Home,
-                    title = if (isDefaultHome) "Duo is your Home app" else "Choose Duo as your Home app",
-                    detail = if (isDefaultHome) "The Home button returns here."
-                        else "Android will show the Home app chooser. You can switch back anytime.",
+                    title = stringResource(if (isDefaultHome) R.string.setup_is_home else R.string.setup_choose_home),
+                    detail = stringResource(if (isDefaultHome) R.string.setup_is_home_detail else R.string.setup_choose_home_detail),
                 )
                 if (!isDefaultHome) Button(
                     onClick = onMakeDefault,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("setup-make-default"),
-                ) { Text("Choose Home app") }
+                ) { Text(stringResource(R.string.setup_choose_home_button)) }
                 HorizontalDivider()
                 SetupGuideRow(
                     icon = Icons.Rounded.Widgets,
-                    title = "Make the space useful",
-                    detail = "Add a widget now, or long-press empty space later to customize any page.",
+                    title = stringResource(R.string.setup_space_title),
+                    detail = stringResource(R.string.setup_space_detail),
                 )
                 OutlinedButton(
                     onClick = onAddWidget,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("setup-add-widget"),
-                ) { Text("Add a widget") }
+                ) { Text(stringResource(R.string.setup_add_widget)) }
             }
         }
 
         Button(
             onClick = onExplore,
             modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("setup-explore"),
-        ) { Text("Explore Home") }
+        ) { Text(stringResource(R.string.setup_explore)) }
         TextButton(
             onClick = onSkip,
             modifier = Modifier.align(Alignment.CenterHorizontally).testTag("setup-skip"),
-        ) { Text("Not now") }
+        ) { Text(stringResource(R.string.not_now)) }
     }
 }
 

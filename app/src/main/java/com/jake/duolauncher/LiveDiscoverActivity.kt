@@ -2,6 +2,7 @@ package com.jake.duolauncher
 
 import android.app.Activity
 import android.app.ActivityOptions
+import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Build
@@ -61,7 +62,8 @@ internal class DiscoverHostStartGate(private var nextToken: Long = System.nanoTi
 internal object LiveDiscover {
     var host = WeakReference<LiveDiscoverActivity>(null)
     var owner = WeakReference<MainActivity>(null)
-    val message = mutableStateOf<String?>("Connecting to Discover…")
+    /** A string resource explaining why the feed is not showing, or null while it is. */
+    val message = mutableStateOf<Int?>(R.string.discover_connecting)
     var onNativeProgress: ((Float) -> Unit)? = null
     var onHomeRequest: (() -> Unit)? = null
     var fullSize = androidx.compose.ui.geometry.Size.Zero
@@ -90,7 +92,7 @@ internal object LiveDiscover {
         owner = WeakReference(activity)
         if (host.get() != null) return
         val token = startGate.request(activity) ?: return
-        message.value = "Connecting to Discover…"
+        message.value = R.string.discover_connecting
         val options = ActivityOptions.makeCustomAnimation(activity, 0, 0).toBundle().apply {
             DiscoverBounds.launchOptions(suppressOverlayAnimation = true)?.let(::putAll)
         }
@@ -120,7 +122,7 @@ internal object LiveDiscover {
                 if (activity.isFinishing || activity.isDestroyed ||
                     !activity.lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED))
                     startGate.reset(activity)
-                else message.value = "Discover couldn't start. Tap Retry to reconnect."
+                else message.value = R.string.discover_start_failed
             }
         }
     }
@@ -216,6 +218,8 @@ internal object LiveDiscover {
 }
 
 class LiveDiscoverActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: Context) { super.attachBaseContext(AppLanguage.wrap(newBase)) }
+
     private lateinit var client: DiscoverClient
     private lateinit var frame: DiscoverFrame
     private var request = 0
@@ -254,7 +258,7 @@ class LiveDiscoverActivity : ComponentActivity() {
                 client.connect()
                 client.page(LiveDiscover.nativeProgress(LiveDiscover.progress), LiveDiscover.pagerOwnsMotion)
             } else if (remaining > 0) decor.postOnAnimation { attach(remaining - 1) }
-            else LiveDiscover.message.value = "Discover couldn't fit beside the dock."
+            else LiveDiscover.message.value = R.string.discover_no_fit
         }
         window.decorView.postOnAnimation { attach(30) }
     }

@@ -224,7 +224,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
                 persist()
                 completedRefreshes++
             } catch (_: Exception) {
-                mutable.update { it.copy(loading = false, error = "Apps could not be loaded. Tap to retry.") }
+                mutable.update { it.copy(loading = false, error = getApplication<Application>().getString(R.string.apps_load_failed)) }
             } finally {
                 refreshing = false
                 if (refreshPending) { refreshPending = false; refresh() }
@@ -344,7 +344,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         return commitLayout(dropApp(old.layout, id, target))
     }
 
-    fun createFolder(firstAppId: String, secondAppId: String, targetIndex: Int, title: String = "Folder"): String? {
+    fun createFolder(firstAppId: String, secondAppId: String, targetIndex: Int, title: String = getApplication<Application>().getString(R.string.folder_default)): String? {
         val installed = mutable.value.apps.mapTo(mutableSetOf(), AppEntry::id)
         if (firstAppId !in installed || secondAppId !in installed) return null
         val id = newFolderId()
@@ -638,7 +638,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .let { it.copy(homeRows = maxOf(it.homeRows, it.layout.requiredRows())) }
     }.getOrElse {
         statePayloadInvalid = legacyRaw != null
-        LauncherState(loading = false, error = "Saved Home layout could not be read; it was left unchanged.")
+        LauncherState(loading = false, error = getApplication<Application>().getString(R.string.layout_load_failed))
     }
 
     override fun onCleared() { launcherApps.unregisterCallback(callback) }

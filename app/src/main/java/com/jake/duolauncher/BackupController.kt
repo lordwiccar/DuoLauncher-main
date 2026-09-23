@@ -75,17 +75,17 @@ class BackupController(
     fun startExport(fileName: String = "duo-launcher-layout.json") {
         val state = model.state.value
         val raw = runCatching { encodeLayoutBackup(state, widgetDescriptors(state), scope) }.getOrElse {
-            errorMessage = it.message ?: "Layout backup could not be prepared."; return
+            errorMessage = activity.getString(R.string.backup_prepare_failed); return
         }
         begin(OP_EXPORT, raw)
         try { createDocument.launch(fileName) }
-        catch (error: Exception) { errorMessage = error.message ?: "The document picker is unavailable."; clearTransaction(false) }
+        catch (error: Exception) { errorMessage = activity.getString(R.string.document_picker_unavailable); clearTransaction(false) }
     }
 
     fun startImport() {
         begin(OP_IMPORT)
         try { openDocument.launch(arrayOf("application/json", "text/json", "text/plain")) }
-        catch (error: Exception) { errorMessage = error.message ?: "The document picker is unavailable."; clearTransaction(false) }
+        catch (error: Exception) { errorMessage = activity.getString(R.string.document_picker_unavailable); clearTransaction(false) }
     }
 
     fun applyImport(): Boolean {
@@ -100,9 +100,9 @@ class BackupController(
             if (token != generation || operation != OP_PREVIEW) return@launch
             result.onSuccess {
                 val changed = model.applyImportedLayout(it)
-                successMessage = if (changed) "Layout restored. Widgets are ready to reconnect." else "This layout is already active."
+                successMessage = activity.getString(if (changed) R.string.backup_restored else R.string.backup_already_active)
                 clearTransaction(clearMessages = false)
-            }.onFailure { errorMessage = it.message ?: "This layout backup is no longer valid." }
+            }.onFailure { errorMessage = it.userMessage(activity.getString(R.string.backup_no_longer_valid)) }
         }
         return true
     }
@@ -138,8 +138,8 @@ class BackupController(
             }
             result.rethrowCancellation()
             if (token != generation || operation != OP_EXPORT) return@launch
-            result.onSuccess { successMessage = "Layout backup saved." }
-                .onFailure { errorMessage = it.message ?: "Layout backup could not be saved." }
+            result.onSuccess { successMessage = activity.getString(R.string.backup_saved) }
+                .onFailure { errorMessage = it.userMessage(activity.getString(R.string.backup_save_failed)) }
             clearTransaction(clearMessages = false)
         }
     }
@@ -155,7 +155,7 @@ class BackupController(
                 parsePreview(it, persist = false)
             }
                 .onFailure {
-                    errorMessage = it.message ?: "Layout backup could not be read."
+                    errorMessage = it.userMessage(activity.getString(R.string.backup_read_failed))
                     clearTransaction(clearMessages = false)
                 }
         }
@@ -177,7 +177,7 @@ class BackupController(
                 onExternalResultChanged(true)
             }.onFailure {
                 if (token != generation) return@onFailure
-                errorMessage = it.message ?: "This layout backup is invalid."
+                errorMessage = it.userMessage(activity.getString(R.string.backup_invalid))
                 clearTransaction(clearMessages = false)
             }
         }
@@ -191,7 +191,7 @@ class BackupController(
             while (true) {
                 val count = it.read(buffer)
                 if (count < 0) break
-                require(output.size() + count <= MAX_LAYOUT_BACKUP_BYTES) { "Layout backup is larger than 2 MB" }
+                if (output.size() + count > MAX_LAYOUT_BACKUP_BYTES) throw UserFacingException(activity.getString(R.string.backup_too_large))
                 output.write(buffer, 0, count)
             }
             output.toString(Charsets.UTF_8.name())

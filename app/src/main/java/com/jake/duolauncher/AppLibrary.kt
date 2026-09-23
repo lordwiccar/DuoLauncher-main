@@ -24,6 +24,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,17 +72,17 @@ internal fun AppLibrary(
             listOf(Color.White.copy(alpha = .09f), Color.Transparent) else listOf(Color.Transparent, Color.Transparent)))
             .padding(horizontal = 16.dp).padding(top = 18.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(if (editing) "Choose home apps" else "All apps", Modifier.weight(1f), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Medium)
-                Text(if (editing) "${pinned.size} pinned" else "${visibleApps.size}", color = ink, fontSize = 12.sp)
+                Text(stringResource(if (editing) R.string.pin_home_apps_title else R.string.all_apps), Modifier.weight(1f), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Medium)
+                Text(if (editing) pluralStringResource(R.plurals.pinned_count, pinned.size, pinned.size) else "${visibleApps.size}", color = ink, fontSize = 12.sp)
             }
             if (hasWork) Row(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(selected = !showWork, onClick = { showWork = false }, label = { Text("Personal") })
-                FilterChip(selected = showWork, onClick = { showWork = true }, label = { Text("Work") })
+                FilterChip(selected = !showWork, onClick = { showWork = false }, label = { Text(stringResource(R.string.profile_personal)) })
+                FilterChip(selected = showWork, onClick = { showWork = true }, label = { Text(stringResource(R.string.profile_work)) })
             }
             OutlinedTextField(query, onQuery, Modifier.fillMaxWidth().padding(vertical = 12.dp).testTag(if (editing) "pin-search" else "library-search"),
-                placeholder = { Text("Search apps") }, singleLine = true, shape = RoundedCornerShape(16.dp),
+                placeholder = { Text(stringResource(R.string.search_apps)) }, singleLine = true, shape = RoundedCornerShape(16.dp),
                 leadingIcon = { Icon(Icons.Rounded.Search, null) },
-                trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { onQuery("") }) { Icon(Icons.Rounded.Close, "Clear search") } },
+                trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { onQuery("") }) { Icon(Icons.Rounded.Close, stringResource(R.string.clear_search)) } },
                 colors = if (glass) OutlinedTextFieldDefaults.colors(
                     focusedTextColor = ink, unfocusedTextColor = ink, cursorColor = ink,
                     focusedContainerColor = Color.White.copy(alpha = .18f), unfocusedContainerColor = Color.White.copy(alpha = .12f),
@@ -93,12 +95,12 @@ internal fun AppLibrary(
                 contentPadding = PaddingValues(bottom = 12.dp)) {
                 if (showWork && selectedProfile?.available == false) item("work-paused") {
                     Column(Modifier.fillMaxWidth().padding(vertical = 20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(if (selectedProfile.quiet) "Work apps are paused" else "Work profile is unavailable")
+                        Text(stringResource(if (selectedProfile.quiet) R.string.work_paused else R.string.work_unavailable))
                         if (selectedProfile.quiet) Button(onClick = { onTurnOnWork(selectedProfile.userSerial) },
-                            Modifier.padding(top = 10.dp).testTag("turn-on-work")) { Text("Turn on work apps") }
+                            Modifier.padding(top = 10.dp).testTag("turn-on-work")) { Text(stringResource(R.string.turn_on_work)) }
                     }
                 }
-                if (groups.isEmpty()) item { Text(if (state.loading) "Loading apps…" else "No apps found", Modifier.padding(vertical = 20.dp)) }
+                if (groups.isEmpty()) item { Text(stringResource(if (state.loading) R.string.loading_apps else R.string.no_apps_found), Modifier.padding(vertical = 20.dp)) }
                 groups.forEach { (letter, entries) ->
                     stickyHeader(key = "heading-$letter") {
                         Row(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -114,19 +116,20 @@ internal fun AppLibrary(
                     }
                     items(entries, key = { it.id }) { app ->
                         val isPinned = app.id in pinned
+                        val appOptions = stringResource(R.string.app_options)
                         val launchBounds = remember { android.graphics.Rect() }
                         val dragModifier = if (drag != null) Modifier.dropRegion(drag, DropTarget.Library(app.id), app.id, page) else Modifier
                         val click = { if (editing) onPin(app.id, !isPinned) else onLaunchFrom(app, launchBounds) }
                         Row(Modifier.fillMaxWidth().heightIn(min = 60.dp).then(dragModifier).clip(RoundedCornerShape(14.dp)).testTag("library-app-${app.id}")
                             .then(if (drag == null) Modifier.combinedClickable(onClick = click, onLongClick = { onActions(app) })
-                                else Modifier.clickable(onClick = click).semantics { onLongClick("App options") { onActions(app); true } })
+                                else Modifier.clickable(onClick = click).semantics { onLongClick(appOptions) { onActions(app); true } })
                             .padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                             Image(app.icon.asImageBitmap(), null, Modifier.size(40.dp)
                                 .onGloballyPositioned { launchBounds.set(it.boundsInWindow().toAndroidBounds()) }.clip(RoundedCornerShape(10.dp)))
                             Text(app.label, Modifier.weight(1f).padding(start = 12.dp), maxLines = 2, fontSize = 14.sp)
                             if (editing) IconButton(onClick = { onPin(app.id, !isPinned) }, Modifier.testTag("pin-${app.id}")) {
                                 Icon(if (isPinned) Icons.Rounded.PushPin else Icons.Outlined.PushPin,
-                                    if (isPinned) "Remove ${app.label} from home" else "Pin ${app.label} to home",
+                                    stringResource(if (isPinned) R.string.unpin_app else R.string.pin_app, app.label),
                                     tint = if (isPinned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                                     modifier = Modifier.size(20.dp))
                             }

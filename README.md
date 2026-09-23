@@ -21,6 +21,7 @@ Screenshots use sample data on an emulator sized to the reference Fold. [Fresh-i
 - App dragging, pages created during an edge drag, Home folders, and separate personal/work catalogs where device policy permits.
 - Alphabetical All apps, Google search with a local app-search fallback, and live Discover on compatible devices.
 - Local photo wallpapers, light/dark/system or sunrise/sunset appearance, and layout export/import.
+- English, Czech, Slovak, Polish, and German, following the system language or chosen in **Language**.
 
 Android still controls the lock screen, notification panels, recents, and system app transitions.
 

@@ -42,6 +42,10 @@ The live path keeps a persistent Google window and live Home graphics layers. He
 
 `DiscoverBounds.kt` contains an unsupported alignment-hint workaround scoped to audited Window Extensions versions 8–10. Other versions retain normal alignment. This avoids an additional vendor task-fragment transition in the tested configuration; it is not a public SystemUI animation API or a compatibility guarantee. Keep the version guard, host-start recovery and fallback path when changing embedding behavior.
 
+## Localization
+
+All user-facing text lives in `res/values/strings.xml` with translations in `values-cs`, `values-sk`, `values-pl`, and `values-de`; `AppLanguageTest` checks that `AppLanguage.tags` and `res/xml/locales_config.xml` agree. `AppLanguage` applies a per-app choice through `LocaleManager` on Android 13+, and on Android 12 stores it and wraps each context in `attachBaseContext`. Saved data stays language-neutral: profile labels are stored as `Personal`/`Work` and localized at display time with `profileName`, Discover status is a string resource id, and only failures wrapped in `UserFacingException` show their own (already localized) message. Dates use `localizedDateFormatter` skeletons so word order and month forms follow the language.
+
 ## Persistence and recovery
 
 Setup uses separate preferences and classifies existing installations before the model creates default state. Completion is stored before closing the welcome sheet, so upgrades do not show onboarding or replace layouts.

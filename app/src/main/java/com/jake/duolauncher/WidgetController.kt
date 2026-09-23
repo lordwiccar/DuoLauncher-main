@@ -51,7 +51,7 @@ class WidgetController(
     private val bind = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val returnedId = result.data?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, pendingId) ?: pendingId
         if (result.resultCode == Activity.RESULT_OK && returnedId == pendingId) configure() else {
-            if (result.resultCode == Activity.RESULT_OK) failureMessage = "The widget host returned an unexpected binding. Try again."
+            if (result.resultCode == Activity.RESULT_OK) failureMessage = activity.getString(R.string.widget_unexpected_binding)
             cancel()
         }
     }
@@ -113,7 +113,7 @@ class WidgetController(
     }
 
     fun clearFailure() { failureMessage = null }
-    fun label(id: Int): String = manager.getAppWidgetInfo(id)?.loadLabel(activity.packageManager) ?: "Widget"
+    fun label(id: Int): String = manager.getAppWidgetInfo(id)?.loadLabel(activity.packageManager) ?: activity.getString(R.string.widget)
     fun providers(profile: UserHandle): List<AppWidgetProviderInfo> =
         manager.getInstalledProvidersForProfile(profile)
     fun personalProviders(): List<AppWidgetProviderInfo> = providers(Process.myUserHandle())
@@ -174,7 +174,7 @@ class WidgetController(
     fun setBuiltin(placement: WidgetPlacement) {
         failureMessage = null
         if (model.placement(placement.slot) == placement) return
-        if (!model.placeWidget(placement)) failureMessage = NO_ROOM
+        if (!model.placeWidget(placement)) failureMessage = activity.getString(R.string.widget_no_room)
     }
 
     fun setBuiltin(slot: Int, id: Int) = setBuiltin(model.placement(slot)?.copy(id = id)
@@ -183,7 +183,7 @@ class WidgetController(
     fun add(placement: WidgetPlacement, provider: AppWidgetProviderInfo, grid: WidgetGridSizing? = null,
         contentSize: WidgetContentSize? = null) {
         if (reconfigureWidgetId != null) {
-            failureMessage = "Finish or cancel the open widget settings first."
+            failureMessage = activity.getString(R.string.widget_settings_open)
             return
         }
         cancel()
@@ -242,7 +242,7 @@ class WidgetController(
         val placement = pendingPlacement ?: return cancel()
         val originalStillPresent = model.placement(placement.slot) == pendingOriginal
         if (pendingId < 0 || !originalStillPresent || !model.placeWidget(placement)) {
-            failureMessage = if (!originalStillPresent) CHANGED else NO_ROOM
+            failureMessage = activity.getString(if (!originalStillPresent) R.string.widget_home_changed else R.string.widget_no_room)
             cancel()
             return
         }
@@ -301,7 +301,7 @@ class WidgetController(
     }
 
     private fun fail() {
-        failureMessage = "This widget could not be added. Try another widget."
+        failureMessage = activity.getString(R.string.widget_add_failed)
         cancel()
     }
 
@@ -318,7 +318,7 @@ class WidgetController(
     private fun launchReconfigure(): Boolean {
         val id = reconfigureWidgetId ?: return false
         if (!canReconfigure(id)) {
-            failureMessage = "This widget can no longer be configured."
+            failureMessage = activity.getString(R.string.widget_configure_gone)
             clearReconfigure()
             return false
         }
@@ -327,7 +327,7 @@ class WidgetController(
             host.startAppWidgetConfigureActivityForResult(activity, id, 0, RECONFIGURE, null)
             true
         } catch (_: Exception) {
-            failureMessage = "This widget could not open its settings."
+            failureMessage = activity.getString(R.string.widget_configure_failed)
             clearReconfigure()
             false
         }
@@ -420,7 +420,5 @@ class WidgetController(
         private const val PENDING_OPTIONS = "pendingWidgetOptions"
         private const val PENDING_WIDTH = "pendingWidgetWidth"
         private const val PENDING_HEIGHT = "pendingWidgetHeight"
-        private const val NO_ROOM = "There isn't room for this widget here."
-        private const val CHANGED = "Home changed while the widget was being configured. Choose a space again."
     }
 }

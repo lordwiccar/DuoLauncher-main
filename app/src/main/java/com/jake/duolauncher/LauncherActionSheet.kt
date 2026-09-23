@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
@@ -58,31 +59,31 @@ internal fun LauncherAppActionSheet(app: AppEntry, placed: Boolean, homePages: I
     Column(Modifier.fillMaxWidth().heightIn(max = maxHeight).verticalScroll(rememberScrollState())
         .padding(horizontal = 20.dp).padding(bottom = 20.dp)) {
         Row(Modifier.fillMaxWidth().heightIn(min = 64.dp), verticalAlignment = Alignment.CenterVertically) {
-            if (moving) IconButton(onClick = { onMoving(false) }) { Icon(Icons.Rounded.ArrowBack, "Back") }
+            if (moving) IconButton(onClick = { onMoving(false) }) { Icon(Icons.Rounded.ArrowBack, stringResource(R.string.back)) }
             Image(app.icon.asImageBitmap(), null, Modifier.size(48.dp).clip(RoundedCornerShape(13.dp)))
             Spacer(Modifier.width(14.dp)); Column(Modifier.weight(1f)) {
-                Text(if (moving) "Move ${app.label}" else app.label, style = MaterialTheme.typography.titleLarge)
-                Text("${app.profileLabel} profile", style = MaterialTheme.typography.bodySmall,
+                Text(if (moving) stringResource(R.string.move_app, app.label) else app.label, style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.profile_label, profileName(app.profileLabel)), style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            IconButton(onClick = onClose) { Icon(Icons.Rounded.Close, "Close app options") }
+            IconButton(onClick = onClose) { Icon(Icons.Rounded.Close, stringResource(R.string.close_app_options)) }
         }
         if (moving) {
-            ActionRow(Icons.Rounded.ArrowUpward, "Move to first position", onMoveFirst)
-            ActionRow(Icons.Rounded.KeyboardArrowUp, "Move earlier", onMoveEarlier)
-            ActionRow(Icons.Rounded.KeyboardArrowDown, "Move later", onMoveLater)
+            ActionRow(Icons.Rounded.ArrowUpward, stringResource(R.string.move_first), onMoveFirst)
+            ActionRow(Icons.Rounded.KeyboardArrowUp, stringResource(R.string.move_earlier), onMoveEarlier)
+            ActionRow(Icons.Rounded.KeyboardArrowDown, stringResource(R.string.move_later), onMoveLater)
             HorizontalDivider(Modifier.padding(vertical = 6.dp))
-            repeat(homePages) { page -> ActionRow(Icons.Rounded.GridView, "Move to page ${page + 1}",
+            repeat(homePages) { page -> ActionRow(Icons.Rounded.GridView, stringResource(R.string.move_to_page, page + 1),
                 { onMovePage(page) }, Modifier.testTag("app-move-${app.id}-page-$page")) }
         } else {
-            if (placed) ActionRow(Icons.Rounded.DragIndicator, "Move on Home", { onMoving(true) })
-            else ActionRow(Icons.Rounded.Home, "Add to Home", onAddOrRemove)
-            onWidgets?.let { ActionRow(Icons.Rounded.Widgets, "Widgets", it) }
-            ActionRow(Icons.Rounded.CreateNewFolder, "Create folder", onCreateFolder)
-            ActionRow(Icons.Rounded.Info, "App info", onInfo)
+            if (placed) ActionRow(Icons.Rounded.DragIndicator, stringResource(R.string.move_on_home), { onMoving(true) })
+            else ActionRow(Icons.Rounded.Home, stringResource(R.string.add_to_home), onAddOrRemove)
+            onWidgets?.let { ActionRow(Icons.Rounded.Widgets, stringResource(R.string.widgets), it) }
+            ActionRow(Icons.Rounded.CreateNewFolder, stringResource(R.string.create_folder), onCreateFolder)
+            ActionRow(Icons.Rounded.Info, stringResource(R.string.app_info), onInfo)
             if (placed) {
                 Spacer(Modifier.height(10.dp)); HorizontalDivider(); Spacer(Modifier.height(4.dp))
-                ActionRow(Icons.Rounded.RemoveCircleOutline, "Remove from Home", onAddOrRemove,
+                ActionRow(Icons.Rounded.RemoveCircleOutline, stringResource(R.string.remove_from_home), onAddOrRemove,
                     tint = MaterialTheme.colorScheme.error)
             }
         }
@@ -96,14 +97,14 @@ internal fun EmptySpaceActionSheet(onWidgets: () -> Unit, onWallpaper: () -> Uni
     Column(Modifier.fillMaxWidth().heightIn(max = maxHeight).verticalScroll(rememberScrollState())
         .padding(horizontal = 20.dp).padding(bottom = 20.dp)) {
         Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("Add to Home", Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
-            IconButton(onClick = onClose) { Icon(Icons.Rounded.Close, "Close empty space options") }
+            Text(stringResource(R.string.add_to_home), Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
+            IconButton(onClick = onClose) { Icon(Icons.Rounded.Close, stringResource(R.string.close_empty_space_options)) }
         }
-        Text("Choose what belongs in this space.", style = MaterialTheme.typography.bodyMedium,
+        Text(stringResource(R.string.empty_space_detail), style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 8.dp))
-        ActionRow(Icons.Rounded.Widgets, "Widgets", onWidgets, Modifier.testTag("empty-space-widgets"))
-        ActionRow(Icons.Rounded.Wallpaper, "Wallpaper", onWallpaper, Modifier.testTag("empty-space-wallpaper"))
-        ActionRow(Icons.Rounded.Tune, "Customize launcher", onCustomize, Modifier.testTag("empty-space-customize"))
+        ActionRow(Icons.Rounded.Widgets, stringResource(R.string.widgets), onWidgets, Modifier.testTag("empty-space-widgets"))
+        ActionRow(Icons.Rounded.Wallpaper, stringResource(R.string.wallpaper), onWallpaper, Modifier.testTag("empty-space-wallpaper"))
+        ActionRow(Icons.Rounded.Tune, stringResource(R.string.customize_launcher), onCustomize, Modifier.testTag("empty-space-customize"))
     }
 }
 

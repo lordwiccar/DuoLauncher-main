@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.text.font.FontWeight
@@ -220,25 +221,25 @@ internal fun VisualWidgetPicker(
         color = Glass.copy(alpha = .96f)) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().padding(horizontal = 18.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onBack) { Icon(Icons.Rounded.ArrowBack, "Back") }
-                Text("Widgets", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Medium)
+                IconButton(onClick = onBack) { Icon(Icons.Rounded.ArrowBack, stringResource(R.string.back)) }
+                Text(stringResource(R.string.widgets), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Medium)
             }
             OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth().padding(vertical = 10.dp)
-                .testTag("widget-catalog-search"), singleLine = true, placeholder = { Text("Search widgets") },
+                .testTag("widget-catalog-search"), singleLine = true, placeholder = { Text(stringResource(R.string.search_widgets)) },
                 leadingIcon = { Icon(Icons.Rounded.Search, null) })
             if (profiles.any { it.isWork }) Row(Modifier.fillMaxWidth().padding(bottom = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 profiles.forEach { profile ->
                     FilterChip(selected = profile.userSerial == selectedProfile.userSerial,
-                        onClick = { onSelectProfile(profile) }, label = { Text(profile.label) })
+                        onClick = { onSelectProfile(profile) }, label = { Text(profileName(profile.label)) })
                 }
             }
             if (!selectedProfile.available || !selectedProfile.unlocked || selectedProfile.quiet) {
                 Column(Modifier.fillMaxWidth().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(if (selectedProfile.quiet) "${selectedProfile.label} apps are paused"
-                        else "${selectedProfile.label} profile is unavailable")
+                    Text(stringResource(if (selectedProfile.quiet) R.string.profile_apps_paused else R.string.profile_unavailable_long,
+                        profileName(selectedProfile.label)))
                     if (selectedProfile.isWork) Button(onClick = { onTurnOnWork(selectedProfile.userSerial) },
-                        modifier = Modifier.padding(top = 12.dp)) { Text("Turn on") }
+                        modifier = Modifier.padding(top = 12.dp)) { Text(stringResource(R.string.turn_on)) }
                 }
             }
             LazyColumn(Modifier.fillMaxSize().testTag("widget-catalog-list"), verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -251,15 +252,15 @@ internal fun VisualWidgetPicker(
                 if (words.isEmpty() && selectedProfile.isPersonal) {
                     item("duo-widgets") { Text("Duo Launcher", style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(top = 10.dp, start = 4.dp)) }
-                    items(listOf(CLOCK_WIDGET to "Clock", DATE_WIDGET to "Date", INFO_WIDGET to "Widget panel"),
+                    items(listOf(CLOCK_WIDGET to R.string.widget_clock, DATE_WIDGET to R.string.widget_date, INFO_WIDGET to R.string.widget_panel),
                         key = { "builtin-${it.first}" }) { (id, label) ->
                         Surface(Modifier.fillMaxWidth().testTag("widget-builtin-$id")
                             .clickable { focusManager.clearFocus(); keyboard?.hide(); onBuiltin(id) },
                             color = Glass.copy(alpha = .55f), border = BorderStroke(1.dp, Color.White.copy(alpha = .55f)),
                             shape = RoundedCornerShape(22.dp)) {
                             Column(Modifier.padding(16.dp)) {
-                                Text(label, style = MaterialTheme.typography.titleMedium)
-                                Text("2 × 2 · Tap to place", style = MaterialTheme.typography.labelMedium)
+                                Text(stringResource(label), style = MaterialTheme.typography.titleMedium)
+                                Text(stringResource(R.string.widget_builtin_detail), style = MaterialTheme.typography.labelMedium)
                             }
                         }
                     }
@@ -291,15 +292,15 @@ internal fun VisualWidgetPicker(
                                 Column(Modifier.padding(bottom = 12.dp)) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(entry.providerLabel, style = MaterialTheme.typography.titleMedium)
-                                        if (entry.isWork) AssistChip(onClick = {}, label = { Text(entry.profileLabel) },
+                                        if (entry.isWork) AssistChip(onClick = {}, label = { Text(profileName(entry.profileLabel)) },
                                             modifier = Modifier.padding(start = 8.dp))
                                     }
                                     if (entry.description.isNotBlank()) Text(entry.description, style = MaterialTheme.typography.bodySmall,
                                         maxLines = 2)
-                                    Text(span?.let { "${it.width} × ${it.height}" } ?: "Doesn’t fit this layout",
+                                    Text(span?.let { "${it.width} × ${it.height}" } ?: stringResource(R.string.widget_does_not_fit),
                                         style = MaterialTheme.typography.labelMedium,
                                         color = if (span == null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary)
-                                    Text("Tap to place · Hold to drag", style = MaterialTheme.typography.bodySmall)
+                                    Text(stringResource(R.string.widget_place_hint), style = MaterialTheme.typography.bodySmall)
                                 }
                                 val ratio = span?.let { it.width.toFloat() / it.height } ?: 1.5f
                                 BoxWithConstraints(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -315,7 +316,7 @@ internal fun VisualWidgetPicker(
                         }
                     }
                 }
-                if (entries != null && filtered.isEmpty()) item { Text("No widgets found", Modifier.padding(20.dp)) }
+                if (entries != null && filtered.isEmpty()) item { Text(stringResource(R.string.no_widgets_found), Modifier.padding(20.dp)) }
             }
         }
     }
