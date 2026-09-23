@@ -1497,11 +1497,12 @@ private fun SharedHomeGrid(
     val draggedId = drag.source?.appId
     val homeTarget = (target as? DropTarget.Home)?.index
     val source = drag.source?.target as? DropTarget.Home
-    val draggedPreviewIndex = draggedId?.let(::previewIndexOf) ?: -1
+    // Cell indices are negative on the unfolded-only page, so absence is null, never -1.
+    val draggedPreviewIndex = draggedId?.let(::previewIndexOf)
     val hiddenIndex = when {
         !drag.active || !drag.moved -> null
-        homeTarget != null -> draggedPreviewIndex.takeIf { it >= 0 }
-        source != null && target !is DropTarget.Dock -> draggedPreviewIndex.takeIf { it >= 0 }
+        homeTarget != null -> draggedPreviewIndex
+        source != null && target !is DropTarget.Dock -> draggedPreviewIndex
         else -> null
     }
     val dimDragged = drag.active && !drag.moved && source != null
@@ -1554,9 +1555,8 @@ private fun SharedHomeGrid(
         val ids = (if (page == -1) savedLeadingSlots + previewLeadingSlots
             else savedSlots.slicePage(pageRange) + previewSlots.slicePage(pageRange)).filterNotNull().distinct()
         ids.forEach { id ->
-            val savedIndex = savedIndexOf(id) ?: -1
-            val previewIndex = previewIndexOf(id) ?: -1
-            val renderIndex = previewIndex.takeIf { it in pageRange } ?: savedIndex.takeIf { it in pageRange } ?: return@forEach
+            val previewIndex = previewIndexOf(id)
+            val renderIndex = previewIndex?.takeIf { it in pageRange } ?: savedIndexOf(id)?.takeIf { it in pageRange } ?: return@forEach
             val app = appsById[id] ?: return@forEach
             key(id) {
                 val localIndex = renderIndex - pageStart
@@ -1565,7 +1565,7 @@ private fun SharedHomeGrid(
                     IntOffset(((localIndex % GRID_COLUMNS) * cellWidthPx).roundToInt(), with(density) { rowTop(row).dp.toPx() }.roundToInt()),
                     label = "home insertion $id",
                 )
-                val visible = previewIndex in pageRange && renderIndex != hiddenIndex
+                val visible = previewIndex != null && previewIndex in pageRange && renderIndex != hiddenIndex
                 val opacity by animateFloatAsState(
                     if (dimDragged && id == draggedId) .28f else 1f,
                     label = "home insertion visibility $id",
@@ -1578,9 +1578,8 @@ private fun SharedHomeGrid(
             }
         }
         folders.forEach { folder ->
-            val savedIndex = savedIndexOf(folder.id) ?: -1
-            val previewIndex = previewIndexOf(folder.id) ?: -1
-            val renderIndex = previewIndex.takeIf { it in pageRange } ?: savedIndex.takeIf { it in pageRange } ?: return@forEach
+            val renderIndex = previewIndexOf(folder.id)?.takeIf { it in pageRange }
+                ?: savedIndexOf(folder.id)?.takeIf { it in pageRange } ?: return@forEach
             val localIndex = renderIndex - pageStart
             val row = localIndex / GRID_COLUMNS
             val x = cellWidth * (localIndex % GRID_COLUMNS)
