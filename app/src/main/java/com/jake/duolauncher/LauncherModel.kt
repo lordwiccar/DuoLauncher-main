@@ -56,6 +56,8 @@ data class LauncherState(
     val labels: Boolean = true,
     val verticalStatus: Boolean = true,
     val homeRows: Int = DEFAULT_HOME_ROWS,
+    /** How see-through an open folder's background is, from opaque (0) to [MAX_FOLDER_TRANSPARENCY]. */
+    val folderTransparency: Float = DEFAULT_FOLDER_TRANSPARENCY,
     val loading: Boolean = true,
     val error: String? = null,
 ) {
@@ -423,6 +425,11 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
     }
     fun setLabels(value: Boolean) { if (statePayloadInvalid) return; undoLayout = null; undoImportSettings = null; mutable.update { it.copy(labels = value, canUndoEdit = false) }; persist() }
     fun setVerticalStatus(value: Boolean) { if (statePayloadInvalid) return; undoLayout = null; undoImportSettings = null; mutable.update { it.copy(verticalStatus = value, canUndoEdit = false) }; persist() }
+    /** A device-local look setting, so it is not part of layout backups or layout undo. */
+    fun setFolderTransparency(value: Float) {
+        if (statePayloadInvalid) return
+        mutable.update { it.copy(folderTransparency = value.coerceIn(0f, MAX_FOLDER_TRANSPARENCY)) }; persist()
+    }
     fun setGoogleSearch(value: Boolean) { if (statePayloadInvalid) return; undoLayout = null; undoImportSettings = null; mutable.update { it.copy(googleSearch = value, canUndoEdit = false) }; persist() }
     fun setPreset(expanded: Boolean, value: LayoutPreset) {
         if (statePayloadInvalid) return
@@ -485,6 +492,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .put("googleSearch", s.googleSearch)
             .put("verticalStatus", s.verticalStatus)
             .put("homeRows", s.homeRows)
+            .put("folderTransparency", s.folderTransparency.toDouble())
             .put("compact", preset(s.compact)).put("expanded", preset(s.expanded))
         val editor = prefs.edit()
         if (legacyRaw != null && sourceSchema == 2 && !prefs.contains("state_v2_backup"))
@@ -634,7 +642,9 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             googleSearch = j.optBoolean("googleSearch", true),
             labels = j.optBoolean("labels", true), compact = preset("compact", LayoutPreset()),
             expanded = preset("expanded", LayoutPreset()), verticalStatus = j.optBoolean("verticalStatus", true),
-            homeRows = j.optInt("homeRows", DEFAULT_HOME_ROWS).coerceIn(DEFAULT_HOME_ROWS, GRID_ROWS))
+            homeRows = j.optInt("homeRows", DEFAULT_HOME_ROWS).coerceIn(DEFAULT_HOME_ROWS, GRID_ROWS),
+            folderTransparency = j.optDouble("folderTransparency", DEFAULT_FOLDER_TRANSPARENCY.toDouble()).toFloat()
+                .takeIf { it.isFinite() }?.coerceIn(0f, MAX_FOLDER_TRANSPARENCY) ?: DEFAULT_FOLDER_TRANSPARENCY)
             .let { it.copy(homeRows = maxOf(it.homeRows, it.layout.requiredRows())) }
     }.getOrElse {
         statePayloadInvalid = legacyRaw != null

@@ -6,9 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MoreVert
@@ -23,14 +23,53 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlin.math.ceil
+import kotlin.math.sqrt
+
+internal const val MAX_FOLDER_COLUMNS = 6
+internal const val MAX_FOLDER_ROWS = 6
+internal const val DEFAULT_FOLDER_TRANSPARENCY = .03f
+internal const val MAX_FOLDER_TRANSPARENCY = .9f
+
+private val FolderCellWidth = 84.dp
+private val FolderCellHeight = 104.dp
+private val FolderColumnGap = 8.dp
+private val FolderRowGap = 10.dp
+private val FolderPadding = 18.dp
+private val FolderMinWidth = 300.dp
+// Title row with its text field, the grid's top margin, and the page dots.
+private val FolderChromeHeight = 72.dp + 12.dp + 28.dp
+
+/** How an open folder lays out its apps: pages of [columns] x [rows], [pages] of them. */
+internal data class FolderGridShape(val columns: Int, val rows: Int, val pages: Int) {
+    val perPage get() = columns * rows
+}
+
+/**
+ * Sizes the grid to its apps, close to square but never taller than wide, within the space the
+ * screen allows and at most 6 x 6. Apps beyond one full page continue on further pages.
+ */
+internal fun folderGridShape(count: Int, maxColumns: Int, maxRows: Int): FolderGridShape {
+    val columnLimit = maxColumns.coerceIn(1, MAX_FOLDER_COLUMNS)
+    val rowLimit = maxRows.coerceIn(1, MAX_FOLDER_ROWS)
+    val apps = count.coerceAtLeast(1)
+    val fullPage = columnLimit * rowLimit
+    if (apps > fullPage) return FolderGridShape(columnLimit, rowLimit, (apps + fullPage - 1) / fullPage)
+    var columns = minOf(columnLimit, ceil(sqrt(apps.toDouble())).toInt())
+    if ((apps + columns - 1) / columns > rowLimit) columns = (apps + rowLimit - 1) / rowLimit
+    return FolderGridShape(columns, (apps + columns - 1) / columns, 1)
+}
+
+private fun fitting(space: Dp, cell: Dp, gap: Dp) = ((space + gap) / (cell + gap)).toInt()
 
 @Composable
 internal fun FolderPanel(
     folder: FolderEntry, apps: Map<String, AppEntry>, drag: HomeDragState, page: Int,
     homeDestinations: List<Int>, dockVacancies: List<Int>, onDismiss: () -> Unit,
     onRename: (String) -> Unit, onLaunch: (AppEntry, android.graphics.Rect?) -> Unit,
-    onMoveOut: (String, DropTarget) -> Unit,
+    onMoveOut: (String, DropTarget) -> Unit, transparency: Float = DEFAULT_FOLDER_TRANSPARENCY,
 ) {
     var title by rememberSaveable(folder.id) { mutableStateOf(folder.title) }
     BackHandler { onDismiss() }
@@ -48,31 +87,52 @@ internal fun FolderPanel(
         )
         .imePadding().testTag("folder-panel"),
         contentAlignment = Alignment.Center) {
-        Surface(Modifier.fillMaxWidth(.9f).fillMaxHeight(.82f).heightIn(min = 260.dp, max = 620.dp)
+      BoxWithConstraints(Modifier.fillMaxSize().safeDrawingPadding().padding(12.dp), contentAlignment = Alignment.Center) {
+        val shownApps = folder.appIds.filter { it in apps }
+        val shape = folderGridShape(shownApps.size,
+            fitting(maxWidth - FolderPadding * 2, FolderCellWidth, FolderColumnGap),
+            fitting(maxHeight - FolderPadding * 2 - FolderChromeHeight, FolderCellHeight, FolderRowGap))
+        val gridWidth = FolderCellWidth * shape.columns + FolderColumnGap * (shape.columns - 1)
+        val gridHeight = FolderCellHeight * shape.rows + FolderRowGap * (shape.rows - 1)
+        val pager = rememberPagerState { shape.pages }
+        Surface(Modifier.width(maxOf(gridWidth + FolderPadding * 2, FolderMinWidth).coerceAtMost(maxWidth))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = {},
             )
             .testTag("folder-panel-content"),
-            color = Glass.copy(alpha = .97f), shape = RoundedCornerShape(30.dp),
+            color = Glass.copy(alpha = 1f - transparency.coerceIn(0f, MAX_FOLDER_TRANSPARENCY)), shape = RoundedCornerShape(30.dp),
             border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .6f))) {
-            Column(Modifier.padding(18.dp)) {
+            Column(Modifier.padding(FolderPadding), horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     OutlinedTextField(title, { title = it }, Modifier.weight(1f).testTag("folder-name"),
                         singleLine = true, label = { Text(stringResource(R.string.folder_name)) })
                     TextButton(onClick = { if (title.isNotBlank()) onRename(title); onDismiss() }) { Text(stringResource(R.string.done)) }
                 }
-                LazyVerticalGrid(GridCells.Adaptive(88.dp), Modifier.fillMaxWidth().weight(1f).padding(top = 12.dp),
-                    contentPadding = PaddingValues(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    items(folder.appIds, key = { it }) { appId ->
-                        apps[appId]?.let { app -> FolderChild(app, folder.id, drag, page, homeDestinations, dockVacancies,
-                            onLaunch = onLaunch, onMoveOut = onMoveOut) }
+                HorizontalPager(pager, Modifier.padding(top = 12.dp).size(gridWidth, gridHeight).testTag("folder-pages"),
+                    pageSpacing = FolderPadding, key = { it }) { folderPage ->
+                    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(FolderRowGap)) {
+                        shownApps.drop(folderPage * shape.perPage).take(shape.perPage).chunked(shape.columns).forEach { row ->
+                            Row(horizontalArrangement = Arrangement.spacedBy(FolderColumnGap)) {
+                                row.forEach { appId -> key(appId) {
+                                    FolderChild(apps.getValue(appId), folder.id, drag, page, homeDestinations, dockVacancies,
+                                        onLaunch = onLaunch, onMoveOut = onMoveOut)
+                                } }
+                            }
+                        }
+                    }
+                }
+                if (shape.pages > 1) Row(Modifier.height(28.dp).testTag("folder-page-dots"), horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    repeat(shape.pages) { index ->
+                        Box(Modifier.size(if (index == pager.currentPage) 8.dp else 6.dp).background(
+                            Ink.copy(alpha = if (index == pager.currentPage) .9f else .35f), CircleShape))
                     }
                 }
             }
         }
+      }
     }
 }
 
@@ -83,14 +143,15 @@ private fun FolderChild(
     onLaunch: (AppEntry, android.graphics.Rect?) -> Unit, onMoveOut: (String, DropTarget) -> Unit,
 ) {
     var menu by remember { mutableStateOf(false) }
-    Surface(Modifier.fillMaxWidth().testTag("folder-child-${app.id}"), color = Color.White.copy(alpha = .34f),
+    Surface(Modifier.size(FolderCellWidth, FolderCellHeight).testTag("folder-child-${app.id}"), color = Color.White.copy(alpha = .34f),
         shape = RoundedCornerShape(18.dp)) {
         Box {
-            Column(Modifier.fillMaxWidth().dropRegion(drag, DropTarget.Library(app.id), app.id, page,
+            Column(Modifier.fillMaxSize().dropRegion(drag, DropTarget.Library(app.id), app.id, page,
                 folderId = folderId, scope = folderId).clickable(enabled = app.available) { onLaunch(app, null) }
                 .padding(horizontal = 6.dp, vertical = 10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(app.icon.asImageBitmap(), null, Modifier.size(46.dp).clip(RoundedCornerShape(12.dp)))
                 Text(app.label, Modifier.padding(top = 6.dp), maxLines = 2, overflow = TextOverflow.Ellipsis,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     style = MaterialTheme.typography.labelMedium)
                 if (app.isWork || !app.available) Text(if (app.available) profileName(app.profileLabel) else stringResource(R.string.profile_unavailable, profileName(app.profileLabel)),
                     maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall)

@@ -262,6 +262,9 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
     }
     if (state.homeRows < GRID_ROWS && !fits(GRID_ROWS)) Text(stringResource(R.string.home_rows_no_room),
         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    CustomizationSlider(stringResource(R.string.folder_transparency),
+        stringResource(R.string.value_percent, Math.round(state.folderTransparency * 100)),
+        state.folderTransparency, 0f..MAX_FOLDER_TRANSPARENCY) { model.setFolderTransparency(it) }
     CustomizationSlider(stringResource(R.string.icon_size), stringResource(R.string.value_dp, p.iconSize.toInt()), p.iconSize, 40f..68f) { model.setPreset(wide, p.copy(iconSize = it)) }
     CustomizationSlider(stringResource(R.string.row_spacing), stringResource(R.string.value_dp, p.rowGap.toInt()), p.rowGap, 0f..28f) { model.setPreset(wide, p.copy(rowGap = it)) }
     CustomizationSlider(stringResource(R.string.dock_width), stringResource(R.string.value_dp, p.dockWidth.toInt()), p.dockWidth, 56f..84f) { model.setPreset(wide, p.copy(dockWidth = it)) }

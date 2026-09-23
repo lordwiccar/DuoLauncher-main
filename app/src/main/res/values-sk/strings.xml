@@ -183,6 +183,7 @@
     <string name="folder_default">Priečinok</string>
     <string name="folder_name">Názov priečinka</string>
     <string name="close_folder">Zavrieť priečinok</string>
+    <string name="folder_transparency">Priehľadnosť pozadia priečinka</string>
     <plurals name="folder_description">
         <item quantity="one">Priečinok %1$s, %2$d aplikácia</item>
         <item quantity="few">Priečinok %1$s, %2$d aplikácie</item>

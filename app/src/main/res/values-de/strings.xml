@@ -181,6 +181,7 @@
     <string name="folder_default">Ordner</string>
     <string name="folder_name">Ordnername</string>
     <string name="close_folder">Ordner schließen</string>
+    <string name="folder_transparency">Transparenz des Ordnerhintergrunds</string>
     <plurals name="folder_description">
         <item quantity="one">Ordner %1$s, %2$d App</item>
         <item quantity="other">Ordner %1$s, %2$d Apps</item>

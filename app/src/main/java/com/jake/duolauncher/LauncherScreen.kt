@@ -1179,7 +1179,7 @@ fun LauncherScreen(
                 FolderPanel(folder, appsById, drag, pager.currentPage, homeDestinations,
                     dockVacancies = state.dock.indices.filter { state.dock[it] == null },
                     onDismiss = { openFolderId = null }, onRename = { model.renameFolder(id, it) },
-                    onLaunch = onLaunchFrom,
+                    onLaunch = onLaunchFrom, transparency = state.folderTransparency,
                     onMoveOut = { appId, destination ->
                         if (model.removeAppFromFolder(id, appId, destination)) openFolderId = model.folder(id)?.id
                     })

@@ -183,6 +183,7 @@
     <string name="folder_default">Složka</string>
     <string name="folder_name">Název složky</string>
     <string name="close_folder">Zavřít složku</string>
+    <string name="folder_transparency">Průhlednost pozadí složky</string>
     <plurals name="folder_description">
         <item quantity="one">Složka %1$s, %2$d aplikace</item>
         <item quantity="few">Složka %1$s, %2$d aplikace</item>
