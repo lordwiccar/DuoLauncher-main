@@ -203,7 +203,7 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
     val bitmap = stagedBitmap ?: committedBitmap
     val apps = remember(state.apps) { state.apps.associateBy { it.id } }
     val homeIcons = state.homeSlots.mapNotNull { id -> id?.let(apps::get) }.take(8)
-    val dockIcons = state.dock.mapNotNull { id -> id?.let(apps::get) }.take(5)
+    val dockIcons = state.dock.mapNotNull { id -> id?.let(apps::get) }
     val scale = previewHeight.value * .632f / 250f
     fun unit(value: Float) = (value * scale).dp
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -238,6 +238,13 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
         FilterChip(wide, { onWide(true) }, label = { Text("Inner") })
     }
     OutlinedButton(onClick = onEditPins, Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Choose Home apps") }
+    Text("Apps in dock · cover and inner", style = MaterialTheme.typography.bodyMedium)
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        (MIN_DOCK_SLOTS..MAX_DOCK_SLOTS).forEach { count ->
+            FilterChip(state.dock.size == count, { model.setDockSlots(count) }, label = { Text("$count") },
+                modifier = Modifier.testTag("dock-slots-$count"))
+        }
+    }
     CustomizationSlider("App icon size", "${p.iconSize.toInt()} dp", p.iconSize, 40f..68f) { model.setPreset(wide, p.copy(iconSize = it)) }
     CustomizationSlider("Space between rows", "${p.rowGap.toInt()} dp", p.rowGap, 0f..28f) { model.setPreset(wide, p.copy(rowGap = it)) }
     CustomizationSlider("Dock width", "${p.dockWidth.toInt()} dp", p.dockWidth, 56f..84f) { model.setPreset(wide, p.copy(dockWidth = it)) }

@@ -421,9 +421,9 @@ fun LauncherScreen(
             val inLibrary = pager.currentPage == visibleHomePages
             var statusHeight by remember { mutableFloatStateOf(0f) }
             val geometry = homeGeometry(maxWidth.value, maxHeight.value, preset, state.labels,
-                statusHeight = if (state.verticalStatus) statusHeight + 22f else 0f,
+                statusRailHeight = if (state.verticalStatus) statusHeight + 22f else 0f,
                 labelHeight = with(density) { 14.sp.toDp().value } + 6f, inLibrary = inLibrary,
-                homeBottomSpace = if (isDefaultHome) 44f else 88f)
+                homeBottomSpace = if (isDefaultHome) 44f else 88f, dockSlots = state.dock.size)
             SideEffect {
                 resizePitchX = with(density) { (geometry.gridWidth / GRID_COLUMNS).dp.toPx() }
                 resizePitchY = with(density) { minOf((geometry.widgetHeight + 18f) / 2f, geometry.rowHeight).dp.toPx() }

@@ -321,6 +321,8 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         persist()
     }
 
+    fun setDockSlots(count: Int) = commitLayout(resizeDock(mutable.value.layout, count))
+
     fun move(id: String, offset: Int) {
         val old = mutable.value
         val from = old.layout.indexOfShortcut(id) ?: return
@@ -519,7 +521,10 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             require(leading.length() == HOME_CELLS)
             List(HOME_CELLS) { leading.optString(it).takeIf { id -> id.isNotBlank() && id != "null" } }
         } else List(HOME_CELLS) { null }
-        val loadedDock = List(4) { j.optJSONArray("dock")?.optString(it)?.takeIf { it.isNotBlank() && it != "null" } }
+        val dockArray = j.optJSONArray("dock")
+        val loadedDock = List((dockArray?.length() ?: 0).coerceIn(MIN_DOCK_SLOTS, MAX_DOCK_SLOTS)) {
+            dockArray?.optString(it)?.takeIf { it.isNotBlank() && it != "null" }
+        }
         val widgetArray = j.optJSONArray("widgets")
         val placements = if (schema >= 6) {
             require(widgetArray != null) { "Schema $schema requires a widget placement array" }

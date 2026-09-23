@@ -3,6 +3,8 @@ package com.jake.duolauncher
 const val GRID_COLUMNS = 4
 const val GRID_ROWS = 6
 const val HOME_CELLS = GRID_COLUMNS * GRID_ROWS
+const val MIN_DOCK_SLOTS = 4
+const val MAX_DOCK_SLOTS = 8
 const val EMPTY_WIDGET = -1
 const val CLOCK_WIDGET = -2
 const val DATE_WIDGET = -3
@@ -227,6 +229,29 @@ fun dropApp(layout: HomeLayout, id: String, target: DropTarget): HomeLayout {
         }
         else -> layout
     }
+}
+
+/**
+ * Changes how many positions the dock offers. Shrinking never drops a shortcut: apps in removed
+ * positions first fill empty kept positions, then move to the first free Home cells.
+ */
+fun resizeDock(layout: HomeLayout, count: Int): HomeLayout {
+    val size = count.coerceIn(MIN_DOCK_SLOTS, MAX_DOCK_SLOTS)
+    if (size >= layout.dock.size) return layout.copy(dock = layout.dock + List(size - layout.dock.size) { null })
+    val dock = layout.dock.take(size).toMutableList()
+    val displaced = ArrayDeque(layout.dock.drop(size).filterNotNull())
+    for (index in dock.indices) if (dock[index] == null && displaced.isNotEmpty()) dock[index] = displaced.removeFirst()
+    val blocked = widgetCells(layout)
+    val slots = layout.slots.toMutableList()
+    var cell = 0
+    while (displaced.isNotEmpty()) {
+        if (cell !in blocked && slots.getOrNull(cell) == null) {
+            while (slots.size <= cell) slots.add(null)
+            slots[cell] = displaced.removeFirst()
+        }
+        cell++
+    }
+    return layout.copy(slots = slots, dock = dock)
 }
 
 fun placeWidget(layout: HomeLayout, placement: WidgetPlacement): HomeLayout {

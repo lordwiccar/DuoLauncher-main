@@ -1,6 +1,6 @@
 # Duo Launcher user guide
 
-Duo Launcher is an experimental Android launcher designed around a foldable phone, a four-column Home grid, and a four-position dock on the right. The cover shows one Home page at a time. Unfolding adds an editable workspace on the left: the first view pairs that workspace with Home 1, followed by Home 1 + Home 2, Home 2 + Home 3, and so on.
+Duo Launcher is an experimental Android launcher designed around a foldable phone, a four-column Home grid, and a dock on the right that holds four to eight apps. The cover shows one Home page at a time. Unfolding adds an editable workspace on the left: the first view pairs that workspace with Home 1, followed by Home 1 + Home 2, Home 2 + Home 3, and so on.
 
 ## Start and switch launchers
 
@@ -21,7 +21,7 @@ To make Duo the launcher, choose **Set as home app** in customization, or open *
 Long press an empty Home cell or any bare wallpaper on Home, such as the space below or beside the grid, to open **Add to Home**, then choose **Widgets**, **Wallpaper**, or **Customize launcher**. In **Make it yours** you can open:
 
 - **Wallpaper & appearance** for launcher photos, Android wallpaper, and color mode.
-- **Home layout** for icon size, row spacing, dock geometry, Home apps, and widgets on the visible page.
+- **Home layout** for the number of dock apps (4–8), icon size, row spacing, dock geometry, Home apps, and widgets on the visible page.
 - **Gestures & search** for app names, the upper-right status display, and Google search behavior.
 - **Backup** to save or restore the layout.
 - **Help & setup** for Home selection, widgets, shade gestures, and Discover.
@@ -32,7 +32,7 @@ After a layout edit, **Undo last layout change** appears in customization. It co
 
 Hold an app, then drag it to an empty cell, another page, or a vacant dock position. Neighboring Home icons move aside when possible. Pause at the left or right screen edge while holding to turn a page; dragging at the end can create another Home page.
 
-Dragging between Home and the dock moves the shortcut instead of duplicating it. The dock holds four apps. When it is full, Duo shows **Dock full • Move an app out first** and rejects a new arrival; it never evicts an app automatically. Existing dock apps can still be reordered. Drag a Home or dock shortcut to **Remove** to remove the shortcut without uninstalling the app.
+Dragging between Home and the dock moves the shortcut instead of duplicating it. The dock holds four apps by default; choose four to eight under **Home layout → Apps in dock**. The dock background grows or shrinks with that number. Choosing fewer positions keeps every app: apps from removed positions fill empty dock positions first, then move to free Home cells. When the dock is full, Duo shows **Dock full • Move an app out first** and rejects a new arrival; it never evicts an app automatically. Existing dock apps can still be reordered. Drag a Home or dock shortcut to **Remove** to remove the shortcut without uninstalling the app.
 
 Long press and release an app for options such as **Move on Home**, **Create folder**, **App info**, or **Remove from Home**. **All apps** remains the complete installed-app catalog even when a shortcut is removed.
 

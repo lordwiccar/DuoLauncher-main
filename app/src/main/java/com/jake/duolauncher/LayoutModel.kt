@@ -42,7 +42,7 @@ fun upgradePreset(preset: LayoutPreset, schema: Int, expanded: Boolean): LayoutP
     else -> preset
 }
 
-fun homeGeometry(width: Float, height: Float, preset: LayoutPreset, labels: Boolean, statusHeight: Float = 0f, labelHeight: Float = 20f, inLibrary: Boolean = false, homeBottomSpace: Float = 44f): HomeGeometry {
+fun homeGeometry(width: Float, height: Float, preset: LayoutPreset, labels: Boolean, statusHeight: Float = 0f, labelHeight: Float = 20f, inLibrary: Boolean = false, homeBottomSpace: Float = 44f, dockSlots: Int = MIN_DOCK_SLOTS, statusRailHeight: Float = 0f): HomeGeometry {
     val p = preset.sanitized()
     val expanded = width >= 650f
     val homeWidth = if (expanded) minOf(460f, width * 0.56f) else width
@@ -54,12 +54,16 @@ fun homeGeometry(width: Float, height: Float, preset: LayoutPreset, labels: Bool
     val contentTop = ((height - widget - 18f - 4f * row - homeBottomSpace) / 2f).coerceIn(16f, 72f)
     // Search reclaims the redundant bottom controls' space for all four dock apps.
     // Extremely short windows still scroll rather than reduce touch targets below 48dp.
-    val topLimit = maxOf(8f, statusHeight)
+    // The status rail is drawn from contentTop, so a tall dock must stay below its measured bottom.
+    val topLimit = maxOf(8f, statusHeight, if (statusRailHeight > 0f) contentTop + statusRailHeight else 0f)
     val bottomReserve = if (inLibrary) 12f else 124f
-    // Outer dock edges span the first through third icon images, excluding the last label.
-    val desiredHeight = if (p.dockAlignToGrid) 2f * row + icon else 256f
+    // With four apps, outer dock edges span the first through third icon images, excluding the
+    // last label. Each extra app adds one more position of that same pitch.
+    val slots = dockSlots.coerceIn(MIN_DOCK_SLOTS, MAX_DOCK_SLOTS)
+    val fourSlotHeight = if (p.dockAlignToGrid) 2f * row + icon else 256f
+    val desiredHeight = (fourSlotHeight - 16f) / MIN_DOCK_SLOTS * slots + 16f
     val dockHeight = minOf(desiredHeight, (height - topLimit - bottomReserve).coerceAtLeast(76f))
-    val dockRowHeight = ((dockHeight - 16f) / 4f).coerceAtLeast(48f)
+    val dockRowHeight = ((dockHeight - 16f) / slots).coerceAtLeast(48f)
     // Use the home position as the anchor, so removing library buttons does not
     // move a low-positioned dock on ordinary page swipes. Move up only to fit.
     val homeDockHeight = minOf(desiredHeight, (height - topLimit - 124f).coerceAtLeast(76f))

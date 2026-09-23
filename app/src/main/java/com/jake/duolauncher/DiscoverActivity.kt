@@ -383,10 +383,10 @@ private fun DiscoverDock(state: LauncherState, status: DeviceStatus, fullSize: S
             }
             var statusHeight by remember { mutableFloatStateOf(0f) }
             val geometry = homeGeometry(fullWidth, maxHeight.value, preset, state.labels,
-                statusHeight = if (state.verticalStatus) statusHeight + 22f else 0f,
+                statusRailHeight = if (state.verticalStatus) statusHeight + 22f else 0f,
                 labelHeight = with(density) { 14.sp.toDp().value } + 6f, inLibrary = true,
                 homeBottomSpace = if (context.getSystemService(android.app.role.RoleManager::class.java)
-                    .isRoleHeld(android.app.role.RoleManager.ROLE_HOME)) 44f else 88f)
+                    .isRoleHeld(android.app.role.RoleManager.ROLE_HOME)) 44f else 88f, dockSlots = state.dock.size)
             if (state.verticalStatus) StatusRail(status, Modifier.align(Alignment.TopEnd).padding(end = 12.dp)
                 .offset(y = geometry.contentTop.dp).width(preset.dockWidth.dp)
                 .onSizeChanged {
