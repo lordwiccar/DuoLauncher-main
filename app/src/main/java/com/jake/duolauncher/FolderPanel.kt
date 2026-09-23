@@ -41,6 +41,7 @@ internal const val MAX_FOLDER_COLUMNS = 6
 internal const val MAX_FOLDER_ROWS = 6
 internal const val DEFAULT_FOLDER_TRANSPARENCY = .03f
 internal const val MAX_FOLDER_TRANSPARENCY = .9f
+internal val FOLDER_BACKDROP_BLUR = 6.dp
 
 private val FolderCellWidth = 84.dp
 private val FolderCellHeight = 104.dp
@@ -132,15 +133,14 @@ internal fun FolderPanel(
                     }
                     LaunchedEffect(Unit) { focus.requestFocus() }
                 } else Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
-                    // Balances the folder menu so the name stays centred.
-                    Spacer(Modifier.width(48.dp))
-                    Row(Modifier.weight(1f), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                        Text(folder.title, Modifier.weight(1f, fill = false).semantics { heading() }.testTag("folder-name"),
-                            style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        IconButton(onClick = { title = folder.title; editing = true }, Modifier.size(36.dp).testTag("folder-rename")) {
-                            Icon(Icons.Rounded.Edit, stringResource(R.string.rename_folder), Modifier.size(18.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .6f))
-                        }
+                    // Balances the pencil and menu on the right so the name stays centred.
+                    Spacer(Modifier.width(84.dp))
+                    Text(folder.title, Modifier.weight(1f).semantics { heading() }.testTag("folder-name"),
+                        style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                    IconButton(onClick = { title = folder.title; editing = true }, Modifier.size(36.dp).testTag("folder-rename")) {
+                        Icon(Icons.Rounded.Edit, stringResource(R.string.rename_folder), Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .6f))
                     }
                     FolderMenu(folderDestinations, onMoveFolder, onDisband)
                 }

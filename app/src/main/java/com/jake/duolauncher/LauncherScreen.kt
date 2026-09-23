@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.boundsInRoot
@@ -414,6 +415,10 @@ fun LauncherScreen(
         }
     }
 
+    // Soften Home behind an open folder so the folder reads as the one surface in focus. No
+    // layer is added while closed, keeping the retained Home layer that Discover draws untouched.
+    val folderBlur by animateDpAsState(if (openFolderId != null) FOLDER_BACKDROP_BLUR else 0.dp, label = "folder blur")
+    val behindFolder = if (folderBlur > 0.dp) Modifier.blur(folderBlur) else Modifier
     val homeLayer = rememberGraphicsLayer()
     DisposableEffect(homeLayer) {
         homeLayer.compositingStrategy = androidx.compose.ui.graphics.layer.CompositingStrategy.Offscreen
@@ -435,7 +440,7 @@ fun LauncherScreen(
             }
         },
         onFinish = { cancelled -> finishDrag(cancelled) })) {
-        DuneWallpaper()
+        DuneWallpaper(Modifier.fillMaxSize().then(behindFolder))
         BoxWithConstraints(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
             val wide = maxWidth.value >= 650f
             val preset = if (wide) state.expanded else state.compact
@@ -506,7 +511,7 @@ fun LauncherScreen(
                     emptyCellIndex = firstEmptyHomeCell(state, targetPage)
                 }
             }
-            Box(Modifier.fillMaxSize().onGloballyPositioned {
+            Box(Modifier.fillMaxSize().then(behindFolder).onGloballyPositioned {
                 gestureOriginInRoot = it.boundsInRoot().topLeft
                 gestureOriginInWindow = it.boundsInWindow().topLeft
             }.onePageGestures(
