@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- System integration -->
-    <string name="dune_wallpaper_label">Duny Duo</string>
-    <string name="dune_wallpaper_description">Duny Duo — krajina spúšťača prispôsobená vášmu displeju.</string>
-    <string name="shade_service_label">Gestá panela Duo Launcher</string>
-    <string name="shade_service_description">Umožňuje gestám na ploche Duo Launcher otvárať systémové upozornenia a panel Rýchle nastavenia. Nečíta obsah obrazovky ani nesleduje činnosť v iných aplikáciách.</string>
+    <string name="dune_wallpaper_label">Duny iDuo</string>
+    <string name="dune_wallpaper_description">Duny iDuo — krajina spúšťača prispôsobená vášmu displeju.</string>
+    <string name="shade_service_label">Gestá panela iDuo Launcher</string>
+    <string name="shade_service_description">Umožňuje gestám na ploche iDuo Launcher otvárať systémové upozornenia a panel Rýchle nastavenia. Nečíta obsah obrazovky ani nesleduje činnosť v iných aplikáciách.</string>
 
     <!-- Common actions -->
     <string name="back">Späť</string>
@@ -47,16 +47,16 @@
     <string name="customize_help_detail">Domovská aplikácia, miniaplikácie, gestá a Discover</string>
     <string name="set_as_home_app">Nastaviť ako domovskú aplikáciu</string>
     <string name="change_home_app">Zmeniť domovskú aplikáciu</string>
-    <string name="set_duo_as_home">Nastaviť Duo ako plochu</string>
+    <string name="set_duo_as_home">Nastaviť iDuo ako plochu</string>
     <string name="undo_layout_change">Vrátiť poslednú zmenu rozloženia</string>
 
     <string name="launcher_background">Pozadie spúšťača</string>
-    <string name="launcher_background_detail">Zmení obrázok za plochami Duo.</string>
+    <string name="launcher_background_detail">Zmení obrázok za plochami iDuo.</string>
     <string name="choose_photo">Vybrať fotku</string>
     <string name="choose_different_photo">Vybrať inú fotku</string>
-    <string name="reset_to_dunes">Obnoviť duny Duo</string>
+    <string name="reset_to_dunes">Obnoviť duny iDuo</string>
     <string name="android_wallpaper">Tapeta Androidu</string>
-    <string name="android_wallpaper_detail">Otvorí ukážku Androidu na zmenu tapety telefónu. Pozadie spúšťača Duo sa tým nezmení.</string>
+    <string name="android_wallpaper_detail">Otvorí ukážku Androidu na zmenu tapety telefónu. Pozadie spúšťača iDuo sa tým nezmení.</string>
     <string name="preview_android_wallpaper">Ukážka tapety Androidu</string>
 
     <string name="appearance">Vzhľad</string>
@@ -114,15 +114,15 @@
     <string name="backup_restore_note">Pred zmenou plochy obnovenie vždy zobrazí prehľad.</string>
 
     <string name="help_home_title">Domovská aplikácia</string>
-    <string name="help_home_default">Duo je vaša domovská aplikácia. Spúšťač môžete zmeniť v nastaveniach domovskej obrazovky Androidu.</string>
-    <string name="help_home_not_default">Vyberte Duo v nastaveniach domovskej obrazovky Androidu, aby sa otvorilo po stlačení tlačidla Domov.</string>
+    <string name="help_home_default">iDuo je vaša domovská aplikácia. Spúšťač môžete zmeniť v nastaveniach domovskej obrazovky Androidu.</string>
+    <string name="help_home_not_default">Vyberte iDuo v nastaveniach domovskej obrazovky Androidu, aby sa otvorilo po stlačení tlačidla Domov.</string>
     <string name="help_customize_title">Prispôsobenie ľubovoľnej strany</string>
     <string name="help_customize">Podržte prst na voľnom mieste a zvoľte Prispôsobiť spúšťač. Ak je strana plná, podržte prst na úzkom páse pri jej ľavom okraji.</string>
     <string name="help_widgets">Pridávajte miniaplikácie Androidu do prázdnych buniek plochy. Podržaním miniaplikáciu presuniete alebo odoberiete.</string>
     <string name="help_shade_title">Upozornenia a rýchle nastavenia</string>
-    <string name="help_shade">Potiahnite na ploche nadol. Prvýkrát Duo vysvetlí voliteľné nastavenie Dostupnosti v Androide. Služba iba otvára systémové panely.</string>
+    <string name="help_shade">Potiahnite na ploche nadol. Prvýkrát iDuo vysvetlí voliteľné nastavenie Dostupnosti v Androide. Služba iba otvára systémové panely.</string>
     <string name="help_shade_setup">Nastaviť gestá panela</string>
-    <string name="help_discover">Potiahnite doprava z prvej strany plochy. Ak Google kanál neposkytne, Duo ponúkne návrat na plochu a možnosti obnovenia.</string>
+    <string name="help_discover">Potiahnite doprava z prvej strany plochy. Ak Google kanál neposkytne, iDuo ponúkne návrat na plochu a možnosti obnovenia.</string>
 
     <!-- Apps and profiles -->
     <string name="all_apps">Všetky aplikácie</string>
@@ -335,7 +335,7 @@
     <string name="photo_picker_unavailable">Výber fotiek nie je dostupný.</string>
     <string name="photo_selection_lost">Rozpracovaný výber fotky sa nepodarilo obnoviť.</string>
     <string name="photo_preview_lost">Rozpracovanú ukážku fotky sa nepodarilo obnoviť.</string>
-    <string name="photo_using_dunes">Používajú sa duny Duo.</string>
+    <string name="photo_using_dunes">Používajú sa duny iDuo.</string>
     <string name="photo_updated">Pozadie spúšťača bolo aktualizované.</string>
     <string name="photo_save_failed">Túto fotku sa nepodarilo uložiť.</string>
     <string name="photo_unusable">Túto fotku nie je možné použiť.</string>
@@ -361,22 +361,22 @@
     <string name="discover_device_unsupported">Toto zariadenie nedokáže zobraziť Discover vedľa doku.</string>
     <string name="install_google_first">Najprv nainštalujte alebo povoľte aplikáciu Google.</string>
     <string name="discover_fallback_title">Discover tu nie je k dispozícii</string>
-    <string name="discover_fallback_message">Duo na tomto zariadení nedokáže umiestniť kanál Discover vedľa plochy. Môžete otvoriť aplikáciu Google alebo zostať na ploche.</string>
+    <string name="discover_fallback_message">iDuo na tomto zariadení nedokáže umiestniť kanál Discover vedľa plochy. Môžete otvoriť aplikáciu Google alebo zostať na ploche.</string>
 
     <!-- Shade gestures -->
     <string name="shade_setup_title">Zapnúť gestá panela</string>
-    <string name="shade_setup_message">Android vyžaduje, aby ste gestá panela Duo Launcher zapli v nastaveniach Dostupnosti. Služba iba otvára upozornenia alebo rýchle nastavenia; nečíta obsah obrazovky ani nesleduje iné aplikácie.</string>
+    <string name="shade_setup_message">Android vyžaduje, aby ste gestá panela iDuo Launcher zapli v nastaveniach Dostupnosti. Služba iba otvára upozornenia alebo rýchle nastavenia; nečíta obsah obrazovky ani nesleduje iné aplikácie.</string>
     <string name="shade_starting">Gestá panela sa spúšťajú. Potiahnite znova nadol.</string>
     <string name="shade_rejected">Android nedokázal otvoriť systémový panel.</string>
     <string name="accessibility_unavailable">Nastavenia Dostupnosti nie sú dostupné.</string>
 
     <!-- First run -->
-    <string name="setup_welcome">Vitajte v Duo</string>
+    <string name="setup_welcome">Vitajte v iDuo</string>
     <string name="setup_tagline">Pokojná plocha navrhnutá pre obe strany vášho skladacieho telefónu.</string>
     <string name="setup_close">Zavrieť uvítanie</string>
-    <string name="setup_is_home">Duo je vaša domovská aplikácia</string>
+    <string name="setup_is_home">iDuo je vaša domovská aplikácia</string>
     <string name="setup_is_home_detail">Tlačidlo Domov vás vráti sem.</string>
-    <string name="setup_choose_home">Nastavte Duo ako domovskú aplikáciu</string>
+    <string name="setup_choose_home">Nastavte iDuo ako domovskú aplikáciu</string>
     <string name="setup_choose_home_detail">Android zobrazí výber domovskej aplikácie. Kedykoľvek to môžete vrátiť.</string>
     <string name="setup_choose_home_button">Vybrať domovskú aplikáciu</string>
     <string name="setup_space_title">Využite priestor</string>

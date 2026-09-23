@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- System integration -->
-    <string name="dune_wallpaper_label">Wydmy Duo</string>
-    <string name="dune_wallpaper_description">Wydmy Duo — krajobraz launchera dopasowany do Twojego ekranu.</string>
-    <string name="shade_service_label">Gesty panelu Duo Launcher</string>
-    <string name="shade_service_description">Pozwala gestom na ekranie głównym Duo Launcher otwierać systemowe powiadomienia i panel Szybkich ustawień. Nie odczytuje zawartości ekranu ani nie obserwuje aktywności w innych aplikacjach.</string>
+    <string name="dune_wallpaper_label">Wydmy iDuo</string>
+    <string name="dune_wallpaper_description">Wydmy iDuo — krajobraz launchera dopasowany do Twojego ekranu.</string>
+    <string name="shade_service_label">Gesty panelu iDuo Launcher</string>
+    <string name="shade_service_description">Pozwala gestom na ekranie głównym iDuo Launcher otwierać systemowe powiadomienia i panel Szybkich ustawień. Nie odczytuje zawartości ekranu ani nie obserwuje aktywności w innych aplikacjach.</string>
 
     <!-- Common actions -->
     <string name="back">Wstecz</string>
@@ -47,16 +47,16 @@
     <string name="customize_help_detail">Aplikacja ekranu głównego, widżety, gesty i Discover</string>
     <string name="set_as_home_app">Ustaw jako aplikację ekranu głównego</string>
     <string name="change_home_app">Zmień aplikację ekranu głównego</string>
-    <string name="set_duo_as_home">Ustaw Duo jako ekran główny</string>
+    <string name="set_duo_as_home">Ustaw iDuo jako ekran główny</string>
     <string name="undo_layout_change">Cofnij ostatnią zmianę układu</string>
 
     <string name="launcher_background">Tło launchera</string>
-    <string name="launcher_background_detail">Zmienia obraz za ekranami głównymi Duo.</string>
+    <string name="launcher_background_detail">Zmienia obraz za ekranami głównymi iDuo.</string>
     <string name="choose_photo">Wybierz zdjęcie</string>
     <string name="choose_different_photo">Wybierz inne zdjęcie</string>
-    <string name="reset_to_dunes">Przywróć wydmy Duo</string>
+    <string name="reset_to_dunes">Przywróć wydmy iDuo</string>
     <string name="android_wallpaper">Tapeta Androida</string>
-    <string name="android_wallpaper_detail">Otwiera podgląd Androida, aby zmienić tapetę telefonu. Nie zmienia tła launchera Duo.</string>
+    <string name="android_wallpaper_detail">Otwiera podgląd Androida, aby zmienić tapetę telefonu. Nie zmienia tła launchera iDuo.</string>
     <string name="preview_android_wallpaper">Podgląd tapety Androida</string>
 
     <string name="appearance">Wygląd</string>
@@ -114,15 +114,15 @@
     <string name="backup_restore_note">Przed zmianą ekranu głównego przywracanie zawsze pokazuje podsumowanie.</string>
 
     <string name="help_home_title">Aplikacja ekranu głównego</string>
-    <string name="help_home_default">Duo jest Twoją aplikacją ekranu głównego. Launcher możesz zmienić w ustawieniach ekranu głównego Androida.</string>
-    <string name="help_home_not_default">Wybierz Duo w ustawieniach ekranu głównego Androida, aby otwierało się po naciśnięciu przycisku ekranu głównego.</string>
+    <string name="help_home_default">iDuo jest Twoją aplikacją ekranu głównego. Launcher możesz zmienić w ustawieniach ekranu głównego Androida.</string>
+    <string name="help_home_not_default">Wybierz iDuo w ustawieniach ekranu głównego Androida, aby otwierało się po naciśnięciu przycisku ekranu głównego.</string>
     <string name="help_customize_title">Dostosuj dowolną stronę</string>
     <string name="help_customize">Przytrzymaj puste miejsce i wybierz Dostosuj launcher. Jeśli strona jest pełna, przytrzymaj wąski pasek przy jej lewej krawędzi.</string>
     <string name="help_widgets">Dodawaj widżety Androida do pustych komórek ekranu głównego. Przytrzymaj widżet, aby go przenieść lub usunąć.</string>
     <string name="help_shade_title">Powiadomienia i szybkie ustawienia</string>
-    <string name="help_shade">Przesuń w dół na ekranie głównym. Za pierwszym razem Duo wyjaśni opcjonalne ustawienie Ułatwień dostępu w Androidzie. Usługa jedynie otwiera panele systemowe.</string>
+    <string name="help_shade">Przesuń w dół na ekranie głównym. Za pierwszym razem iDuo wyjaśni opcjonalne ustawienie Ułatwień dostępu w Androidzie. Usługa jedynie otwiera panele systemowe.</string>
     <string name="help_shade_setup">Skonfiguruj gesty panelu</string>
-    <string name="help_discover">Przesuń w prawo z pierwszej strony ekranu głównego. Jeśli Google nie dostarczy kanału, Duo zapewni powrót do ekranu głównego i opcje naprawy.</string>
+    <string name="help_discover">Przesuń w prawo z pierwszej strony ekranu głównego. Jeśli Google nie dostarczy kanału, iDuo zapewni powrót do ekranu głównego i opcje naprawy.</string>
 
     <!-- Apps and profiles -->
     <string name="all_apps">Wszystkie aplikacje</string>
@@ -335,7 +335,7 @@
     <string name="photo_picker_unavailable">Wybór zdjęć jest niedostępny.</string>
     <string name="photo_selection_lost">Nie udało się przywrócić rozpoczętego wyboru zdjęcia.</string>
     <string name="photo_preview_lost">Nie udało się przywrócić rozpoczętego podglądu zdjęcia.</string>
-    <string name="photo_using_dunes">Używane są wydmy Duo.</string>
+    <string name="photo_using_dunes">Używane są wydmy iDuo.</string>
     <string name="photo_updated">Tło launchera zostało zaktualizowane.</string>
     <string name="photo_save_failed">Nie udało się zapisać tego zdjęcia.</string>
     <string name="photo_unusable">Nie można użyć tego zdjęcia.</string>
@@ -361,22 +361,22 @@
     <string name="discover_device_unsupported">To urządzenie nie może wyświetlić Discover obok doku.</string>
     <string name="install_google_first">Najpierw zainstaluj lub włącz aplikację Google.</string>
     <string name="discover_fallback_title">Discover nie jest tu dostępny</string>
-    <string name="discover_fallback_message">Duo nie może umieścić kanału Discover obok ekranu głównego na tym urządzeniu. Możesz otworzyć aplikację Google lub zostać na ekranie głównym.</string>
+    <string name="discover_fallback_message">iDuo nie może umieścić kanału Discover obok ekranu głównego na tym urządzeniu. Możesz otworzyć aplikację Google lub zostać na ekranie głównym.</string>
 
     <!-- Shade gestures -->
     <string name="shade_setup_title">Włącz gesty panelu</string>
-    <string name="shade_setup_message">Android wymaga włączenia gestów panelu Duo Launcher w ustawieniach Ułatwień dostępu. Usługa jedynie otwiera powiadomienia lub szybkie ustawienia; nie odczytuje zawartości ekranu ani nie obserwuje innych aplikacji.</string>
+    <string name="shade_setup_message">Android wymaga włączenia gestów panelu iDuo Launcher w ustawieniach Ułatwień dostępu. Usługa jedynie otwiera powiadomienia lub szybkie ustawienia; nie odczytuje zawartości ekranu ani nie obserwuje innych aplikacji.</string>
     <string name="shade_starting">Gesty panelu uruchamiają się. Przesuń ponownie w dół.</string>
     <string name="shade_rejected">Android nie mógł otworzyć panelu systemowego.</string>
     <string name="accessibility_unavailable">Ustawienia Ułatwień dostępu są niedostępne.</string>
 
     <!-- First run -->
-    <string name="setup_welcome">Witaj w Duo</string>
+    <string name="setup_welcome">Witaj w iDuo</string>
     <string name="setup_tagline">Spokojny ekran główny stworzony dla obu stron Twojego składanego telefonu.</string>
     <string name="setup_close">Zamknij powitanie</string>
-    <string name="setup_is_home">Duo jest Twoją aplikacją ekranu głównego</string>
+    <string name="setup_is_home">iDuo jest Twoją aplikacją ekranu głównego</string>
     <string name="setup_is_home_detail">Przycisk ekranu głównego przeniesie Cię tutaj.</string>
-    <string name="setup_choose_home">Wybierz Duo jako aplikację ekranu głównego</string>
+    <string name="setup_choose_home">Wybierz iDuo jako aplikację ekranu głównego</string>
     <string name="setup_choose_home_detail">Android pokaże wybór aplikacji ekranu głównego. W każdej chwili możesz to zmienić.</string>
     <string name="setup_choose_home_button">Wybierz aplikację ekranu głównego</string>
     <string name="setup_space_title">Wykorzystaj przestrzeń</string>

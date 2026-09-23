@@ -11,7 +11,7 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent>
     </queries>
-    <application android:label="Duo Launcher" android:icon="@drawable/ic_launcher"
+    <application android:label="iDuo Launcher" android:icon="@drawable/ic_launcher"
         android:name=".DuoApplication"
         android:theme="@style/Theme.Duo" android:allowBackup="false" android:supportsRtl="true"
         android:localeConfig="@xml/locales_config">

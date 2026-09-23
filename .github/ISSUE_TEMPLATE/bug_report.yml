@@ -1,16 +1,16 @@
 name: Bug report
-description: Report a reproducible Duo Launcher problem
+description: Report a reproducible iDuo Launcher problem
 title: "[Bug]: "
 labels:
   - bug
 body:
   - type: markdown
     attributes:
-      value: Thanks for helping improve Duo Launcher.
+      value: Thanks for helping improve iDuo Launcher.
   - type: input
     id: version
     attributes:
-      label: Duo Launcher version
+      label: iDuo Launcher version
       placeholder: 0.15.0-beta01
     validations:
       required: true

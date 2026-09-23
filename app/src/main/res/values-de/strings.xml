@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- System integration -->
-    <string name="dune_wallpaper_label">Duo-Dünen</string>
-    <string name="dune_wallpaper_description">Duo-Dünen — die Landschaft des Launchers, passend zu deinem Display.</string>
-    <string name="shade_service_label">Duo Launcher-Leistengesten</string>
-    <string name="shade_service_description">Ermöglicht es den Startbildschirm-Gesten von Duo Launcher, die Systembenachrichtigungen und die Schnelleinstellungen zu öffnen. Es werden weder Bildschirminhalte gelesen noch Aktivitäten in anderen Apps beobachtet.</string>
+    <string name="dune_wallpaper_label">iDuo-Dünen</string>
+    <string name="dune_wallpaper_description">iDuo-Dünen — die Landschaft des Launchers, passend zu deinem Display.</string>
+    <string name="shade_service_label">iDuo Launcher-Leistengesten</string>
+    <string name="shade_service_description">Ermöglicht es den Startbildschirm-Gesten von iDuo Launcher, die Systembenachrichtigungen und die Schnelleinstellungen zu öffnen. Es werden weder Bildschirminhalte gelesen noch Aktivitäten in anderen Apps beobachtet.</string>
 
     <!-- Common actions -->
     <string name="back">Zurück</string>
@@ -47,16 +47,16 @@
     <string name="customize_help_detail">Start-App, Widgets, Gesten und Discover</string>
     <string name="set_as_home_app">Als Start-App festlegen</string>
     <string name="change_home_app">Start-App ändern</string>
-    <string name="set_duo_as_home">Duo als Startbildschirm festlegen</string>
+    <string name="set_duo_as_home">iDuo als Startbildschirm festlegen</string>
     <string name="undo_layout_change">Letzte Layoutänderung rückgängig machen</string>
 
     <string name="launcher_background">Launcher-Hintergrund</string>
-    <string name="launcher_background_detail">Ändert das Bild hinter den Startbildschirmen von Duo.</string>
+    <string name="launcher_background_detail">Ändert das Bild hinter den Startbildschirmen von iDuo.</string>
     <string name="choose_photo">Foto auswählen</string>
     <string name="choose_different_photo">Anderes Foto auswählen</string>
-    <string name="reset_to_dunes">Auf Duo-Dünen zurücksetzen</string>
+    <string name="reset_to_dunes">Auf iDuo-Dünen zurücksetzen</string>
     <string name="android_wallpaper">Android-Hintergrund</string>
-    <string name="android_wallpaper_detail">Öffnet die Android-Vorschau, um den Hintergrund des Telefons zu ändern. Der Launcher-Hintergrund von Duo bleibt unverändert.</string>
+    <string name="android_wallpaper_detail">Öffnet die Android-Vorschau, um den Hintergrund des Telefons zu ändern. Der Launcher-Hintergrund von iDuo bleibt unverändert.</string>
     <string name="preview_android_wallpaper">Vorschau des Android-Hintergrunds</string>
 
     <string name="appearance">Darstellung</string>
@@ -114,15 +114,15 @@
     <string name="backup_restore_note">Vor einer Änderung des Startbildschirms zeigt die Wiederherstellung eine Übersicht.</string>
 
     <string name="help_home_title">Start-App</string>
-    <string name="help_home_default">Duo ist deine Start-App. Du kannst den Launcher in den Android-Einstellungen für den Startbildschirm wechseln.</string>
-    <string name="help_home_not_default">Wähle Duo in den Android-Einstellungen für den Startbildschirm, damit es beim Drücken der Home-Taste erscheint.</string>
+    <string name="help_home_default">iDuo ist deine Start-App. Du kannst den Launcher in den Android-Einstellungen für den Startbildschirm wechseln.</string>
+    <string name="help_home_not_default">Wähle iDuo in den Android-Einstellungen für den Startbildschirm, damit es beim Drücken der Home-Taste erscheint.</string>
     <string name="help_customize_title">Jede Seite anpassen</string>
     <string name="help_customize">Halte eine freie Stelle gedrückt und wähle „Launcher anpassen“. Ist eine Seite voll, halte den schmalen Bereich am linken Rand gedrückt.</string>
     <string name="help_widgets">Füge Android-Widgets in leere Felder des Startbildschirms ein. Halte ein Widget gedrückt, um es zu verschieben oder zu entfernen.</string>
     <string name="help_shade_title">Benachrichtigungen und Schnelleinstellungen</string>
-    <string name="help_shade">Wische auf dem Startbildschirm nach unten. Beim ersten Mal erklärt Duo die optionale Bedienungshilfen-Einstellung von Android. Der Dienst öffnet nur die Systemleisten.</string>
+    <string name="help_shade">Wische auf dem Startbildschirm nach unten. Beim ersten Mal erklärt iDuo die optionale Bedienungshilfen-Einstellung von Android. Der Dienst öffnet nur die Systemleisten.</string>
     <string name="help_shade_setup">Leistengesten einrichten</string>
-    <string name="help_discover">Wische auf der ersten Startbildschirmseite nach rechts. Falls Google den Feed nicht liefert, bietet Duo eine Rückkehr zum Startbildschirm und Wiederherstellungsoptionen.</string>
+    <string name="help_discover">Wische auf der ersten Startbildschirmseite nach rechts. Falls Google den Feed nicht liefert, bietet iDuo eine Rückkehr zum Startbildschirm und Wiederherstellungsoptionen.</string>
 
     <!-- Apps and profiles -->
     <string name="all_apps">Alle Apps</string>
@@ -319,7 +319,7 @@
     <string name="photo_picker_unavailable">Die Fotoauswahl ist nicht verfügbar.</string>
     <string name="photo_selection_lost">Die ausstehende Fotoauswahl konnte nicht wiederhergestellt werden.</string>
     <string name="photo_preview_lost">Die ausstehende Fotovorschau konnte nicht wiederhergestellt werden.</string>
-    <string name="photo_using_dunes">Duo-Dünen werden verwendet.</string>
+    <string name="photo_using_dunes">iDuo-Dünen werden verwendet.</string>
     <string name="photo_updated">Launcher-Hintergrund aktualisiert.</string>
     <string name="photo_save_failed">Dieses Foto konnte nicht gespeichert werden.</string>
     <string name="photo_unusable">Dieses Foto kann nicht verwendet werden.</string>
@@ -345,22 +345,22 @@
     <string name="discover_device_unsupported">Dieses Gerät kann Discover nicht neben dem Dock anzeigen.</string>
     <string name="install_google_first">Installiere oder aktiviere zuerst die Google App.</string>
     <string name="discover_fallback_title">Discover ist hier nicht verfügbar</string>
-    <string name="discover_fallback_message">Duo kann den Discover-Feed auf diesem Gerät nicht neben dem Startbildschirm platzieren. Du kannst die Google App öffnen oder auf dem Startbildschirm bleiben.</string>
+    <string name="discover_fallback_message">iDuo kann den Discover-Feed auf diesem Gerät nicht neben dem Startbildschirm platzieren. Du kannst die Google App öffnen oder auf dem Startbildschirm bleiben.</string>
 
     <!-- Shade gestures -->
     <string name="shade_setup_title">Leistengesten aktivieren</string>
-    <string name="shade_setup_message">Android verlangt, dass du die Leistengesten von Duo Launcher in den Bedienungshilfen aktivierst. Dieser Dienst öffnet nur Benachrichtigungen oder Schnelleinstellungen; er liest keine Bildschirminhalte und beobachtet keine anderen Apps.</string>
+    <string name="shade_setup_message">Android verlangt, dass du die Leistengesten von iDuo Launcher in den Bedienungshilfen aktivierst. Dieser Dienst öffnet nur Benachrichtigungen oder Schnelleinstellungen; er liest keine Bildschirminhalte und beobachtet keine anderen Apps.</string>
     <string name="shade_starting">Leistengesten werden gestartet. Wische erneut nach unten.</string>
     <string name="shade_rejected">Android konnte die Systemleiste nicht öffnen.</string>
     <string name="accessibility_unavailable">Die Bedienungshilfen-Einstellungen sind nicht verfügbar.</string>
 
     <!-- First run -->
-    <string name="setup_welcome">Willkommen bei Duo</string>
+    <string name="setup_welcome">Willkommen bei iDuo</string>
     <string name="setup_tagline">Ein ruhiger Startbildschirm für beide Seiten deines Foldables.</string>
     <string name="setup_close">Begrüßung schließen</string>
-    <string name="setup_is_home">Duo ist deine Start-App</string>
+    <string name="setup_is_home">iDuo ist deine Start-App</string>
     <string name="setup_is_home_detail">Die Home-Taste führt hierher zurück.</string>
-    <string name="setup_choose_home">Duo als Start-App wählen</string>
+    <string name="setup_choose_home">iDuo als Start-App wählen</string>
     <string name="setup_choose_home_detail">Android zeigt die Auswahl der Start-App an. Du kannst jederzeit zurückwechseln.</string>
     <string name="setup_choose_home_button">Start-App auswählen</string>
     <string name="setup_space_title">Den Platz sinnvoll nutzen</string>

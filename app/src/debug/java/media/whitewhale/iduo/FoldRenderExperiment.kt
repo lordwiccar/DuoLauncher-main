@@ -33,7 +33,7 @@ import androidx.lifecycle.LifecycleOwner
 import java.lang.ref.WeakReference
 
 /**
- * Explicit debug lab for copying and animating Duo Launcher's own window.
+ * Explicit debug lab for copying and animating iDuo Launcher's own window.
  *
  * Enable with `adb shell am start ... --ez duo_fold_render_probe true`. Frames never leave
  * memory. The effect is timed and the gyroscope supplies only a small visual trim; neither is

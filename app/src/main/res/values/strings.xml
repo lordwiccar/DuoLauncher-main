@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- System integration -->
-    <string name="dune_wallpaper_label">Duo dunes</string>
-    <string name="dune_wallpaper_description">Duo dunes — the launcher’s landscape, sized for your display.</string>
-    <string name="shade_service_label">Duo Launcher shade gestures</string>
-    <string name="shade_service_description">Allows Duo Launcher’s Home screen gestures to open the system notifications and Quick Settings panels. It does not read screen content or observe activity in other apps.</string>
+    <string name="dune_wallpaper_label">iDuo dunes</string>
+    <string name="dune_wallpaper_description">iDuo dunes — the launcher’s landscape, sized for your display.</string>
+    <string name="shade_service_label">iDuo Launcher shade gestures</string>
+    <string name="shade_service_description">Allows iDuo Launcher’s Home screen gestures to open the system notifications and Quick Settings panels. It does not read screen content or observe activity in other apps.</string>
 
     <!-- Common actions -->
     <string name="back">Back</string>
@@ -47,16 +47,16 @@
     <string name="customize_help_detail">Home app, widgets, gestures, and Discover</string>
     <string name="set_as_home_app">Set as home app</string>
     <string name="change_home_app">Change home app</string>
-    <string name="set_duo_as_home">Set Duo as Home</string>
+    <string name="set_duo_as_home">Set iDuo as Home</string>
     <string name="undo_layout_change">Undo last layout change</string>
 
     <string name="launcher_background">Launcher background</string>
-    <string name="launcher_background_detail">Changes the image behind Duo’s Home screens.</string>
+    <string name="launcher_background_detail">Changes the image behind iDuo’s Home screens.</string>
     <string name="choose_photo">Choose a photo</string>
     <string name="choose_different_photo">Choose a different photo</string>
-    <string name="reset_to_dunes">Reset to Duo dunes</string>
+    <string name="reset_to_dunes">Reset to iDuo dunes</string>
     <string name="android_wallpaper">Android wallpaper</string>
-    <string name="android_wallpaper_detail">Opens Android’s preview to change the phone wallpaper. It does not change Duo’s launcher background.</string>
+    <string name="android_wallpaper_detail">Opens Android’s preview to change the phone wallpaper. It does not change iDuo’s launcher background.</string>
     <string name="preview_android_wallpaper">Preview Android wallpaper</string>
 
     <string name="appearance">Appearance</string>
@@ -114,15 +114,15 @@
     <string name="backup_restore_note">Restore shows a review before changing Home.</string>
 
     <string name="help_home_title">Home app</string>
-    <string name="help_home_default">Duo is your Home app. You can switch launchers in Android’s Home settings.</string>
-    <string name="help_home_not_default">Choose Duo in Android’s Home settings to use it when you press Home.</string>
+    <string name="help_home_default">iDuo is your Home app. You can switch launchers in Android’s Home settings.</string>
+    <string name="help_home_not_default">Choose iDuo in Android’s Home settings to use it when you press Home.</string>
     <string name="help_customize_title">Customize any page</string>
     <string name="help_customize">Long-press empty space, then choose Customize launcher. If a page is full, long-press the slim area at its left edge.</string>
     <string name="help_widgets">Add Android widgets to empty Home cells. Hold a widget to move or remove it.</string>
     <string name="help_shade_title">Notifications and quick settings</string>
-    <string name="help_shade">Swipe down on Home. The first time, Duo explains Android’s optional Accessibility setting. The service only opens the system panels.</string>
+    <string name="help_shade">Swipe down on Home. The first time, iDuo explains Android’s optional Accessibility setting. The service only opens the system panels.</string>
     <string name="help_shade_setup">Set up shade gestures</string>
-    <string name="help_discover">Swipe right from the first Home page. If Google can’t provide the feed, Duo keeps a Home return and recovery actions available.</string>
+    <string name="help_discover">Swipe right from the first Home page. If Google can’t provide the feed, iDuo keeps a Home return and recovery actions available.</string>
 
     <!-- Apps and profiles -->
     <string name="all_apps">All apps</string>
@@ -319,7 +319,7 @@
     <string name="photo_picker_unavailable">The photo picker is unavailable.</string>
     <string name="photo_selection_lost">The pending photo selection could not be restored.</string>
     <string name="photo_preview_lost">The pending photo preview could not be restored.</string>
-    <string name="photo_using_dunes">Using Duo dunes.</string>
+    <string name="photo_using_dunes">Using iDuo dunes.</string>
     <string name="photo_updated">Launcher background updated.</string>
     <string name="photo_save_failed">That photo could not be saved.</string>
     <string name="photo_unusable">That photo could not be used.</string>
@@ -345,22 +345,22 @@
     <string name="discover_device_unsupported">This device can’t show Discover beside the dock.</string>
     <string name="install_google_first">Install or enable the Google app first.</string>
     <string name="discover_fallback_title">Discover isn’t available here</string>
-    <string name="discover_fallback_message">Duo can’t place the Discover feed beside Home on this device. You can open the Google app or stay on Home.</string>
+    <string name="discover_fallback_message">iDuo can’t place the Discover feed beside Home on this device. You can open the Google app or stay on Home.</string>
 
     <!-- Shade gestures -->
     <string name="shade_setup_title">Turn on shade gestures</string>
-    <string name="shade_setup_message">Android requires you to enable Duo Launcher shade gestures in Accessibility settings. This service only opens Notifications or Quick Settings; it doesn’t read screen content or watch other apps.</string>
+    <string name="shade_setup_message">Android requires you to enable iDuo Launcher shade gestures in Accessibility settings. This service only opens Notifications or Quick Settings; it doesn’t read screen content or watch other apps.</string>
     <string name="shade_starting">Shade gestures are starting. Swipe down again.</string>
     <string name="shade_rejected">Android couldn’t open the system panel.</string>
     <string name="accessibility_unavailable">Accessibility settings are unavailable.</string>
 
     <!-- First run -->
-    <string name="setup_welcome">Welcome to Duo</string>
+    <string name="setup_welcome">Welcome to iDuo</string>
     <string name="setup_tagline">A quiet Home screen built for both sides of your foldable.</string>
     <string name="setup_close">Close welcome</string>
-    <string name="setup_is_home">Duo is your Home app</string>
+    <string name="setup_is_home">iDuo is your Home app</string>
     <string name="setup_is_home_detail">The Home button returns here.</string>
-    <string name="setup_choose_home">Choose Duo as your Home app</string>
+    <string name="setup_choose_home">Choose iDuo as your Home app</string>
     <string name="setup_choose_home_detail">Android will show the Home app chooser. You can switch back anytime.</string>
     <string name="setup_choose_home_button">Choose Home app</string>
     <string name="setup_space_title">Make the space useful</string>
