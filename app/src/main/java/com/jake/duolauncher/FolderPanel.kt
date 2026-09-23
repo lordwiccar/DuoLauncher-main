@@ -20,7 +20,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -42,6 +51,8 @@ internal const val MAX_FOLDER_ROWS = 6
 internal const val DEFAULT_FOLDER_TRANSPARENCY = .03f
 internal const val MAX_FOLDER_TRANSPARENCY = .9f
 internal val FOLDER_BACKDROP_BLUR = 6.dp
+/** An opening folder starts at about its Home icon's size and grows to full size. */
+private const val FOLDER_OPEN_START_SCALE = .25f
 
 private val FolderCellWidth = 84.dp
 private val FolderCellHeight = 104.dp
@@ -80,7 +91,12 @@ internal fun FolderPanel(
     folderDestinations: List<Int>, onDismiss: () -> Unit,
     onRename: (String) -> Unit, onLaunch: (AppEntry, android.graphics.Rect?) -> Unit,
     onMoveFolder: (Int) -> Unit, onDisband: () -> Unit, transparency: Float = DEFAULT_FOLDER_TRANSPARENCY,
+    /** Centre of the folder's Home icon in root coordinates; the panel grows out of it. */
+    origin: Offset? = null,
 ) {
+    val opening = remember(folder.id) { Animatable(0f) }
+    LaunchedEffect(folder.id) { opening.animateTo(1f, spring(dampingRatio = .82f, stiffness = Spring.StiffnessMediumLow)) }
+    var panelBounds by remember { mutableStateOf(Rect.Zero) }
     var title by rememberSaveable(folder.id) { mutableStateOf(folder.title) }
     var editing by rememberSaveable(folder.id) { mutableStateOf(false) }
     // A blank name keeps the current one; closing the folder while editing keeps what was typed.
@@ -95,7 +111,7 @@ internal fun FolderPanel(
         onDispose { if (drag.activeSourceScope == folder.id) drag.activeSourceScope = null }
     }
     val closeLabel = stringResource(R.string.close_folder)
-    Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = .28f))
+    Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = .28f * opening.value.coerceIn(0f, 1f)))
         .clickable(
             interactionSource = remember { MutableInteractionSource() },
             indication = null,
@@ -113,6 +129,17 @@ internal fun FolderPanel(
         val gridHeight = FolderCellHeight * shape.rows + FolderRowGap * (shape.rows - 1)
         val pager = rememberPagerState { shape.pages }
         Surface(Modifier.width(maxOf(gridWidth + FolderPadding * 2, FolderMinWidth).coerceAtMost(maxWidth))
+            // Measured before the layer below, so the bounds are the settled, unscaled panel.
+            .onGloballyPositioned { panelBounds = it.boundsInRoot() }
+            .graphicsLayer {
+                val progress = opening.value
+                val scale = FOLDER_OPEN_START_SCALE + (1f - FOLDER_OPEN_START_SCALE) * progress
+                scaleX = scale; scaleY = scale
+                alpha = (progress * 1.6f).coerceIn(0f, 1f)
+                transformOrigin = origin?.takeIf { panelBounds.width > 0f && panelBounds.height > 0f }?.let {
+                    TransformOrigin((it.x - panelBounds.left) / panelBounds.width, (it.y - panelBounds.top) / panelBounds.height)
+                } ?: TransformOrigin.Center
+            }
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,

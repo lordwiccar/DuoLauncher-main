@@ -1186,6 +1186,7 @@ fun LauncherScreen(
                     folderDestinations = homeDestinations.filter { homeCellPage(it) != folderPage },
                     onDismiss = { openFolderId = null }, onRename = { model.renameFolder(id, it) },
                     onLaunch = onLaunchFrom, transparency = state.folderTransparency,
+                    origin = drag.regions[DropTarget.Folder(id)]?.bounds?.center,
                     onMoveFolder = { destination ->
                         if (model.applyDrop(id, DropTarget.Home(destination))) {
                             openFolderId = null
