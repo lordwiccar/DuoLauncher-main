@@ -166,11 +166,9 @@
     <string name="move_later">Posunout dozadu</string>
     <string name="move_to_page">Přesunout na stránku %1$d</string>
     <string name="move_to_leading_page">Přesunout na stránku jen pro rozložený telefon</string>
-    <string name="move_to_dock">Přesunout do doku</string>
     <string name="move_on_home">Přesunout na ploše</string>
     <string name="add_to_home">Přidat na plochu</string>
     <string name="remove_from_home">Odebrat z plochy</string>
-    <string name="remove_shortcut">Odebrat zástupce</string>
     <string name="app_info">Informace o aplikaci</string>
     <string name="create_folder">Vytvořit složku</string>
     <string name="create_folder_with">Vytvořit složku s aplikací %1$s</string>
@@ -185,6 +183,8 @@
     <string name="rename_folder">Přejmenovat složku</string>
     <string name="folder_name_save">Uložit název</string>
     <string name="close_folder">Zavřít složku</string>
+    <string name="folder_options">Možnosti složky</string>
+    <string name="disband_folder">Zrušit složku</string>
     <string name="folder_transparency">Průhlednost pozadí složky</string>
     <plurals name="folder_description">
         <item quantity="one">Složka %1$s, %2$d aplikace</item>

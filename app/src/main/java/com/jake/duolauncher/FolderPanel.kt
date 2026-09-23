@@ -76,9 +76,9 @@ private fun fitting(space: Dp, cell: Dp, gap: Dp) = ((space + gap) / (cell + gap
 @Composable
 internal fun FolderPanel(
     folder: FolderEntry, apps: Map<String, AppEntry>, drag: HomeDragState, page: Int,
-    homeDestinations: List<Int>, dockVacancies: List<Int>, onDismiss: () -> Unit,
+    folderDestinations: List<Int>, onDismiss: () -> Unit,
     onRename: (String) -> Unit, onLaunch: (AppEntry, android.graphics.Rect?) -> Unit,
-    onMoveOut: (String, DropTarget) -> Unit, transparency: Float = DEFAULT_FOLDER_TRANSPARENCY,
+    onMoveFolder: (Int) -> Unit, onDisband: () -> Unit, transparency: Float = DEFAULT_FOLDER_TRANSPARENCY,
 ) {
     var title by rememberSaveable(folder.id) { mutableStateOf(folder.title) }
     var editing by rememberSaveable(folder.id) { mutableStateOf(false) }
@@ -131,16 +131,18 @@ internal fun FolderPanel(
                         Icon(Icons.Rounded.Check, stringResource(R.string.folder_name_save))
                     }
                     LaunchedEffect(Unit) { focus.requestFocus() }
-                } else Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically) {
-                    // Balances the pencil so the name itself stays centred.
-                    Spacer(Modifier.width(36.dp))
-                    Text(folder.title, Modifier.weight(1f, fill = false).semantics { heading() }.testTag("folder-name"),
-                        style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    IconButton(onClick = { title = folder.title; editing = true }, Modifier.size(36.dp).testTag("folder-rename")) {
-                        Icon(Icons.Rounded.Edit, stringResource(R.string.rename_folder), Modifier.size(18.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .6f))
+                } else Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
+                    // Balances the folder menu so the name stays centred.
+                    Spacer(Modifier.width(48.dp))
+                    Row(Modifier.weight(1f), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                        Text(folder.title, Modifier.weight(1f, fill = false).semantics { heading() }.testTag("folder-name"),
+                            style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        IconButton(onClick = { title = folder.title; editing = true }, Modifier.size(36.dp).testTag("folder-rename")) {
+                            Icon(Icons.Rounded.Edit, stringResource(R.string.rename_folder), Modifier.size(18.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .6f))
+                        }
                     }
+                    FolderMenu(folderDestinations, onMoveFolder, onDisband)
                 }
                 HorizontalPager(pager, Modifier.padding(top = 12.dp).size(gridWidth, gridHeight).testTag("folder-pages"),
                     pageSpacing = FolderPadding, key = { it }) { folderPage ->
@@ -148,8 +150,7 @@ internal fun FolderPanel(
                         shownApps.drop(folderPage * shape.perPage).take(shape.perPage).chunked(shape.columns).forEach { row ->
                             Row(horizontalArrangement = Arrangement.spacedBy(FolderColumnGap)) {
                                 row.forEach { appId -> key(appId) {
-                                    FolderChild(apps.getValue(appId), folder.id, drag, page, homeDestinations, dockVacancies,
-                                        onLaunch = onLaunch, onMoveOut = onMoveOut)
+                                    FolderChild(apps.getValue(appId), folder.id, drag, page, onLaunch)
                                 } }
                             }
                         }
@@ -168,45 +169,40 @@ internal fun FolderPanel(
     }
 }
 
+/** Actions for the whole folder; single apps move out by dragging them. */
 @Composable
-private fun FolderChild(
-    app: AppEntry, folderId: String, drag: HomeDragState, page: Int,
-    homeDestinations: List<Int>, dockVacancies: List<Int>,
-    onLaunch: (AppEntry, android.graphics.Rect?) -> Unit, onMoveOut: (String, DropTarget) -> Unit,
-) {
-    var menu by remember { mutableStateOf(false) }
-    Surface(Modifier.size(FolderCellWidth, FolderCellHeight).testTag("folder-child-${app.id}"), color = Color.White.copy(alpha = .34f),
-        shape = RoundedCornerShape(18.dp)) {
-        Box {
-            Column(Modifier.fillMaxSize().dropRegion(drag, DropTarget.Library(app.id), app.id, page,
-                folderId = folderId, scope = folderId).clickable(enabled = app.available) { onLaunch(app, null) }
-                .padding(horizontal = 6.dp, vertical = 10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(app.icon.asImageBitmap(), null, Modifier.size(46.dp).clip(RoundedCornerShape(12.dp)))
-                Text(app.label, Modifier.padding(top = 6.dp), maxLines = 2, overflow = TextOverflow.Ellipsis,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    style = MaterialTheme.typography.labelMedium)
-                if (app.isWork || !app.available) Text(if (app.available) profileName(app.profileLabel) else stringResource(R.string.profile_unavailable, profileName(app.profileLabel)),
-                    maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall)
-            }
-            IconButton(onClick = { menu = true }, Modifier.align(Alignment.TopEnd).size(36.dp)
-                .testTag("folder-options-${app.id}")) { Icon(Icons.Rounded.MoreVert, stringResource(R.string.move_app, app.label)) }
-            DropdownMenu(menu, onDismissRequest = { menu = false }) {
-                homeDestinations.distinctBy(::homeCellPage).forEach { destination ->
-                    val destinationPage = homeCellPage(destination)
-                    val label = if (destinationPage == -1) stringResource(R.string.move_to_leading_page) else stringResource(R.string.move_to_page, destinationPage + 1)
-                    DropdownMenuItem(text = { Text(label) }, onClick = {
-                        menu = false; onMoveOut(app.id, DropTarget.Home(destination))
-                    }, modifier = Modifier.testTag("folder-move-${app.id}-page-$destinationPage"))
-                }
-                dockVacancies.firstOrNull()?.let { dock ->
-                    DropdownMenuItem(text = { Text(stringResource(R.string.move_to_dock)) }, onClick = {
-                        menu = false; onMoveOut(app.id, DropTarget.Dock(dock))
-                    }, modifier = Modifier.testTag("folder-move-${app.id}-dock"))
-                }
-                DropdownMenuItem(text = { Text(stringResource(R.string.remove_shortcut)) }, onClick = {
-                    menu = false; onMoveOut(app.id, DropTarget.Remove)
-                }, modifier = Modifier.testTag("folder-remove-${app.id}"))
-            }
+private fun FolderMenu(destinations: List<Int>, onMove: (Int) -> Unit, onDisband: () -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { open = true }, Modifier.testTag("folder-options")) {
+            Icon(Icons.Rounded.MoreVert, stringResource(R.string.folder_options))
         }
+        DropdownMenu(open, onDismissRequest = { open = false }) {
+            destinations.distinctBy(::homeCellPage).forEach { destination ->
+                val destinationPage = homeCellPage(destination)
+                DropdownMenuItem(text = { Text(if (destinationPage == -1) stringResource(R.string.move_to_leading_page)
+                    else stringResource(R.string.move_to_page, destinationPage + 1)) },
+                    onClick = { open = false; onMove(destination) },
+                    modifier = Modifier.testTag("folder-move-page-$destinationPage"))
+            }
+            DropdownMenuItem(text = { Text(stringResource(R.string.disband_folder)) },
+                onClick = { open = false; onDisband() }, modifier = Modifier.testTag("folder-disband"))
+        }
+    }
+}
+
+@Composable
+private fun FolderChild(app: AppEntry, folderId: String, drag: HomeDragState, page: Int,
+    onLaunch: (AppEntry, android.graphics.Rect?) -> Unit) {
+    Column(Modifier.size(FolderCellWidth, FolderCellHeight).testTag("folder-child-${app.id}")
+        .dropRegion(drag, DropTarget.Library(app.id), app.id, page, folderId = folderId, scope = folderId)
+        .clip(RoundedCornerShape(18.dp)).clickable(enabled = app.available) { onLaunch(app, null) }
+        .padding(horizontal = 4.dp, vertical = 10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Image(app.icon.asImageBitmap(), null, Modifier.size(52.dp).clip(RoundedCornerShape(13.dp)))
+        Text(app.label, Modifier.padding(top = 6.dp), maxLines = 2, overflow = TextOverflow.Ellipsis,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            style = MaterialTheme.typography.labelMedium)
+        if (app.isWork || !app.available) Text(if (app.available) profileName(app.profileLabel) else stringResource(R.string.profile_unavailable, profileName(app.profileLabel)),
+            maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall)
     }
 }

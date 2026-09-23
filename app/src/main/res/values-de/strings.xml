@@ -164,11 +164,9 @@
     <string name="move_later">Nach hinten verschieben</string>
     <string name="move_to_page">Auf Seite %1$d verschieben</string>
     <string name="move_to_leading_page">Auf die Seite für den aufgeklappten Zustand verschieben</string>
-    <string name="move_to_dock">In das Dock verschieben</string>
     <string name="move_on_home">Auf dem Startbildschirm verschieben</string>
     <string name="add_to_home">Zum Startbildschirm hinzufügen</string>
     <string name="remove_from_home">Vom Startbildschirm entfernen</string>
-    <string name="remove_shortcut">Verknüpfung entfernen</string>
     <string name="app_info">App-Info</string>
     <string name="create_folder">Ordner erstellen</string>
     <string name="create_folder_with">Ordner mit %1$s erstellen</string>
@@ -183,6 +181,8 @@
     <string name="rename_folder">Ordner umbenennen</string>
     <string name="folder_name_save">Namen speichern</string>
     <string name="close_folder">Ordner schließen</string>
+    <string name="folder_options">Ordneroptionen</string>
+    <string name="disband_folder">Ordner auflösen</string>
     <string name="folder_transparency">Transparenz des Ordnerhintergrunds</string>
     <plurals name="folder_description">
         <item quantity="one">Ordner %1$s, %2$d App</item>

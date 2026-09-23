@@ -164,11 +164,9 @@
     <string name="move_later">Move later</string>
     <string name="move_to_page">Move to page %1$d</string>
     <string name="move_to_leading_page">Move to Unfolded-only page</string>
-    <string name="move_to_dock">Move to dock</string>
     <string name="move_on_home">Move on Home</string>
     <string name="add_to_home">Add to Home</string>
     <string name="remove_from_home">Remove from Home</string>
-    <string name="remove_shortcut">Remove shortcut</string>
     <string name="app_info">App info</string>
     <string name="create_folder">Create folder</string>
     <string name="create_folder_with">Create folder with %1$s</string>
@@ -183,6 +181,8 @@
     <string name="rename_folder">Rename folder</string>
     <string name="folder_name_save">Save name</string>
     <string name="close_folder">Close folder</string>
+    <string name="folder_options">Folder options</string>
+    <string name="disband_folder">Ungroup folder</string>
     <string name="folder_transparency">Folder background transparency</string>
     <plurals name="folder_description">
         <item quantity="one">Folder %1$s, %2$d app</item>

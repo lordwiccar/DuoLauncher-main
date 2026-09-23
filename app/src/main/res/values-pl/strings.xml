@@ -166,11 +166,9 @@
     <string name="move_later">Przesuń później</string>
     <string name="move_to_page">Przenieś na stronę %1$d</string>
     <string name="move_to_leading_page">Przenieś na stronę tylko dla rozłożonego telefonu</string>
-    <string name="move_to_dock">Przenieś do doku</string>
     <string name="move_on_home">Przenieś na ekranie głównym</string>
     <string name="add_to_home">Dodaj do ekranu głównego</string>
     <string name="remove_from_home">Usuń z ekranu głównego</string>
-    <string name="remove_shortcut">Usuń skrót</string>
     <string name="app_info">Informacje o aplikacji</string>
     <string name="create_folder">Utwórz folder</string>
     <string name="create_folder_with">Utwórz folder z aplikacją %1$s</string>
@@ -185,6 +183,8 @@
     <string name="rename_folder">Zmień nazwę folderu</string>
     <string name="folder_name_save">Zapisz nazwę</string>
     <string name="close_folder">Zamknij folder</string>
+    <string name="folder_options">Opcje folderu</string>
+    <string name="disband_folder">Rozgrupuj folder</string>
     <string name="folder_transparency">Przezroczystość tła folderu</string>
     <plurals name="folder_description">
         <item quantity="one">Folder %1$s, %2$d aplikacja</item>

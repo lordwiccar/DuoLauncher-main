@@ -166,11 +166,9 @@
     <string name="move_later">Posunúť dozadu</string>
     <string name="move_to_page">Presunúť na stranu %1$d</string>
     <string name="move_to_leading_page">Presunúť na stranu len pre rozložený telefón</string>
-    <string name="move_to_dock">Presunúť do doku</string>
     <string name="move_on_home">Presunúť na ploche</string>
     <string name="add_to_home">Pridať na plochu</string>
     <string name="remove_from_home">Odobrať z plochy</string>
-    <string name="remove_shortcut">Odobrať odkaz</string>
     <string name="app_info">Informácie o aplikácii</string>
     <string name="create_folder">Vytvoriť priečinok</string>
     <string name="create_folder_with">Vytvoriť priečinok s aplikáciou %1$s</string>
@@ -185,6 +183,8 @@
     <string name="rename_folder">Premenovať priečinok</string>
     <string name="folder_name_save">Uložiť názov</string>
     <string name="close_folder">Zavrieť priečinok</string>
+    <string name="folder_options">Možnosti priečinka</string>
+    <string name="disband_folder">Zrušiť priečinok</string>
     <string name="folder_transparency">Priehľadnosť pozadia priečinka</string>
     <plurals name="folder_description">
         <item quantity="one">Priečinok %1$s, %2$d aplikácia</item>

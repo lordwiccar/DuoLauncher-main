@@ -360,6 +360,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
     }
     fun removeAppFromFolder(folderId: String, appId: String, target: DropTarget) =
         commitLayout(com.jake.duolauncher.removeAppFromFolder(mutable.value.layout, folderId, appId, target))
+    fun disbandFolder(folderId: String) = commitLayout(com.jake.duolauncher.disbandFolder(mutable.value.layout, folderId))
     fun moveFolderApp(folderId: String, appId: String, index: Int) =
         commitLayout(com.jake.duolauncher.moveFolderApp(mutable.value.layout, folderId, appId, index))
     fun folder(id: String) = mutable.value.layout.folder(id)

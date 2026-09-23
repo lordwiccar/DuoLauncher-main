@@ -1176,13 +1176,18 @@ fun LauncherScreen(
                     (0 until HOME_CELLS).map { homeCellIndex(destinationPage, it) }
                         .firstOrNull { it !in blocked && state.layout.slotAt(it) == null }
                 }
-                FolderPanel(folder, appsById, drag, pager.currentPage, homeDestinations,
-                    dockVacancies = state.dock.indices.filter { state.dock[it] == null },
+                val folderPage = state.layout.indexOfShortcut(id)?.let(::homeCellPage)
+                FolderPanel(folder, appsById, drag, pager.currentPage,
+                    folderDestinations = homeDestinations.filter { homeCellPage(it) != folderPage },
                     onDismiss = { openFolderId = null }, onRename = { model.renameFolder(id, it) },
                     onLaunch = onLaunchFrom, transparency = state.folderTransparency,
-                    onMoveOut = { appId, destination ->
-                        if (model.removeAppFromFolder(id, appId, destination)) openFolderId = model.folder(id)?.id
-                    })
+                    onMoveFolder = { destination ->
+                        if (model.applyDrop(id, DropTarget.Home(destination))) {
+                            openFolderId = null
+                            scope.launch { pager.animateScrollToPage(homeCellPage(destination).coerceIn(0, homePages - 1)) }
+                        }
+                    },
+                    onDisband = { if (model.disbandFolder(id)) openFolderId = null })
             } ?: LaunchedEffect(id) { openFolderId = null }
         }
         launcherActivity.backups.preview?.let { preview ->

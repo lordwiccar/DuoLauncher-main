@@ -81,9 +81,10 @@ class FolderIntegrationTest {
                 instrumentation.removeMonitor(launchedActivity)
             }
             compose.onNodeWithTag("home-folder-${folder.id}").performClick()
-            compose.onNodeWithTag("folder-options-${first.id}").performClick()
-            compose.onNodeWithTag("folder-move-${first.id}-page-0").performClick()
+            compose.onNodeWithTag("folder-options").performClick()
+            compose.onNodeWithTag("folder-disband").performClick()
             compose.waitUntil(5_000) { model().folder(folder.id) == null }
+            assertTrue(listOf(first.id, second.id).all { model().state.value.layout.indexOfShortcut(it) != null })
             compose.runOnIdle { model().undoEdit() }
             compose.waitUntil(5_000) { model().folder(folder.id)?.appIds?.containsAll(listOf(first.id, second.id)) == true }
 

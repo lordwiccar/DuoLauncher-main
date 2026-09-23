@@ -79,6 +79,25 @@ fun removeAppFromFolder(layout: HomeLayout, folderId: String, appId: String, tar
     return if (placed == next) layout else placed
 }
 
+/**
+ * Ungroups a folder where it stands: its first app takes the folder's cell and the rest fill the
+ * nearest free, visible Home cells, starting on the folder's own page.
+ */
+fun disbandFolder(layout: HomeLayout, folderId: String): HomeLayout {
+    val folder = layout.folder(folderId) ?: return layout
+    val cell = layout.indexOfShortcut(folderId) ?: return layout
+    val cleared = layout.withSlot(cell, null).copy(folders = layout.folders.filterNot { it.id == folderId })
+    val blocked = cleared.unavailableCells()
+    val page = homeCellPage(cell)
+    val lastPage = cleared.pageCount + folder.appIds.size / HOME_CELLS + 1
+    val pages = listOf(page) + (maxOf(0, page)..lastPage).filter { it != page }
+    val free = pages.asSequence()
+        .flatMap { candidate -> (0 until HOME_CELLS).asSequence().map { homeCellIndex(candidate, it) } }
+        .filter { it != cell && it !in blocked && cleared.cellVisible(it) && cleared.slotAt(it) == null }
+    val targets = (sequenceOf(cell) + free).take(folder.appIds.size).toList()
+    return folder.appIds.zip(targets).fold(cleared) { next, (appId, index) -> next.withSlot(index, appId) }
+}
+
 fun reconcileFolders(layout: HomeLayout, removedAppIds: Set<String>): HomeLayout {
     var next = layout
     removedAppIds.forEach { appId ->
