@@ -1914,7 +1914,8 @@ private fun AppPicker(apps: List<AppEntry>, dockSlot: Int?, onSelect: (AppEntry)
     val filtered = remember(apps, query) { apps.filter { it.label.contains(query.trim(), ignoreCase = true) } }
     Column(Modifier.fillMaxWidth().fillMaxHeight(.88f).padding(horizontal = 20.dp).imePadding()) {
         Text(if (dockSlot == null) stringResource(R.string.your_apps) else stringResource(R.string.dock_position_label, dockSlot + 1), style = MaterialTheme.typography.headlineSmall)
-        OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth().padding(vertical = 16.dp).testTag("search-field"),
+        OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth().padding(vertical = 16.dp).testTag("search-field")
+            .releasesDiscoverWhileTyping("app-picker-search"),
             placeholder = { Text(stringResource(R.string.search_apps)) }, leadingIcon = { Icon(Icons.Rounded.Search, null) }, singleLine = true,
             trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(Icons.Rounded.Close, stringResource(R.string.clear_search)) } }, shape = RoundedCornerShape(20.dp))
         if (dockSlot != null) TextButton(onClick = onClear) { Text(stringResource(R.string.dock_leave_empty)) }

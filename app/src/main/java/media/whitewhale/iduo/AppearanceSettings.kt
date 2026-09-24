@@ -37,10 +37,10 @@ internal fun AppearanceSettings(state: AppearanceState, onMode: (AppearanceMode)
         }
         if (state.mode == AppearanceMode.SUNRISE_SUNSET) {
             state.fallback?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            OutlinedTextField(place, { place = it }, Modifier.testTag("appearance-place"), label = { Text(stringResource(R.string.place_name)) }, singleLine = true)
+            OutlinedTextField(place, { place = it }, Modifier.testTag("appearance-place").releasesDiscoverWhileTyping("appearance-place"), label = { Text(stringResource(R.string.place_name)) }, singleLine = true)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(latitude, { latitude = it }, Modifier.weight(1f).testTag("appearance-latitude"), label = { Text(stringResource(R.string.latitude_label)) }, singleLine = true)
-                OutlinedTextField(longitude, { longitude = it }, Modifier.weight(1f).testTag("appearance-longitude"), label = { Text(stringResource(R.string.longitude_label)) }, singleLine = true)
+                OutlinedTextField(latitude, { latitude = it }, Modifier.weight(1f).testTag("appearance-latitude").releasesDiscoverWhileTyping("appearance-latitude"), label = { Text(stringResource(R.string.latitude_label)) }, singleLine = true)
+                OutlinedTextField(longitude, { longitude = it }, Modifier.weight(1f).testTag("appearance-longitude").releasesDiscoverWhileTyping("appearance-longitude"), label = { Text(stringResource(R.string.longitude_label)) }, singleLine = true)
             }
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Button(onClick = {
