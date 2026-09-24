@@ -1,5 +1,6 @@
 package media.whitewhale.iduo
 
+import androidx.core.content.ContextCompat
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -64,10 +65,11 @@ class DeviceStatusMonitor(private val context: Context) : DefaultLifecycleObserv
     }
 
     override fun onStart(owner: LifecycleOwner) {
-        context.registerReceiver(receiver, IntentFilter().apply {
+        // Only the system sends these; no other app may deliver to this receiver.
+        ContextCompat.registerReceiver(context, receiver, IntentFilter().apply {
             addAction(Intent.ACTION_BATTERY_CHANGED); addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED)
             addAction(WifiManager.RSSI_CHANGED_ACTION)
-        })
+        }, ContextCompat.RECEIVER_NOT_EXPORTED)
         receiverRegistered = true
         networkRegistered = runCatching { connection.registerDefaultNetworkCallback(networkCallback); true }.getOrDefault(false)
         phoneRegistered = runCatching { phone.registerTelephonyCallback(context.mainExecutor, phoneCallback); true }.getOrDefault(false)
