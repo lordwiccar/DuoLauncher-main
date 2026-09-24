@@ -24,6 +24,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.text.Collator
 
+/** Home's left page: Google's Discover feed, or iDuo's own RSS reader. */
+enum class LeftPage { DISCOVER, RSS }
+
 data class AppEntry(
     val id: String,
     val label: String,
@@ -60,6 +63,8 @@ data class LauncherState(
     val folderTransparency: Float = DEFAULT_FOLDER_TRANSPARENCY,
     /** All apps as horizontal pages of a grid instead of a vertical list. */
     val libraryGrid: Boolean = false,
+    /** What Home's left page shows. */
+    val leftPage: LeftPage = LeftPage.DISCOVER,
     val loading: Boolean = true,
     val error: String? = null,
 ) {
@@ -447,6 +452,11 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         if (statePayloadInvalid) return
         mutable.update { it.copy(libraryGrid = value) }; persist()
     }
+    /** A device-local view setting, like the All apps view. */
+    fun setLeftPage(value: LeftPage) {
+        if (statePayloadInvalid) return
+        mutable.update { it.copy(leftPage = value) }; persist()
+    }
     fun setGoogleSearch(value: Boolean) { if (statePayloadInvalid) return; undoLayout = null; undoImportSettings = null; mutable.update { it.copy(googleSearch = value, canUndoEdit = false) }; persist() }
     fun setPreset(expanded: Boolean, value: LayoutPreset) {
         if (statePayloadInvalid) return
@@ -511,6 +521,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .put("homeRows", s.homeRows)
             .put("folderTransparency", s.folderTransparency.toDouble())
             .put("libraryGrid", s.libraryGrid)
+            .put("leftPage", s.leftPage.name)
             .put("compact", preset(s.compact)).put("expanded", preset(s.expanded))
         val editor = prefs.edit()
         if (legacyRaw != null && sourceSchema == 2 && !prefs.contains("state_v2_backup"))
@@ -663,7 +674,8 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             homeRows = j.optInt("homeRows", DEFAULT_HOME_ROWS).coerceIn(DEFAULT_HOME_ROWS, GRID_ROWS),
             folderTransparency = j.optDouble("folderTransparency", DEFAULT_FOLDER_TRANSPARENCY.toDouble()).toFloat()
                 .takeIf { it.isFinite() }?.coerceIn(0f, MAX_FOLDER_TRANSPARENCY) ?: DEFAULT_FOLDER_TRANSPARENCY,
-            libraryGrid = j.optBoolean("libraryGrid", false))
+            libraryGrid = j.optBoolean("libraryGrid", false),
+            leftPage = LeftPage.entries.firstOrNull { it.name == j.optString("leftPage") } ?: LeftPage.DISCOVER)
             .let { it.copy(homeRows = maxOf(it.homeRows, it.layout.requiredRows())) }
     }.getOrElse {
         statePayloadInvalid = legacyRaw != null

@@ -193,6 +193,22 @@
     <string name="all_apps_view">All apps view</string>
     <string name="all_apps_view_list">List</string>
     <string name="all_apps_view_grid">Grid in pages</string>
+    <string name="left_page">Left page</string>
+    <string name="left_page_discover" translatable="false">Google Discover</string>
+    <string name="left_page_rss">RSS reader</string>
+    <string name="rss_title">News</string>
+    <string name="rss_manage">Manage sources</string>
+    <string name="rss_sources">Sources</string>
+    <string name="rss_add_hint">Feed or website address</string>
+    <string name="rss_add">Add</string>
+    <string name="rss_remove_source">Remove %1$s</string>
+    <string name="rss_empty">Add a news source to fill this page.</string>
+    <string name="rss_add_first">Add a source</string>
+    <string name="rss_no_feed">No RSS or Atom feed was found at that address.</string>
+    <string name="rss_load_failed">Some sources could not be loaded.</string>
+    <string name="rss_duplicate">This source is already added.</string>
+    <string name="rss_refresh">Refresh</string>
+    <string name="rss_adding">Checking address…</string>
     <plurals name="folder_description">
         <item quantity="one">Folder %1$s, %2$d app</item>
         <item quantity="other">Folder %1$s, %2$d apps</item>

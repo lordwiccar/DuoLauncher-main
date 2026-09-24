@@ -18,6 +18,8 @@ Android controls widget-binding approval and Home-app selection. Providers can r
 
 ## Google and other apps
 
+If you choose the **RSS reader** for the left page, iDuo connects directly over HTTPS to the sources you add, and to the article pictures they link, to download their feeds. Those sites see your IP address and a request identifying iDuo Launcher, as with any visit. Your sources and recently downloaded articles stay on the device. With Google Discover selected, or with no sources, iDuo makes no network requests of its own.
+
 Discover and Google search use the installed Google app. Apps, search results, articles, and widgets may use their providers' network services and accounts. Those apps' policies and settings apply; iDuo does not proxy their traffic or collect their content.
 
 ## Export, reports, and removal

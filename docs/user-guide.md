@@ -12,6 +12,7 @@ To make iDuo the launcher, choose **Set as home app** in customization, or open 
 
 - Swipe horizontally across Home, the dock, or the right rail to move one page per gesture.
 - Swipe right from Home 1 for Discover. Swipe left, press Back, or use its right-pointing arrow to return.
+- **Gestures & search → Left page** chooses between **Google Discover** and iDuo's **RSS reader**. In the reader, the small settings icon at the top left manages sources: type a feed address, or a website address and iDuo finds its feed. Pull down or use the refresh button to update; tap an article to open it in the browser.
 - Swipe past the last Home page for **All apps**. Its **Search apps** field always searches installed apps locally.
 - **Home layout → All apps view** switches All apps between an alphabetical **List** and a **Grid in pages** that you swipe sideways; swiping past its first page returns to Home.
 - The dock and its search control stay on the right. The page controls also open Discover or All apps.

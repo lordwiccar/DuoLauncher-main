@@ -7,6 +7,7 @@
 - Group Home icons into folders by dropping one onto another. Open folders size to their content up to 6 × 6 icons, page beyond that, grow out of their Home icon, blur Home behind them, and offer rename, move to page and ungroup.
 - Add adjustable folder background transparency.
 - Show Android's wallpaper on Home, including live wallpapers. A photo or the bundled iDuo dunes chosen in iDuo are set as the Android wallpaper on the Home screen, lock screen or both.
+- Offer an RSS reader as an alternative to Google Discover on the left page, with source management behind a settings icon. The reader adds the internet permission; it only contacts the sources you add.
 - Add a paged grid view for All apps, selectable under Home layout.
 - Fix app search and other text fields: the keyboard opens and typing reaches the field while Discover is ready in the background.
 - Keep Home, dock and folder shortcuts of apps that change their icon by switching launch activities.

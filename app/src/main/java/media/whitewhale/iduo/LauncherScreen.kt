@@ -187,10 +187,26 @@ fun LauncherScreen(
     val pendingNewPage = widgets.pendingPlacement?.page == homePages
     val visibleHomePages = homePages + if (drag.active || widgetSession != null || pendingNewPage) 1 else 0
     var expandedWorkspace by remember { mutableStateOf(false) }
-    val firstHome = if (DiscoverBounds.available) 1 else 0
+    // The RSS reader is an ordinary page; Discover has a page only where Google's feed can be embedded.
+    val rssLeft = state.leftPage == LeftPage.RSS
+    val firstHome = if (rssLeft || DiscoverBounds.available) 1 else 0
     val pageCount = visibleHomePages + 1
     val nativePager = rememberPagerState(initialPage = savedPage.coerceIn(-firstHome, pageCount - 1) + firstHome, pageCount = { pageCount + firstHome })
-    val pager = remember(nativePager) { LauncherPager(nativePager, firstHome) }
+    val pager = remember(nativePager, firstHome) { LauncherPager(nativePager, firstHome) }
+    // Adding or removing the left page shifts every physical page; keep showing the same one.
+    val shownFirstHome = remember { intArrayOf(firstHome) }
+    LaunchedEffect(firstHome) {
+        if (shownFirstHome[0] != firstHome) {
+            val logical = nativePager.currentPage - shownFirstHome[0]
+            shownFirstHome[0] = firstHome
+            nativePager.scrollToPage((logical + firstHome).coerceIn(0, pageCount + firstHome - 1))
+        }
+    }
+    // Google's feed host must not run, or hold input focus, while the RSS reader has the page.
+    DisposableEffect(rssLeft) {
+        if (rssLeft) LiveDiscover.setExternalResultPending(launcherActivity, "main", "left-page-rss", true)
+        onDispose { if (rssLeft) LiveDiscover.setExternalResultPending(launcherActivity, "main", "left-page-rss", false) }
+    }
     fun leaveTemporaryWidgetPage() {
         val persistedPages = model.state.value.homePages
         if (pager.currentPage >= persistedPages)
@@ -568,7 +584,7 @@ fun LauncherScreen(
                 .discoverSwipe(firstHome == 0 && pager.currentPage == 0 && !drag.active && sheet.isEmpty() &&
                     !showFirstRun && selectedId == null, onDiscover)
                 .onGloballyPositioned {
-                    if (firstHome > 0) {
+                    if (firstHome > 0 && !rssLeft) {
                         val bounds = it.boundsInWindow()
                         LiveDiscover.pagerOrigin = bounds.topLeft
                         val padding = 32 * density.density
@@ -577,7 +593,7 @@ fun LauncherScreen(
                                 (bounds.right - 16 * density.density).toInt(), (bounds.bottom - padding).toInt()), bounds.width)
                     }
                 }
-                .semantics { stateDescription = if (pager.currentPage == -1) launcherActivity.getString(R.string.discover)
+                .semantics { stateDescription = if (pager.currentPage == -1) launcherActivity.getString(if (rssLeft) R.string.rss_title else R.string.discover)
                     else if (pager.currentPage == visibleHomePages) launcherActivity.getString(R.string.all_apps)
                     else launcherActivity.getString(R.string.home_page_of, pager.currentPage + 1, visibleHomePages) }
             if (geometry.expanded) {
@@ -613,7 +629,9 @@ fun LauncherScreen(
                     key = { if (it < firstHome) "discover" else if (it - firstHome == visibleHomePages) "library" else "home-${it - firstHome}" }) { physicalPage ->
                     val page = physicalPage - firstHome
                     if (page == -1) {
-                        DiscoverContent(Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, bottom = 16.dp))
+                        if (rssLeft) RssPage(Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, bottom = bottomSpace),
+                            active = pager.currentPage == -1)
+                        else DiscoverContent(Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, bottom = 16.dp))
                     } else if (page == visibleHomePages) {
                         AppLibrary(state, libraryQuery, { libraryQuery = it }, onLaunch, model::setPinned,
                             onActions = { selectedId = it.id }, modifier = Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, bottom = bottomSpace).testTag("library-page"),
@@ -658,7 +676,9 @@ fun LauncherScreen(
                 }
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
                     if (!drag.active) IconButton(onClick = openDiscover, Modifier.size(32.dp).testTag("discover-page-link")) {
-                        Icon(Icons.Rounded.Explore, stringResource(R.string.discover), tint = Color.White.copy(alpha = .65f), modifier = Modifier.size(17.dp))
+                        Icon(if (rssLeft) Icons.Rounded.RssFeed else Icons.Rounded.Explore,
+                            stringResource(if (rssLeft) R.string.rss_title else R.string.discover),
+                            tint = Color.White.copy(alpha = .65f), modifier = Modifier.size(17.dp))
                     }
                     if (visibleHomePages <= 6) repeat(visibleHomePages) { index ->
                         Box(Modifier.size(28.dp).clip(CircleShape).clickable { scope.launch { pager.animateScrollToPage(index) } }
@@ -1352,7 +1372,9 @@ private fun ExpandedWorkspace(
         if (showDiscover) {
             key("discover-pane") {
                 Box(Modifier.place(-viewportWidth).fillMaxSize()) {
-                    DiscoverContent(Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, bottom = 16.dp))
+                    if (state.leftPage == LeftPage.RSS) RssPage(Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, bottom = bottomSpace),
+                        active = nativePager.currentPage < firstHome)
+                    else DiscoverContent(Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, bottom = 16.dp))
                 }
             }
         }

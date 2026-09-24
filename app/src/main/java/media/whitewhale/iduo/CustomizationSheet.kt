@@ -122,6 +122,13 @@ internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, mo
                 CustomizationPage.HOME -> HomeLayoutSettings(state, wide, { wide = it }, model, homePage, maxRowsFit,
                     onEditPins, onWidget, onAddWidget, onRemoveWidget)
                 CustomizationPage.GESTURES -> {
+                    Text(stringResource(R.string.left_page), style = MaterialTheme.typography.bodyMedium)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterChip(state.leftPage == LeftPage.DISCOVER, { model.setLeftPage(LeftPage.DISCOVER) },
+                            label = { Text(stringResource(R.string.left_page_discover)) }, modifier = Modifier.testTag("left-page-discover"))
+                        FilterChip(state.leftPage == LeftPage.RSS, { model.setLeftPage(LeftPage.RSS) },
+                            label = { Text(stringResource(R.string.left_page_rss)) }, modifier = Modifier.testTag("left-page-rss"))
+                    }
                     SettingsSwitch(stringResource(R.string.show_app_names), state.labels, model::setLabels, "label-switch")
                     SettingsSwitch(stringResource(R.string.show_status), state.verticalStatus, model::setVerticalStatus, "status-switch")
                     SettingsSwitch(stringResource(R.string.search_opens_google), state.googleSearch, model::setGoogleSearch, "google-search-switch")
