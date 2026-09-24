@@ -7,6 +7,7 @@
 - Group Home icons into folders by dropping one onto another. Open folders size to their content up to 6 × 6 icons, page beyond that, grow out of their Home icon, blur Home behind them, and offer rename, move to page and ungroup.
 - Add adjustable folder background transparency.
 - Show Android's wallpaper on Home, including live wallpapers. A photo or the bundled iDuo dunes chosen in iDuo are set as the Android wallpaper on the Home screen, lock screen or both.
+- Keep Home, dock and folder shortcuts of apps that change their icon by switching launch activities.
 - Allow four to eight dock apps and six or eight Home rows; long press on Home opens settings.
 
 ## 0.15.0-beta01

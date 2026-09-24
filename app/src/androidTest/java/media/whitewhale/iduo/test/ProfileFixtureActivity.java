@@ -2,6 +2,7 @@ package media.whitewhale.iduo.test;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -11,8 +12,23 @@ public final class ProfileFixtureActivity extends android.app.Activity {
     public static final String RESULT_TOKEN = "resultToken";
     private static final String TAG = "DuoProfilePolicy";
 
+    /** Swaps the enabled launch entry between this activity and its alias, as icon-changing apps do. */
+    public static final String SWITCH_LAUNCH_ALIAS = "media.whitewhale.iduo.test.SWITCH_LAUNCH_ALIAS";
+
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
+        if (SWITCH_LAUNCH_ALIAS.equals(getIntent().getAction())) {
+            PackageManager packages = getPackageManager();
+            ComponentName activity = new ComponentName(this, ProfileFixtureActivity.class);
+            ComponentName alias = new ComponentName(this, "media.whitewhale.iduo.test.ProfileFixtureAlternateIcon");
+            boolean aliasOn = packages.getComponentEnabledSetting(alias) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+            packages.setComponentEnabledSetting(aliasOn ? activity : alias,
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+            packages.setComponentEnabledSetting(aliasOn ? alias : activity,
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+            finish();
+            return;
+        }
         String token = getIntent().getStringExtra(RESULT_TOKEN);
         String widgetPackage = getIntent().getStringExtra(WIDGET_PACKAGE);
         try {

@@ -76,4 +76,25 @@ class ProfileSupportTest {
             temporarilyUnavailable = setOf(42L to "com.work"), confirmedRemoved = emptySet(), personalSerial = 0,
             definitivelyRemovedProfiles = setOf(42)))
     }
+
+    @Test fun shortcutFollowsAnAppThatSwitchedItsLaunchAlias() {
+        val renamed = renamedActivityIds(listOf("com.bank/.IconBlue", "com.mail/.Main"),
+            listOf("com.bank/.IconRed", "com.mail/.Main"), personalSerial = 0)
+        assertEquals(mapOf("com.bank/.IconBlue" to "com.bank/.IconRed"), renamed)
+    }
+
+    @Test fun renameStaysInItsProfileAndNeverDuplicatesAPlacedActivity() {
+        val work = profileAppId("com.bank/.IconBlue", userSerial = 42, personalSerial = 0)
+        val workNew = profileAppId("com.bank/.IconRed", userSerial = 42, personalSerial = 0)
+        // The personal copy is already placed, so only the work shortcut may move to the work activity.
+        val renamed = renamedActivityIds(listOf(work, "com.bank/.IconBlue", "com.bank/.IconRed"),
+            listOf("com.bank/.IconRed", workNew), personalSerial = 0)
+        assertEquals(mapOf(work to workNew), renamed)
+    }
+
+    @Test fun removedPackageAndFoldersAreNotRenamed() {
+        val folder = newFolderId()
+        assertEquals(emptyMap<String, String>(), renamedActivityIds(listOf("com.gone/.Main", folder),
+            listOf("com.other/.Main"), personalSerial = 0))
+    }
 }

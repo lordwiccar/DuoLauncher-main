@@ -207,14 +207,23 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
                     val pins = if (sourceSchema < 6 && needsMigration) migrateSchema5Apps(legacyPins) else legacyPins
                     val availableIds = entries.mapTo(mutableSetOf(), AppEntry::id)
                     val authoritative = apps.authoritativeProfiles
-                    val removedIds = removedAppIds(old.homeSlots.filterNotNull() + old.leadingSlots.filterNotNull() +
-                        old.dock.filterNotNull() + old.folders.flatMap { it.appIds }, availableIds,
-                        authoritative, temporarilyUnavailable, removed, userManager.getSerialNumberForUser(Process.myUserHandle()),
+                    val personalSerial = userManager.getSerialNumberForUser(Process.myUserHandle())
+                    // An app that swapped its launch activity (e.g. to change its icon) keeps its places.
+                    val renamed = renamedActivityIds(pins.filterNotNull() + old.leadingSlots.filterNotNull() +
+                        dock.filterNotNull() + old.folders.flatMap { it.appIds }, entries.map(AppEntry::id), personalSerial)
+                    fun follow(id: String?) = id?.let { renamed[it] ?: it }
+                    val followedPins = pins.map(::follow)
+                    val followedLeading = old.leadingSlots.map(::follow)
+                    val followedDock = dock.map(::follow)
+                    val followedFolders = old.folders.map { folder -> folder.copy(appIds = folder.appIds.map { renamed[it] ?: it }) }
+                    val removedIds = removedAppIds(followedPins.filterNotNull() + followedLeading.filterNotNull() +
+                        followedDock.filterNotNull() + followedFolders.flatMap { it.appIds }, availableIds,
+                        authoritative, temporarilyUnavailable, removed, personalSerial,
                         apps.removedProfiles)
-                    val validPins = pins.map { it?.takeUnless(removedIds::contains) }
-                    val validDock = dock.map { it?.takeUnless(removedIds::contains) }
-                    val reconciled = reconcileFolders(HomeLayout(validPins, validDock, old.widgetPlacements, old.folders,
-                        old.widgetRestores, old.leadingSlots, old.homeRows), removedIds)
+                    val validPins = followedPins.map { it?.takeUnless(removedIds::contains) }
+                    val validDock = followedDock.map { it?.takeUnless(removedIds::contains) }
+                    val reconciled = reconcileFolders(HomeLayout(validPins, validDock, old.widgetPlacements, followedFolders,
+                        old.widgetRestores, followedLeading, old.homeRows), removedIds)
                     old.copy(apps = entries, profiles = profiles, homeSlots = reconciled.slots, leadingSlots = reconciled.leadingSlots,
                         dock = reconciled.dock, folders = reconciled.folders,
                         canUndoEdit = old.canUndoEdit && old.layout == reconciled, loading = false,

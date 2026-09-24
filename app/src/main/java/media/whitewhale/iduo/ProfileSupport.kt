@@ -57,6 +57,30 @@ fun removedAppIds(
         (serial in authoritativeProfiles && id !in availableIds && serial to packageName !in temporarilyUnavailable)
 }
 
+/**
+ * Apps that change their icon, for example a seasonal or user-chosen one, often do so by switching
+ * between activity aliases, which changes their launch component. Maps each saved ID whose activity
+ * is gone to a launch activity of the same package and profile that is not already placed, so the
+ * shortcut follows the app instead of disappearing with its old component.
+ */
+fun renamedActivityIds(savedIds: Collection<String>, availableIds: Collection<String>, personalSerial: Long): Map<String, String> {
+    val available = availableIds.toSet()
+    val claimed = savedIds.filterTo(mutableSetOf()) { it in available }
+    fun packageKey(id: String) = parseProfileAppId(id)?.let { identity ->
+        (identity.userSerial ?: personalSerial) to identity.component.substringBefore('/')
+    }?.takeIf { it.second.isNotBlank() }
+    val candidates = availableIds.filterNot(claimed::contains).groupBy(::packageKey)
+    val renamed = mutableMapOf<String, String>()
+    for (id in savedIds.distinct()) {
+        if (id in available || isReservedFolderId(id)) continue
+        val key = packageKey(id) ?: continue
+        val replacement = candidates[key]?.firstOrNull { it !in claimed } ?: continue
+        claimed += replacement
+        renamed[id] = replacement
+    }
+    return renamed
+}
+
 /** API 35 identifies managed profiles exactly; earlier LauncherApps exposed associated managed profiles. */
 fun isSupportedWorkProfile(launcherApps: LauncherApps, user: UserHandle): Boolean =
     Build.VERSION.SDK_INT < 35 || runCatching {
