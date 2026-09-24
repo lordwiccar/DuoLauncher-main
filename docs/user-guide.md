@@ -13,6 +13,7 @@ To make iDuo the launcher, choose **Set as home app** in customization, or open 
 - Swipe horizontally across Home, the dock, or the right rail to move one page per gesture.
 - Swipe right from Home 1 for Discover. Swipe left, press Back, or use its right-pointing arrow to return.
 - Swipe past the last Home page for **All apps**. Its **Search apps** field always searches installed apps locally.
+- **Home layout → All apps view** switches All apps between an alphabetical **List** and a **Grid in pages** that you swipe sideways; swiping past its first page returns to Home.
 - The dock and its search control stay on the right. The page controls also open Discover or All apps.
 - Pressing the system Home control from an app returns to the Home page or unfolded pair you last had visible. From All apps, search, or Discover it returns to the last Home view.
 

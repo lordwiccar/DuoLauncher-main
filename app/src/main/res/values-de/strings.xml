@@ -189,6 +189,9 @@
     <string name="folder_options">Ordneroptionen</string>
     <string name="disband_folder">Ordner auflösen</string>
     <string name="folder_transparency">Transparenz des Ordnerhintergrunds</string>
+    <string name="all_apps_view">Ansicht aller Apps</string>
+    <string name="all_apps_view_list">Liste</string>
+    <string name="all_apps_view_grid">Raster mit Seiten</string>
     <plurals name="folder_description">
         <item quantity="one">Ordner %1$s, %2$d App</item>
         <item quantity="other">Ordner %1$s, %2$d Apps</item>

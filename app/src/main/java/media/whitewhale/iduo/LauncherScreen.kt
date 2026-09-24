@@ -549,6 +549,9 @@ fun LauncherScreen(
                 },
                 onDownwardSwipe = launcherActivity::openSystemShade,
                 onLeadingOverscroll = if (firstHome == 0) onDiscover else null,
+                childPagesHorizontally = { point, travel ->
+                    drag.childPager?.let { child -> child.bounds().contains(point + gestureOriginInRoot) && child.canPage(travel) } == true
+                },
             ).pointerInput(Unit) {
                 // Bare wallpaper anywhere on Home opens Home options. Icons, cells, the dock and
                 // controls consume their own presses first, and a page swipe cancels this one.

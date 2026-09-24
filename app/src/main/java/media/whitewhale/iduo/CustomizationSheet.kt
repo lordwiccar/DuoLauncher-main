@@ -280,6 +280,13 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
     CustomizationSlider(stringResource(R.string.folder_transparency),
         stringResource(R.string.value_percent, Math.round(state.folderTransparency * 100)),
         state.folderTransparency, 0f..MAX_FOLDER_TRANSPARENCY) { model.setFolderTransparency(it) }
+    Text(stringResource(R.string.all_apps_view), style = MaterialTheme.typography.bodyMedium)
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FilterChip(!state.libraryGrid, { model.setLibraryGrid(false) }, label = { Text(stringResource(R.string.all_apps_view_list)) },
+            modifier = Modifier.testTag("library-view-list"))
+        FilterChip(state.libraryGrid, { model.setLibraryGrid(true) }, label = { Text(stringResource(R.string.all_apps_view_grid)) },
+            modifier = Modifier.testTag("library-view-grid"))
+    }
     CustomizationSlider(stringResource(R.string.icon_size), stringResource(R.string.value_dp, p.iconSize.toInt()), p.iconSize, 40f..68f) { model.setPreset(wide, p.copy(iconSize = it)) }
     CustomizationSlider(stringResource(R.string.row_spacing), stringResource(R.string.value_dp, p.rowGap.toInt()), p.rowGap, 0f..28f) { model.setPreset(wide, p.copy(rowGap = it)) }
     CustomizationSlider(stringResource(R.string.dock_width), stringResource(R.string.value_dp, p.dockWidth.toInt()), p.dockWidth, 56f..84f) { model.setPreset(wide, p.copy(dockWidth = it)) }

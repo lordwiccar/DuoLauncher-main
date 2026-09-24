@@ -193,13 +193,7 @@ internal fun FolderPanel(
                         }
                     }
                 }
-                if (shape.pages > 1) Row(Modifier.height(28.dp).testTag("folder-page-dots"), horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
-                    repeat(shape.pages) { index ->
-                        Box(Modifier.size(if (index == pager.currentPage) 8.dp else 6.dp).background(
-                            Ink.copy(alpha = if (index == pager.currentPage) .9f else .35f), CircleShape))
-                    }
-                }
+                if (shape.pages > 1) PageDots(shape.pages, pager.currentPage, Modifier.testTag("folder-page-dots"))
             }
         }
       }
@@ -224,6 +218,17 @@ private fun FolderMenu(destinations: List<Int>, onMove: (Int) -> Unit, onDisband
             }
             DropdownMenuItem(text = { Text(stringResource(R.string.disband_folder)) },
                 onClick = { open = false; onDisband() }, modifier = Modifier.testTag("folder-disband"))
+        }
+    }
+}
+
+/** Dots under a paged grid, the current page larger and darker. */
+@Composable
+internal fun PageDots(pages: Int, current: Int, modifier: Modifier = Modifier) {
+    Row(modifier.height(28.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        repeat(pages) { index ->
+            Box(Modifier.size(if (index == current) 8.dp else 6.dp).background(
+                Ink.copy(alpha = if (index == current) .9f else .35f), CircleShape))
         }
     }
 }

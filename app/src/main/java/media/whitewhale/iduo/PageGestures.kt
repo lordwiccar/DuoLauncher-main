@@ -37,9 +37,11 @@ internal class PageGestureLimits(private val pager: PagerState) : NestedScrollCo
     var anchor: Int? = null
     var pointerDown = false
     var editing = false
+    /** Set while a paged child owns the current horizontal swipe; Home must not take its scroll. */
+    var childOwnsGesture = false
     override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
         val start = anchor ?: return Offset.Zero
-        if (!pointerDown || editing || source != NestedScrollSource.UserInput || available.x == 0f) return Offset.Zero
+        if (!pointerDown || editing || childOwnsGesture || source != NestedScrollSource.UserInput || available.x == 0f) return Offset.Zero
         val stride = pager.layoutInfo.pageSize + pager.layoutInfo.pageSpacing
         if (stride <= 0) return Offset.Zero
         val position = pager.currentPage + pager.currentPageOffsetFraction
@@ -81,7 +83,10 @@ internal fun Modifier.onePageGestures(
     canStartDownwardSwipe: (Offset) -> Boolean = { true },
     onDownwardSwipe: ((ShadePanel) -> Unit)? = null,
     onLeadingOverscroll: (() -> Unit)? = null,
+    /** Whether a horizontal swipe from this point, with this travel, belongs to a paged child. */
+    childPagesHorizontally: (Offset, Float) -> Boolean = { _, _ -> false },
 ) : Modifier {
+    val currentChildPages by rememberUpdatedState(childPagesHorizontally)
     val currentEnabled by rememberUpdatedState(enabled)
     val currentCanStartDownwardSwipe by rememberUpdatedState(canStartDownwardSwipe)
     val currentDownwardSwipe by rememberUpdatedState(onDownwardSwipe)
@@ -101,6 +106,7 @@ internal fun Modifier.onePageGestures(
                 }
                 limits.anchor = anchor
                 limits.pointerDown = true
+                limits.childOwnsGesture = false
                 val tracker = VelocityTracker().apply { addPointerInputChange(down) }
                 var dragPositions: Channel<Float>? = null
                 var dragSlopOffset = 0f
@@ -132,6 +138,11 @@ internal fun Modifier.onePageGestures(
                             if (maxOf(abs(distance.x), abs(distance.y)) > viewConfiguration.touchSlop) {
                                 trace?.slop(distance.x, distance.y,
                                     pager.currentPage + pager.currentPageOffsetFraction)
+                                if (abs(distance.y) < abs(distance.x) && currentChildPages(down.position, distance.x)) {
+                                    limits.childOwnsGesture = true
+                                    cancelReason = "child_pager"
+                                    break
+                                }
                                 if (abs(distance.y) >= abs(distance.x)) {
                                     // A terminal release can preserve meaningful travel after a
                                     // blocked frame dropped every MOVE. It can page horizontally,

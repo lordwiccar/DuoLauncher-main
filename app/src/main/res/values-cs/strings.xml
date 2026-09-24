@@ -191,6 +191,9 @@
     <string name="folder_options">Možnosti složky</string>
     <string name="disband_folder">Zrušit složku</string>
     <string name="folder_transparency">Průhlednost pozadí složky</string>
+    <string name="all_apps_view">Zobrazení všech aplikací</string>
+    <string name="all_apps_view_list">Seznam</string>
+    <string name="all_apps_view_grid">Mřížka po stránkách</string>
     <plurals name="folder_description">
         <item quantity="one">Složka %1$s, %2$d aplikace</item>
         <item quantity="few">Složka %1$s, %2$d aplikace</item>

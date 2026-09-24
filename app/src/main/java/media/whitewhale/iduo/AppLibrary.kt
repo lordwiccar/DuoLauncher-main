@@ -11,6 +11,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.PushPin
@@ -33,6 +38,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.boundsInRoot
 
 @Composable
 internal fun AppLibrary(
@@ -92,7 +98,20 @@ internal fun AppLibrary(
                     focusedLeadingIconColor = ink, unfocusedLeadingIconColor = ink,
                     focusedTrailingIconColor = ink, unfocusedTrailingIconColor = ink,
                 ) else OutlinedTextFieldDefaults.colors())
-            LazyColumn(Modifier.weight(1f).testTag("all-apps-list"), state = listState,
+            val workUnavailable = showWork && selectedProfile?.available == false
+            if (state.libraryGrid && !editing && !workUnavailable && visibleApps.isNotEmpty()) {
+                LibraryGrid(visibleApps, resetKey = query to showWork, drag, Modifier.weight(1f)) { app ->
+                    val launchBounds = remember { android.graphics.Rect() }
+                    Column(Modifier.fillMaxSize().testTag("library-app-${app.id}")
+                        .then(libraryItemInput(app, drag, page, { onLaunchFrom(app, launchBounds) }, onActions))
+                        .padding(horizontal = 4.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Image(app.icon.asImageBitmap(), null, Modifier.size(52.dp)
+                            .onGloballyPositioned { launchBounds.set(it.boundsInWindow().toAndroidBounds()) }.clip(RoundedCornerShape(13.dp)))
+                        Text(app.label, Modifier.padding(top = 6.dp), maxLines = 2, overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center, fontSize = 12.sp, lineHeight = 14.sp)
+                    }
+                }
+            } else LazyColumn(Modifier.weight(1f).testTag("all-apps-list"), state = listState,
                 contentPadding = PaddingValues(bottom = 12.dp)) {
                 if (showWork && selectedProfile?.available == false) item("work-paused") {
                     Column(Modifier.fillMaxWidth().padding(vertical = 20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -117,13 +136,10 @@ internal fun AppLibrary(
                     }
                     items(entries, key = { it.id }) { app ->
                         val isPinned = app.id in pinned
-                        val appOptions = stringResource(R.string.app_options)
                         val launchBounds = remember { android.graphics.Rect() }
-                        val dragModifier = if (drag != null) Modifier.dropRegion(drag, DropTarget.Library(app.id), app.id, page) else Modifier
                         val click = { if (editing) onPin(app.id, !isPinned) else onLaunchFrom(app, launchBounds) }
-                        Row(Modifier.fillMaxWidth().heightIn(min = 60.dp).then(dragModifier).clip(RoundedCornerShape(14.dp)).testTag("library-app-${app.id}")
-                            .then(if (drag == null) Modifier.combinedClickable(onClick = click, onLongClick = { onActions(app) })
-                                else Modifier.clickable(onClick = click).semantics { onLongClick(appOptions) { onActions(app); true } })
+                        Row(Modifier.fillMaxWidth().heightIn(min = 60.dp).testTag("library-app-${app.id}")
+                            .then(libraryItemInput(app, drag, page, click, onActions))
                             .padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                             Image(app.icon.asImageBitmap(), null, Modifier.size(40.dp)
                                 .onGloballyPositioned { launchBounds.set(it.boundsInWindow().toAndroidBounds()) }.clip(RoundedCornerShape(10.dp)))
@@ -138,6 +154,63 @@ internal fun AppLibrary(
                     }
                 }
             }
+        }
+    }
+}
+
+/** Tap to open; long press offers actions, or on Home starts dragging the app out of All apps. */
+@Composable
+private fun libraryItemInput(app: AppEntry, drag: HomeDragState?, page: Int?, onClick: () -> Unit,
+    onActions: (AppEntry) -> Unit): Modifier {
+    val appOptions = stringResource(R.string.app_options)
+    val dragModifier = if (drag != null) Modifier.dropRegion(drag, DropTarget.Library(app.id), app.id, page) else Modifier
+    return dragModifier.clip(RoundedCornerShape(14.dp))
+        .then(if (drag == null) Modifier.combinedClickable(onClick = onClick, onLongClick = { onActions(app) })
+            else Modifier.clickable(onClick = onClick).semantics { onLongClick(appOptions) { onActions(app); true } })
+}
+
+private val LibraryCellWidth = 84.dp
+private val LibraryCellHeight = 100.dp
+
+/** How many whole cells of [cell] fit in [space]; at least one. */
+private fun cellsFitting(space: Dp, cell: Dp) = maxOf(1, (space / cell).toInt())
+
+/**
+ * All apps as a grid split into horizontal pages that fill the available space. Swiping past
+ * the first page hands the gesture back to the Home pager.
+ */
+@Composable
+private fun LibraryGrid(apps: List<AppEntry>, resetKey: Any, drag: HomeDragState?, modifier: Modifier,
+    cell: @Composable (AppEntry) -> Unit) {
+    var bounds by remember { mutableStateOf(androidx.compose.ui.geometry.Rect.Zero) }
+    BoxWithConstraints(modifier.fillMaxWidth().testTag("all-apps-grid")
+        .onGloballyPositioned { bounds = it.boundsInRoot() }) {
+        val columns = cellsFitting(maxWidth, LibraryCellWidth)
+        val rows = cellsFitting(maxHeight - 28.dp, LibraryCellHeight)
+        val perPage = columns * rows
+        val pages = (apps.size + perPage - 1) / perPage
+        val pager = rememberPagerState { pages }
+        LaunchedEffect(resetKey) { pager.scrollToPage(0) }
+        if (drag != null) DisposableEffect(drag, pager) {
+            // Swipes page the grid; at its first or last page they page Home instead.
+            val region = ChildPagerRegion({ bounds }) { travel ->
+                if (travel < 0f) pager.canScrollForward else pager.canScrollBackward
+            }
+            drag.childPager = region
+            onDispose { if (drag.childPager === region) drag.childPager = null }
+        }
+        Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+            HorizontalPager(pager, Modifier.weight(1f).fillMaxWidth(), verticalAlignment = Alignment.Top) { index ->
+                Column(Modifier.fillMaxSize()) {
+                    apps.drop(index * perPage).take(perPage).chunked(columns).forEach { row ->
+                        Row(Modifier.fillMaxWidth().height(LibraryCellHeight)) {
+                            row.forEach { app -> Box(Modifier.weight(1f).fillMaxHeight()) { cell(app) } }
+                            repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
+                        }
+                    }
+                }
+            }
+            if (pages > 1) PageDots(pages, pager.currentPage, Modifier.testTag("library-page-dots"))
         }
     }
 }

@@ -20,7 +20,16 @@ internal data class DragRegion(val target: DropTarget, val bounds: Rect, val app
 }
 
 @Stable
+/**
+ * A horizontally paged child of a Home page (the All apps grid). Home's page gesture leaves a
+ * horizontal swipe that starts inside [bounds] (root coordinates) to the child while it can still
+ * page that way: [canPage] takes the finger's horizontal travel, negative toward the next page.
+ */
+internal class ChildPagerRegion(val bounds: () -> Rect, val canPage: (Float) -> Boolean)
+
 internal class HomeDragState {
+    /** The paged child currently on screen, if any. */
+    var childPager: ChildPagerRegion? = null
     val regions = mutableStateMapOf<DropTarget, DragRegion>()
     private val regionOwners = mutableMapOf<DropTarget, Any>()
     var source by mutableStateOf<DragRegion?>(null)
