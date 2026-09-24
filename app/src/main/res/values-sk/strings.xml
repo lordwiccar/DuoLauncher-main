@@ -94,6 +94,7 @@
     <string name="pin_home_apps_title">Aplikácie na plochu</string>
     <string name="dock_apps_setting">Aplikácie v doku · vonkajší aj vnútorný displej</string>
     <string name="home_rows_setting">Riadky plochy · vonkajší aj vnútorný displej</string>
+    <string name="grid_layout">Rozloženie mriežky</string>
     <string name="home_rows_option">%1$d × %2$d aplikácií</string>
     <string name="home_rows_no_room">Pre viac riadkov zmenšite na tejto obrazovke ikony alebo rozostup riadkov.</string>
     <string name="icon_size">Veľkosť ikon</string>

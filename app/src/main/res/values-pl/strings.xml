@@ -94,6 +94,7 @@
     <string name="pin_home_apps_title">Aplikacje na ekranie głównym</string>
     <string name="dock_apps_setting">Aplikacje w doku · ekran zewnętrzny i wewnętrzny</string>
     <string name="home_rows_setting">Wiersze ekranu głównego · ekran zewnętrzny i wewnętrzny</string>
+    <string name="grid_layout">Układ siatki</string>
     <string name="home_rows_option">%1$d × %2$d aplikacji</string>
     <string name="home_rows_no_room">Więcej wierszy wymaga mniejszych ikon lub mniejszego odstępu między wierszami na tym ekranie.</string>
     <string name="icon_size">Rozmiar ikon</string>

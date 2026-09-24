@@ -12,6 +12,7 @@ import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,7 +31,7 @@ internal enum class CustomizationPage { OVERVIEW, WALLPAPER, HOME, GESTURES, LAN
 
 @Composable
 internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, model: LauncherModel,
-    isDefaultHome: Boolean, moreRowsFit: Boolean, page: CustomizationPage, onPage: (CustomizationPage) -> Unit,
+    isDefaultHome: Boolean, maxRowsFit: Int, page: CustomizationPage, onPage: (CustomizationPage) -> Unit,
     onMakeDefault: () -> Unit, onClose: () -> Unit, onEditPins: () -> Unit, onWidget: (Int) -> Unit,
     onAddWidget: (Int) -> Unit, onRemoveWidget: (Int) -> Unit, onWallpaperSettings: () -> Unit,
     onExportLayout: () -> Unit, onImportLayout: () -> Unit,
@@ -118,7 +119,7 @@ internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, mo
                     HorizontalDivider(Modifier.padding(vertical = 6.dp))
                     AppearanceSettings(appearance, onAppearanceMode, onAppearanceManual, onAppearanceDeviceLocation, onAppearanceClear)
                 }
-                CustomizationPage.HOME -> HomeLayoutSettings(state, wide, { wide = it }, model, homePage, moreRowsFit,
+                CustomizationPage.HOME -> HomeLayoutSettings(state, wide, { wide = it }, model, homePage, maxRowsFit,
                     onEditPins, onWidget, onAddWidget, onRemoveWidget)
                 CustomizationPage.GESTURES -> {
                     SettingsSwitch(stringResource(R.string.show_app_names), state.labels, model::setLabels, "label-switch")
@@ -249,8 +250,29 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
     }
 }
 
+/** Home rows on a wheel; layouts that cannot fit this screen stay visible but cannot be chosen. */
+@Composable private fun GridLayoutDialog(current: Int, maxRowsFit: Int, onDismiss: () -> Unit, onChoose: (Int) -> Unit) {
+    val options = (DEFAULT_HOME_ROWS..GRID_ROWS).toList()
+    var chosen by remember { mutableIntStateOf(current) }
+    fun fits(rows: Int) = rows <= maxOf(DEFAULT_HOME_ROWS, maxRowsFit)
+    AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.grid_layout)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(stringResource(R.string.home_rows_setting), style = MaterialTheme.typography.bodyMedium)
+                WheelPicker(options.map { stringResource(R.string.home_rows_option, GRID_COLUMNS, it - 2) },
+                    initial = options.indexOf(current).coerceAtLeast(0), onSelected = { chosen = options[it] },
+                    enabled = { fits(options[it]) })
+                if (!fits(chosen)) Text(stringResource(R.string.home_rows_no_room),
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+            }
+        },
+        confirmButton = { TextButton(onClick = { onChoose(chosen) }, enabled = fits(chosen),
+            modifier = Modifier.testTag("grid-layout-apply")) { Text(stringResource(R.string.apply)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } })
+}
+
 @Composable private fun HomeLayoutSettings(state: LauncherState, wide: Boolean, onWide: (Boolean) -> Unit,
-    model: LauncherModel, homePage: Int, moreRowsFit: Boolean, onEditPins: () -> Unit, onWidget: (Int) -> Unit,
+    model: LauncherModel, homePage: Int, maxRowsFit: Int, onEditPins: () -> Unit, onWidget: (Int) -> Unit,
     onAddWidget: (Int) -> Unit, onRemoveWidget: (Int) -> Unit) {
     val p = if (wide) state.expanded else state.compact
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -265,18 +287,14 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
                 modifier = Modifier.testTag("dock-slots-$count"))
         }
     }
-    fun fits(rows: Int) = rows <= DEFAULT_HOME_ROWS || moreRowsFit
-    Text(stringResource(R.string.home_rows_setting), style = MaterialTheme.typography.bodyMedium)
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        listOf(DEFAULT_HOME_ROWS, GRID_ROWS).forEach { rows ->
-            FilterChip(state.homeRows == rows, { model.setHomeRows(rows) },
-                label = { Text(stringResource(R.string.home_rows_option, GRID_COLUMNS, rows - 2)) },
-                enabled = state.homeRows == rows || fits(rows),
-                modifier = Modifier.testTag("home-rows-$rows"))
-        }
+    var choosingRows by rememberSaveable { mutableStateOf(false) }
+    OutlinedButton(onClick = { choosingRows = true }, Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("grid-layout")) {
+        Text(stringResource(R.string.grid_layout), Modifier.weight(1f))
+        Text(stringResource(R.string.home_rows_option, GRID_COLUMNS, state.homeRows - 2), fontWeight = FontWeight.SemiBold)
     }
-    if (state.homeRows < GRID_ROWS && !fits(GRID_ROWS)) Text(stringResource(R.string.home_rows_no_room),
-        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    if (choosingRows) GridLayoutDialog(state.homeRows, maxRowsFit, onDismiss = { choosingRows = false }) { rows ->
+        model.setHomeRows(rows); choosingRows = false
+    }
     CustomizationSlider(stringResource(R.string.folder_transparency),
         stringResource(R.string.value_percent, Math.round(state.folderTransparency * 100)),
         state.folderTransparency, 0f..MAX_FOLDER_TRANSPARENCY) { model.setFolderTransparency(it) }

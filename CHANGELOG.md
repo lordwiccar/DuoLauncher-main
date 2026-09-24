@@ -10,7 +10,7 @@
 - Add a paged grid view for All apps, selectable under Home layout.
 - Fix app search and other text fields: the keyboard opens and typing reaches the field while Discover is ready in the background.
 - Keep Home, dock and folder shortcuts of apps that change their icon by switching launch activities.
-- Allow four to eight dock apps and six or eight Home rows; long press on Home opens settings.
+- Allow four to eight dock apps and a Home grid of 4 × 4, 4 × 5 or 4 × 6 apps chosen on a scrolling wheel; long press on Home opens settings.
 
 ## 0.15.0-beta01
 

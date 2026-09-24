@@ -22,7 +22,7 @@ To make iDuo the launcher, choose **Set as home app** in customization, or open 
 Long press an empty Home cell or any bare wallpaper on Home, such as the space below or beside the grid, to open **Add to Home**, then choose **Widgets**, **Wallpaper**, or **Customize launcher**. In **Make it yours** you can open:
 
 - **Wallpaper & appearance** for the wallpaper and color mode.
-- **Home layout** for the number of dock apps (4–8), **Home rows** (4 × 4 or 4 × 6 apps below the widget band; the unfolded screen shows two pages side by side), icon size, row spacing, dock geometry, Home apps, and widgets on the visible page.
+- **Home layout** for the number of dock apps (4–8), **Grid layout** (4 × 4, 4 × 5 or 4 × 6 apps below the widget band, chosen on a scrolling wheel; the unfolded screen shows two pages side by side), icon size, row spacing, dock geometry, Home apps, and widgets on the visible page.
 - **Gestures & search** for app names, the upper-right status display, and Google search behavior.
 - **Backup** to save or restore the layout.
 - **Help & setup** for Home selection, widgets, shade gestures, and Discover.
@@ -47,7 +47,7 @@ Open **Widgets** from an empty-space menu, **Add widget to this page** in custom
 
 Hold an existing widget to pick it up, then drag it across cells or pages. A small amount of held finger jitter is allowed. Move into the lower-right **Remove** target to delete it from Home. Long press and release without dragging to open **Widget options**, which can include **Widget settings**, **Resize on Home**, page moves, **Replace**, and **Remove**.
 
-For **Resize on Home**, drag the resize handle and choose **Apply**, or choose **Cancel**. The alternate size controls end with **Apply size**. iDuo rejects sizes or moves that overlap another item, exceed the visible grid (four columns by six or eight rows), or violate the provider's allowed sizes.
+For **Resize on Home**, drag the resize handle and choose **Apply**, or choose **Cancel**. The alternate size controls end with **Apply size**. iDuo rejects sizes or moves that overlap another item, exceed the visible grid (four columns by six to eight rows), or violate the provider's allowed sizes.
 
 Scrollable Android widgets keep their native vertical scrolling when the touch begins on scrollable provider content. A horizontal swipe can still change Home pages. Hold still before moving when you intend to pick up the widget.
 

@@ -94,6 +94,7 @@
     <string name="pin_home_apps_title">Choose home apps</string>
     <string name="dock_apps_setting">Apps in dock · cover and inner</string>
     <string name="home_rows_setting">Home rows · cover and inner</string>
+    <string name="grid_layout">Grid layout</string>
     <string name="home_rows_option" tools:ignore="PluralsCandidate">%1$d × %2$d apps</string>
     <string name="home_rows_no_room">More rows need a smaller icon size or less row spacing on this screen.</string>
     <string name="icon_size">App icon size</string>

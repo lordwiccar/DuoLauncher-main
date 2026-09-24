@@ -94,6 +94,7 @@
     <string name="pin_home_apps_title">Apps auf dem Startbildschirm</string>
     <string name="dock_apps_setting">Apps im Dock · Außen- und Innendisplay</string>
     <string name="home_rows_setting">Startbildschirm-Zeilen · Außen- und Innendisplay</string>
+    <string name="grid_layout">Rasterlayout</string>
     <string name="home_rows_option">%1$d × %2$d Apps</string>
     <string name="home_rows_no_room">Für mehr Zeilen auf diesem Bildschirm kleinere Symbole oder weniger Zeilenabstand wählen.</string>
     <string name="icon_size">Symbolgröße</string>

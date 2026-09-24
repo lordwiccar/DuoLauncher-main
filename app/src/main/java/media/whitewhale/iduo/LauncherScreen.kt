@@ -466,10 +466,12 @@ fun LauncherScreen(
                 statusRailHeight = if (state.verticalStatus) statusHeight + 22f else 0f,
                 labelHeight = with(density) { 14.sp.toDp().value } + 6f, inLibrary = inLibrary,
                 homeBottomSpace = if (isDefaultHome) 44f else 88f, dockSlots = state.dock.size, homeRows = state.homeRows)
-            // Whether this screen can show every row of the larger grid, measured like the page itself.
-            val moreRowsFit = homeGeometry(maxWidth.value, maxHeight.value, preset, state.labels,
-                labelHeight = with(density) { 14.sp.toDp().value } + 6f,
-                homeBottomSpace = if (isDefaultHome) 44f else 88f, homeRows = GRID_ROWS).gridFits
+            // The most Home rows this screen can show in full, measured like the page itself.
+            val maxRowsFit = (GRID_ROWS downTo DEFAULT_HOME_ROWS + 1).firstOrNull { rows ->
+                homeGeometry(maxWidth.value, maxHeight.value, preset, state.labels,
+                    labelHeight = with(density) { 14.sp.toDp().value } + 6f,
+                    homeBottomSpace = if (isDefaultHome) 44f else 88f, homeRows = rows).gridFits
+            } ?: DEFAULT_HOME_ROWS
             SideEffect {
                 resizePitchX = with(density) { (geometry.gridWidth / GRID_COLUMNS).dp.toPx() }
                 resizePitchY = with(density) { minOf((geometry.widgetHeight + 18f) / 2f, geometry.rowHeight).dp.toPx() }
@@ -720,7 +722,7 @@ fun LauncherScreen(
                                 onActions = { selectedId = it.id; sheet = "" }, editing = true, modifier = Modifier.weight(1f).fillMaxWidth(),
                                 onTurnOnWork = { model.turnOnWork(it) })
                         }
-                        "settings", "settings:wallpaper" -> CustomizationSheet(state, wide, model, isDefaultHome, moreRowsFit,
+                        "settings", "settings:wallpaper" -> CustomizationSheet(state, wide, model, isDefaultHome, maxRowsFit,
                             page = activeCustomizationPage, onPage = { customizationPage = it; sheet = "settings" },
                             onMakeDefault = { sheet = ""; onMakeDefault() },
                             onClose = { customizationPage = CustomizationPage.OVERVIEW; sheet = "" }, onEditPins = { sheet = "pins" },
