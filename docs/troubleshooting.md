@@ -69,11 +69,11 @@ Open **All apps** and select **Personal** or **Work**. For a paused managed prof
 
 Android documents the administrator-controlled activity and storage boundaries in its [work-profile guide](https://developer.android.com/work/managed-profiles).
 
-## A background photo did not change
+## The wallpaper did not change
 
-Selecting a photo only stages a preview. Choose **Apply** to commit it; **Cancel** intentionally keeps the previous launcher background. If iDuo says the picker was interrupted, choose **Resume** or select the photo again after cancelling.
+Selecting a photo only stages a preview. Choose **Apply** and then the screens to set it on; **Cancel** intentionally keeps the current wallpaper. If Android refuses the wallpaper, for example under a device policy, iDuo reports that and nothing changes. If iDuo says the picker was interrupted, choose **Resume** or select the photo again after cancelling.
 
-Layout backups exclude photos and cannot restore a photo deleted from its source. If no committed copy or ready preview remains, choose another photo. **Preview Android wallpaper** opens Android’s separate wallpaper preview and does not apply the selected iDuo background.
+Layout backups exclude photos and cannot restore a photo deleted from its source. If no committed copy or ready preview remains, choose another photo. iDuo always shows the Android wallpaper, so a wallpaper changed in Android's settings appears on Home right away.
 
 ## Cellular status says unavailable
 

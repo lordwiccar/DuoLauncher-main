@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <queries>
         <package android:name="com.google.android.googlequicksearchbox" />
         <intent>
@@ -24,11 +25,6 @@
         <activity android:name=".DiscoverFeedActivity" android:theme="@style/Theme.Duo.Discover" android:exported="false" android:resizeableActivity="true" />
         <activity android:name=".LiveDiscoverActivity" android:theme="@style/Theme.Duo.LiveDiscover"
             android:exported="false" android:resizeableActivity="true" />
-        <service android:name=".DuneWallpaperService" android:label="@string/dune_wallpaper_label"
-            android:permission="android.permission.BIND_WALLPAPER" android:exported="true">
-            <intent-filter><action android:name="android.service.wallpaper.WallpaperService" /></intent-filter>
-            <meta-data android:name="android.service.wallpaper" android:resource="@xml/dune_wallpaper" />
-        </service>
         <service android:name=".SystemShadeAccessibilityService"
             android:label="@string/shade_service_label"
             android:description="@string/shade_service_description"

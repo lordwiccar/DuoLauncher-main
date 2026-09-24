@@ -20,7 +20,7 @@ To make iDuo the launcher, choose **Set as home app** in customization, or open 
 
 Long press an empty Home cell or any bare wallpaper on Home, such as the space below or beside the grid, to open **Add to Home**, then choose **Widgets**, **Wallpaper**, or **Customize launcher**. In **Make it yours** you can open:
 
-- **Wallpaper & appearance** for launcher photos, Android wallpaper, and color mode.
+- **Wallpaper & appearance** for the wallpaper and color mode.
 - **Home layout** for the number of dock apps (4–8), **Home rows** (4 × 4 or 4 × 6 apps below the widget band; the unfolded screen shows two pages side by side), icon size, row spacing, dock geometry, Home apps, and widgets on the visible page.
 - **Gestures & search** for app names, the upper-right status display, and Google search behavior.
 - **Backup** to save or restore the layout.
@@ -52,9 +52,9 @@ Scrollable Android widgets keep their native vertical scrolling when the touch b
 
 ## Background and appearance
 
-In **Wallpaper & appearance**, **Choose a photo** creates a private preview. It does not replace the current launcher background until you choose **Apply**; **Cancel** keeps the committed background. If selection is interrupted, choose **Resume** or **Cancel**. Recovery has been checked for activity recreation and a completed private preview file, but an interruption during the earlier decode step may require selecting the photo again.
+iDuo shows your Android wallpaper, including live wallpapers, and follows any change made in Android's settings. In **Wallpaper & appearance**, **Choose a photo** creates a private preview. **Apply** asks whether to set it on the **Home screen**, the **Lock screen**, or both, then sets it as the Android wallpaper; **Cancel** keeps the current wallpaper. If selection is interrupted, choose **Resume** or **Cancel**. Recovery has been checked for activity recreation and a completed private preview file, but an interruption during the earlier decode step may require selecting the photo again.
 
-**Preview Android wallpaper** opens Android's separate wallpaper preview. It does not change iDuo's **Launcher background**. **Reset to iDuo dunes** removes the selected launcher background.
+**Use iDuo dunes** sets the bundled dunes landscape as the Android wallpaper, asking for the same screens. **Open wallpaper settings** opens Android's own wallpaper picker. While a folder is open, the wallpaper is dimmed and softly blurred.
 
 Appearance choices are **Light**, **Dark**, **Follow system**, and **Sunrise / sunset**. Sunrise/sunset accepts coordinates through **Use this place**, or requests approximate location only when you choose **Use device location**. If location is unavailable, iDuo visibly falls back to the system theme. **Clear location** removes saved coordinates; iDuo does not request location in the background.
 

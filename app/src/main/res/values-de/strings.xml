@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- System integration -->
-    <string name="dune_wallpaper_label">iDuo-Dünen</string>
-    <string name="dune_wallpaper_description">iDuo-Dünen — die Landschaft des Launchers, passend zu deinem Display.</string>
     <string name="shade_service_label">iDuo Launcher-Leistengesten</string>
     <string name="shade_service_description">Ermöglicht es den Startbildschirm-Gesten von iDuo Launcher, die Systembenachrichtigungen und die Schnelleinstellungen zu öffnen. Es werden weder Bildschirminhalte gelesen noch Aktivitäten in anderen Apps beobachtet.</string>
 
@@ -50,14 +48,21 @@
     <string name="set_duo_as_home">iDuo als Startbildschirm festlegen</string>
     <string name="undo_layout_change">Letzte Layoutänderung rückgängig machen</string>
 
-    <string name="launcher_background">Launcher-Hintergrund</string>
-    <string name="launcher_background_detail">Ändert das Bild hinter den Startbildschirmen von iDuo.</string>
     <string name="choose_photo">Foto auswählen</string>
     <string name="choose_different_photo">Anderes Foto auswählen</string>
-    <string name="reset_to_dunes">Auf iDuo-Dünen zurücksetzen</string>
     <string name="android_wallpaper">Android-Hintergrund</string>
-    <string name="android_wallpaper_detail">Öffnet die Android-Vorschau, um den Hintergrund des Telefons zu ändern. Der Launcher-Hintergrund von iDuo bleibt unverändert.</string>
-    <string name="preview_android_wallpaper">Vorschau des Android-Hintergrunds</string>
+    <string name="wallpaper_detail">iDuo zeigt deinen Android-Hintergrund. Ein hier gewähltes Foto oder die iDuo-Dünen werden als Android-Hintergrund festgelegt.</string>
+    <string name="use_iduo_dunes">iDuo-Dünen verwenden</string>
+    <string name="android_wallpaper_detail">Wähle in den Android-Einstellungen einen beliebigen Hintergrund, auch Live-Hintergründe. iDuo zeigt ihn sofort an.</string>
+    <string name="open_wallpaper_settings">Hintergrundeinstellungen öffnen</string>
+    <string name="wallpaper_settings_unavailable">Die Hintergrundeinstellungen von Android sind nicht verfügbar.</string>
+    <string name="wallpaper_target_title">Hintergrund festlegen für</string>
+    <string name="wallpaper_target_home">Startbildschirm</string>
+    <string name="wallpaper_target_lock">Sperrbildschirm</string>
+    <string name="wallpaper_target_both">Start- und Sperrbildschirm</string>
+    <string name="wallpaper_set_failed">Android hat den Hintergrund nicht übernommen.</string>
+    <string name="wallpaper_updated">Hintergrund aktualisiert.</string>
+    <string name="restore_photo_note">Dein Hintergrund ist nicht Teil der Layout-Sicherung.</string>
 
     <string name="appearance">Darstellung</string>
     <string name="appearance_light">Hell</string>
@@ -301,7 +306,6 @@
     </plurals>
     <string name="restore_includes_leading">Enthält deine Seite für den aufgeklappten Zustand.</string>
     <string name="restore_settings_note">Außerdem werden Symbollayout, Beschriftungen, Suche und Statuseinstellungen wiederhergestellt.</string>
-    <string name="restore_photo_note">Dein gewähltes Launcher-Hintergrundfoto ist nicht Teil der Layout-Sicherung.</string>
     <string name="restore_unavailable_apps">Nicht verfügbare Apps (%1$d)</string>
     <string name="restore_unavailable_app">Nicht verfügbare App</string>
     <string name="restore_missing_app">• %1$s — ihre gespeicherte Position bleibt leer</string>
@@ -319,14 +323,11 @@
     <string name="photo_picker_unavailable">Die Fotoauswahl ist nicht verfügbar.</string>
     <string name="photo_selection_lost">Die ausstehende Fotoauswahl konnte nicht wiederhergestellt werden.</string>
     <string name="photo_preview_lost">Die ausstehende Fotovorschau konnte nicht wiederhergestellt werden.</string>
-    <string name="photo_using_dunes">iDuo-Dünen werden verwendet.</string>
-    <string name="photo_updated">Launcher-Hintergrund aktualisiert.</string>
     <string name="photo_save_failed">Dieses Foto konnte nicht gespeichert werden.</string>
     <string name="photo_unusable">Dieses Foto kann nicht verwendet werden.</string>
     <string name="photo_preview_save_failed">Die Vorschau dieses Fotos konnte nicht gespeichert werden.</string>
     <string name="photo_no_pixels">Das ausgewählte Bild enthält keine verwendbaren Pixel.</string>
     <string name="photo_too_large">Das ausgewählte Bild ist zu groß.</string>
-    <string name="wallpaper_preview_unavailable">Die Hintergrundvorschau des Systems ist nicht verfügbar.</string>
 
     <!-- Discover -->
     <string name="discover">Discover</string>

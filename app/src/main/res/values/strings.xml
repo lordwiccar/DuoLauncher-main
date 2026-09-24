@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- System integration -->
-    <string name="dune_wallpaper_label">iDuo dunes</string>
-    <string name="dune_wallpaper_description">iDuo dunes — the launcher’s landscape, sized for your display.</string>
     <string name="shade_service_label">iDuo Launcher shade gestures</string>
     <string name="shade_service_description">Allows iDuo Launcher’s Home screen gestures to open the system notifications and Quick Settings panels. It does not read screen content or observe activity in other apps.</string>
 
@@ -50,14 +48,21 @@
     <string name="set_duo_as_home">Set iDuo as Home</string>
     <string name="undo_layout_change">Undo last layout change</string>
 
-    <string name="launcher_background">Launcher background</string>
-    <string name="launcher_background_detail">Changes the image behind iDuo’s Home screens.</string>
     <string name="choose_photo">Choose a photo</string>
     <string name="choose_different_photo">Choose a different photo</string>
-    <string name="reset_to_dunes">Reset to iDuo dunes</string>
     <string name="android_wallpaper">Android wallpaper</string>
-    <string name="android_wallpaper_detail">Opens Android’s preview to change the phone wallpaper. It does not change iDuo’s launcher background.</string>
-    <string name="preview_android_wallpaper">Preview Android wallpaper</string>
+    <string name="wallpaper_detail">iDuo shows your Android wallpaper. A photo or the iDuo dunes chosen here become the Android wallpaper.</string>
+    <string name="use_iduo_dunes">Use iDuo dunes</string>
+    <string name="android_wallpaper_detail">Choose any wallpaper in Android’s settings, including live wallpapers. iDuo shows it right away.</string>
+    <string name="open_wallpaper_settings">Open wallpaper settings</string>
+    <string name="wallpaper_settings_unavailable">Android’s wallpaper settings are unavailable.</string>
+    <string name="wallpaper_target_title">Set wallpaper on</string>
+    <string name="wallpaper_target_home">Home screen</string>
+    <string name="wallpaper_target_lock">Lock screen</string>
+    <string name="wallpaper_target_both">Home and lock screens</string>
+    <string name="wallpaper_set_failed">Android did not accept the wallpaper.</string>
+    <string name="wallpaper_updated">Wallpaper updated.</string>
+    <string name="restore_photo_note">Your wallpaper is not included in layout backups.</string>
 
     <string name="appearance">Appearance</string>
     <string name="appearance_light">Light</string>
@@ -301,7 +306,6 @@
     </plurals>
     <string name="restore_includes_leading">Includes your unfolded-only page.</string>
     <string name="restore_settings_note">This also restores icon layout, labels, search, and status settings.</string>
-    <string name="restore_photo_note">Your selected launcher background photo is not included in layout backups.</string>
     <string name="restore_unavailable_apps">Unavailable apps (%1$d)</string>
     <string name="restore_unavailable_app">Unavailable app</string>
     <string name="restore_missing_app">• %1$s — its saved position will stay empty</string>
@@ -319,14 +323,11 @@
     <string name="photo_picker_unavailable">The photo picker is unavailable.</string>
     <string name="photo_selection_lost">The pending photo selection could not be restored.</string>
     <string name="photo_preview_lost">The pending photo preview could not be restored.</string>
-    <string name="photo_using_dunes">Using iDuo dunes.</string>
-    <string name="photo_updated">Launcher background updated.</string>
     <string name="photo_save_failed">That photo could not be saved.</string>
     <string name="photo_unusable">That photo could not be used.</string>
     <string name="photo_preview_save_failed">That photo preview could not be saved.</string>
     <string name="photo_no_pixels">The selected image has no usable pixels.</string>
     <string name="photo_too_large">The selected image is too large.</string>
-    <string name="wallpaper_preview_unavailable">The system wallpaper preview is unavailable.</string>
 
     <!-- Discover -->
     <string name="discover">Discover</string>

@@ -126,7 +126,7 @@ fun DuoTheme(dark: Boolean = false, content: @Composable () -> Unit) {
 fun LauncherScreen(
     state: LauncherState, model: LauncherModel, widgets: WidgetController, homeRequests: Int,
     onLaunch: (AppEntry) -> Unit, onMakeDefault: () -> Unit, onAppInfo: (AppEntry) -> Unit,
-    isDefaultHome: Boolean, deviceStatus: DeviceStatus, onStatusMode: (Boolean) -> Unit, onWallpaperPreview: () -> Unit,
+    isDefaultHome: Boolean, deviceStatus: DeviceStatus, onStatusMode: (Boolean) -> Unit, onWallpaperSettings: () -> Unit,
     onDiscover: () -> Unit = {}, searchRequests: Int = 0,
     onLaunchFrom: (AppEntry, android.graphics.Rect?) -> Unit = { app, _ -> onLaunch(app) },
     onGoogleSearch: (android.graphics.Rect?) -> Boolean = { false },
@@ -419,6 +419,22 @@ fun LauncherScreen(
     // layer is added while closed, keeping the retained Home layer that Discover draws untouched.
     val folderBlur by animateDpAsState(if (openFolderId != null) FOLDER_BACKDROP_BLUR else 0.dp, label = "folder blur")
     val behindFolder = if (folderBlur > 0.dp) Modifier.blur(folderBlur) else Modifier
+    // Android's wallpaper lies behind this window, so the window blurs it rather than Compose.
+    val wallpaperBlur = with(LocalDensity.current) { FOLDER_BACKDROP_BLUR.roundToPx() }
+    DisposableEffect(openFolderId != null) {
+        launcherActivity.window.setWallpaperBlur(if (openFolderId != null) wallpaperBlur else 0)
+        onDispose { launcherActivity.window.setWallpaperBlur(0) }
+    }
+    // Let a wallpaper wider than the screen scroll with the Home pages.
+    LaunchedEffect(nativePager, homePages, firstHome) {
+        val wallpapers = android.app.WallpaperManager.getInstance(launcherActivity)
+        val span = (homePages - 1).coerceAtLeast(1).toFloat()
+        wallpapers.setWallpaperOffsetSteps(1f / span, 1f)
+        snapshotFlow { nativePager.currentPage + nativePager.currentPageOffsetFraction - firstHome }.collect { position ->
+            val token = launcherActivity.window.decorView.windowToken ?: return@collect
+            wallpapers.setWallpaperOffsets(token, if (homePages > 1) (position / span).coerceIn(0f, 1f) else .5f, .5f)
+        }
+    }
     val homeLayer = rememberGraphicsLayer()
     DisposableEffect(homeLayer) {
         homeLayer.compositingStrategy = androidx.compose.ui.graphics.layer.CompositingStrategy.Offscreen
@@ -440,7 +456,6 @@ fun LauncherScreen(
             }
         },
         onFinish = { cancelled -> finishDrag(cancelled) })) {
-        DuneWallpaper(Modifier.fillMaxSize().then(behindFolder))
         BoxWithConstraints(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
             val wide = maxWidth.value >= 650f
             val preset = if (wide) state.expanded else state.compact
@@ -716,7 +731,7 @@ fun LauncherScreen(
                             onAppearanceClear = onAppearanceClear,
                             onShadeSetup = { sheet = ""; onShadeSetup() },
                             backgrounds = launcherActivity.backgrounds,
-                            onWallpaperPreview = { sheet = ""; onWallpaperPreview() }, homePage = pager.currentPage.coerceIn(0, homePages - 1))
+                            onWallpaperSettings = { sheet = ""; onWallpaperSettings() }, homePage = pager.currentPage.coerceIn(0, homePages - 1))
                         "widgetActions" -> model.placement(widgetSlot)?.let { placement ->
                             val topPitch = (geometry.widgetHeight + 18f) / 2f
                             val gridSizing = WidgetGridSizing(GRID_COLUMNS, state.homeRows, geometry.gridWidth / GRID_COLUMNS,

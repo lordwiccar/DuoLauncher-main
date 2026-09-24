@@ -1,8 +1,6 @@
 package media.whitewhale.iduo
 
 import android.app.role.RoleManager
-import android.app.WallpaperManager
-import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.LauncherApps
 import android.os.Bundle
@@ -95,7 +93,7 @@ class MainActivity : ComponentActivity() {
             DuoTheme(appearance.state.dark) {
                 LauncherScreen(state, model, widgets, homeRequests.intValue,
                     onLaunch = { launchApp(it) }, onMakeDefault = ::makeDefault, onAppInfo = ::appInfo,
-                    isDefaultHome = defaultHome.value, deviceStatus = deviceStatus, onStatusMode = ::setStatusMode, onWallpaperPreview = ::previewWallpaper,
+                    isDefaultHome = defaultHome.value, deviceStatus = deviceStatus, onStatusMode = ::setStatusMode, onWallpaperSettings = ::openWallpaperSettings,
                     onDiscover = ::openDiscover, searchRequests = searchRequests.intValue,
                     onLaunchFrom = ::launchApp, onGoogleSearch = ::openGoogleSearch,
                     appearance = appearance.state,
@@ -125,6 +123,7 @@ class MainActivity : ComponentActivity() {
             timeReceiverRegistered = true
         }
         appearance.refresh(systemDark())
+        SystemWallpaper.verify(this)
     }
     override fun onStop() {
         if (timeReceiverRegistered) { unregisterReceiver(timeReceiver); timeReceiverRegistered = false }
@@ -367,12 +366,12 @@ class MainActivity : ComponentActivity() {
         if (vertical) controller.hide(WindowInsetsCompat.Type.statusBars()) else controller.show(WindowInsetsCompat.Type.statusBars())
     }
 
-    private fun previewWallpaper() {
+    /** Android's own wallpaper picker, including live wallpapers; Home follows whatever it sets. */
+    private fun openWallpaperSettings() {
         try {
-            startActivity(Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER)
-                .putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, ComponentName(this, DuneWallpaperService::class.java)))
+            startActivity(Intent.createChooser(Intent(Intent.ACTION_SET_WALLPAPER), getString(R.string.open_wallpaper_settings)))
         } catch (_: android.content.ActivityNotFoundException) {
-            Toast.makeText(this, R.string.wallpaper_preview_unavailable, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, R.string.wallpaper_settings_unavailable, Toast.LENGTH_LONG).show()
         }
     }
 

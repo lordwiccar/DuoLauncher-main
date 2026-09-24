@@ -69,7 +69,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import org.json.JSONObject
 import java.lang.ref.WeakReference
-import kotlin.concurrent.thread
 
 class DuoApplication : Application() {
     override fun attachBaseContext(newBase: Context) { super.attachBaseContext(AppLanguage.wrap(newBase)) }
@@ -78,7 +77,7 @@ class DuoApplication : Application() {
         super.onCreate()
         DiscoverEmbedding.initialize(this)
         DiscoverBounds.initialize(this)
-        thread(name = "default-wallpaper") { DefaultWallpaper.load(this) }
+        SystemWallpaper.initialize(this)
     }
 }
 
@@ -263,7 +262,6 @@ class DiscoverFeedActivity : DiscoverPageActivity() {
                 }
                 val progress = DiscoverMotion.progress.floatValue
                 Box(Modifier.fillMaxSize()) {
-                    if (!DiscoverBounds.available) DuneWallpaper()
                     Surface(if (DiscoverBounds.available) Modifier.fillMaxSize()
                         else Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing).padding(12.dp),
                         shape = RoundedCornerShape(if (DiscoverBounds.available) 16.dp else 26.dp),
@@ -352,23 +350,9 @@ private fun DiscoverDock(state: LauncherState, status: DeviceStatus, fullSize: S
     val preset = if (fullWidth >= 650f) state.expanded else state.compact
     val apps = remember(state.apps) { state.apps.associateBy { it.id } }
     val progress = DiscoverMotion.progress.floatValue
-    val backgroundRevision = LauncherBackgroundCache.revision.intValue
-    val backgroundPhoto = remember(backgroundRevision) {
-        LauncherBackgroundCache.bitmap?.takeUnless { it.isRecycled }?.asImageBitmap()
-    }
     DiscoverMotion.pageWidth = (fullWidth - preset.dockWidth - 28f) * density.density
     Box(Modifier.fillMaxSize().testTag("discover-chrome").semantics { testTagsAsResourceId = true }) {
-        Canvas(Modifier.fillMaxSize()) {
-            val offset = fullSize.width - size.width
-            translate(left = -offset) {
-                // Draw the same full-screen wallpaper coordinates in this narrow viewport.
-                val native = drawContext.canvas
-                val painter = androidx.compose.ui.graphics.drawscope.CanvasDrawScope()
-                painter.draw(density, layoutDirection, native, fullSize) {
-                    drawLauncherBackground(backgroundPhoto, DuoAppearanceRuntime.dark)
-                }
-            }
-        }
+        // The window shows Android's wallpaper behind the dock, aligned with Home's.
         BoxWithConstraints(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
             if (DiscoverBounds.available) Box(Modifier.fillMaxHeight().width((fullWidth - preset.dockWidth - 28).dp)
                 .padding(start = 16.dp, top = 16.dp, bottom = 16.dp).onGloballyPositioned {

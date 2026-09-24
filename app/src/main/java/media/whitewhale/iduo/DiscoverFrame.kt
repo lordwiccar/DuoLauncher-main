@@ -103,7 +103,7 @@ internal class DiscoverFrame(private val activity: Activity, private val vertica
                         canvas.translate(-LiveDiscover.viewport.left.toFloat(), -LiveDiscover.viewport.top.toFloat())
                         painter.draw(Density(d), LayoutDirection.Ltr, androidx.compose.ui.graphics.Canvas(canvas),
                             LiveDiscover.fullSize) {
-                            drawLauncherBackground(LauncherBackgroundCache.bitmap?.asImageBitmap(), DuoAppearanceRuntime.dark)
+                            drawLauncherBackground(LauncherBackgroundCache.bitmap?.asImageBitmap())
                             translate(LiveDiscover.pagerOrigin.x, LiveDiscover.pagerOrigin.y) { drawLayer(layer) }
                         }
                     }
@@ -122,7 +122,7 @@ internal class DiscoverFrame(private val activity: Activity, private val vertica
                 canvas.translate(-origin.x, -origin.y)
                 painter.draw(Density(d), LayoutDirection.Ltr, androidx.compose.ui.graphics.Canvas(canvas),
                     if (fullSize == Size.Zero) Size(width.toFloat(), height.toFloat()) else fullSize) {
-                        drawLauncherBackground(LauncherBackgroundCache.bitmap?.asImageBitmap(), DuoAppearanceRuntime.dark)
+                        drawLauncherBackground(LauncherBackgroundCache.bitmap?.asImageBitmap())
                     }
                 if (DiscoverBounds.available) canvas.drawColor(
                     if (DuoAppearanceRuntime.dark) 0xeb263a43.toInt() else 0xebe8eff2.toInt())

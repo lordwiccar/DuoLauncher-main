@@ -20,7 +20,7 @@ Screenshots use sample data on an emulator sized to the reference Fold. [Fresh-i
 - Android widgets, visual widget selection, resizing, native scrolling, and drag-and-drop between pages.
 - App dragging, pages created during an edge drag, Home folders, and separate personal/work catalogs where device policy permits.
 - Alphabetical All apps, Google search with a local app-search fallback, and live Discover on compatible devices.
-- Local photo wallpapers, light/dark/system or sunrise/sunset appearance, and layout export/import.
+- Android's own wallpaper on Home, set from a photo or the bundled dunes; light/dark/system or sunrise/sunset appearance; and layout export/import.
 - English, Czech, Slovak, Polish, and German, following the system language or chosen in **Language**.
 
 Android still controls the lock screen, notification panels, recents, and system app transitions.
@@ -90,4 +90,4 @@ The [contributor code map](docs/architecture.md) explains the main components, d
 
 Use issue templates with version, phone model, Android version, folded/unfolded state, and reproduction steps. Review screenshots and logs for personal/work information. See [contributing](CONTRIBUTING.md) and [changes](CHANGELOG.md).
 
-Source is under the [MIT license](LICENSE); dependency notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). This independent project is unaffiliated with Apple, Google, or Samsung. The default wallpaper is drawn locally; app icons come from installed apps. Apple research media and Google application code are excluded from the public source and APK.
+Source is under the [MIT license](LICENSE); dependency notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). This independent project is unaffiliated with Apple, Google, or Samsung. The bundled dunes wallpaper ships with the app; app icons come from installed apps. Apple research media and Google application code are excluded from the public source and APK.

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- System integration -->
-    <string name="dune_wallpaper_label">Duny iDuo</string>
-    <string name="dune_wallpaper_description">Duny iDuo — krajina spouštěče přizpůsobená vašemu displeji.</string>
     <string name="shade_service_label">Gesta panelu iDuo Launcher</string>
     <string name="shade_service_description">Umožňuje gestům na ploše iDuo Launcher otevírat systémová oznámení a panel Rychlé nastavení. Nečte obsah obrazovky ani nesleduje činnost v jiných aplikacích.</string>
 
@@ -50,14 +48,21 @@
     <string name="set_duo_as_home">Nastavit iDuo jako plochu</string>
     <string name="undo_layout_change">Vrátit poslední změnu rozložení</string>
 
-    <string name="launcher_background">Pozadí spouštěče</string>
-    <string name="launcher_background_detail">Změní obrázek za plochami iDuo.</string>
     <string name="choose_photo">Vybrat fotku</string>
     <string name="choose_different_photo">Vybrat jinou fotku</string>
-    <string name="reset_to_dunes">Obnovit duny iDuo</string>
     <string name="android_wallpaper">Tapeta Androidu</string>
-    <string name="android_wallpaper_detail">Otevře náhled Androidu pro změnu tapety telefonu. Pozadí spouštěče iDuo tím nezměníte.</string>
-    <string name="preview_android_wallpaper">Náhled tapety Androidu</string>
+    <string name="wallpaper_detail">iDuo zobrazuje tapetu Androidu. Fotka nebo duny iDuo vybrané zde se nastaví jako tapeta Androidu.</string>
+    <string name="use_iduo_dunes">Použít duny iDuo</string>
+    <string name="android_wallpaper_detail">V nastavení Androidu můžete vybrat libovolnou tapetu, i živou. iDuo ji hned zobrazí.</string>
+    <string name="open_wallpaper_settings">Otevřít nastavení tapety</string>
+    <string name="wallpaper_settings_unavailable">Nastavení tapety v Androidu není dostupné.</string>
+    <string name="wallpaper_target_title">Nastavit tapetu na</string>
+    <string name="wallpaper_target_home">Domovskou obrazovku</string>
+    <string name="wallpaper_target_lock">Zamykací obrazovku</string>
+    <string name="wallpaper_target_both">Domovskou i zamykací obrazovku</string>
+    <string name="wallpaper_set_failed">Android tapetu nepřijal.</string>
+    <string name="wallpaper_updated">Tapeta byla změněna.</string>
+    <string name="restore_photo_note">Tapeta není součástí zálohy rozložení.</string>
 
     <string name="appearance">Vzhled</string>
     <string name="appearance_light">Světlý</string>
@@ -315,7 +320,6 @@
     </plurals>
     <string name="restore_includes_leading">Zahrnuje vaši stránku jen pro rozložený telefon.</string>
     <string name="restore_settings_note">Obnoví se také rozložení ikon, popisky, vyhledávání a nastavení stavu.</string>
-    <string name="restore_photo_note">Vybraná fotka na pozadí spouštěče není součástí zálohy rozložení.</string>
     <string name="restore_unavailable_apps">Nedostupné aplikace (%1$d)</string>
     <string name="restore_unavailable_app">Nedostupná aplikace</string>
     <string name="restore_missing_app">• %1$s — její uložená pozice zůstane prázdná</string>
@@ -335,14 +339,11 @@
     <string name="photo_picker_unavailable">Výběr fotek není dostupný.</string>
     <string name="photo_selection_lost">Rozpracovaný výběr fotky se nepodařilo obnovit.</string>
     <string name="photo_preview_lost">Rozpracovaný náhled fotky se nepodařilo obnovit.</string>
-    <string name="photo_using_dunes">Používají se duny iDuo.</string>
-    <string name="photo_updated">Pozadí spouštěče bylo aktualizováno.</string>
     <string name="photo_save_failed">Tuto fotku se nepodařilo uložit.</string>
     <string name="photo_unusable">Tuto fotku nelze použít.</string>
     <string name="photo_preview_save_failed">Náhled této fotky se nepodařilo uložit.</string>
     <string name="photo_no_pixels">Vybraný obrázek neobsahuje použitelné pixely.</string>
     <string name="photo_too_large">Vybraný obrázek je příliš velký.</string>
-    <string name="wallpaper_preview_unavailable">Systémový náhled tapety není dostupný.</string>
 
     <!-- Discover -->
     <string name="discover">Discover</string>

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- System integration -->
-    <string name="dune_wallpaper_label">Duny iDuo</string>
-    <string name="dune_wallpaper_description">Duny iDuo — krajina spúšťača prispôsobená vášmu displeju.</string>
     <string name="shade_service_label">Gestá panela iDuo Launcher</string>
     <string name="shade_service_description">Umožňuje gestám na ploche iDuo Launcher otvárať systémové upozornenia a panel Rýchle nastavenia. Nečíta obsah obrazovky ani nesleduje činnosť v iných aplikáciách.</string>
 
@@ -50,14 +48,21 @@
     <string name="set_duo_as_home">Nastaviť iDuo ako plochu</string>
     <string name="undo_layout_change">Vrátiť poslednú zmenu rozloženia</string>
 
-    <string name="launcher_background">Pozadie spúšťača</string>
-    <string name="launcher_background_detail">Zmení obrázok za plochami iDuo.</string>
     <string name="choose_photo">Vybrať fotku</string>
     <string name="choose_different_photo">Vybrať inú fotku</string>
-    <string name="reset_to_dunes">Obnoviť duny iDuo</string>
     <string name="android_wallpaper">Tapeta Androidu</string>
-    <string name="android_wallpaper_detail">Otvorí ukážku Androidu na zmenu tapety telefónu. Pozadie spúšťača iDuo sa tým nezmení.</string>
-    <string name="preview_android_wallpaper">Ukážka tapety Androidu</string>
+    <string name="wallpaper_detail">iDuo zobrazuje tapetu Androidu. Fotka alebo duny iDuo vybrané tu sa nastavia ako tapeta Androidu.</string>
+    <string name="use_iduo_dunes">Použiť duny iDuo</string>
+    <string name="android_wallpaper_detail">V nastaveniach Androidu môžete vybrať ľubovoľnú tapetu, aj živú. iDuo ju hneď zobrazí.</string>
+    <string name="open_wallpaper_settings">Otvoriť nastavenia tapety</string>
+    <string name="wallpaper_settings_unavailable">Nastavenia tapety v Androide nie sú dostupné.</string>
+    <string name="wallpaper_target_title">Nastaviť tapetu na</string>
+    <string name="wallpaper_target_home">Domovskú obrazovku</string>
+    <string name="wallpaper_target_lock">Uzamknutú obrazovku</string>
+    <string name="wallpaper_target_both">Domovskú aj uzamknutú obrazovku</string>
+    <string name="wallpaper_set_failed">Android tapetu neprijal.</string>
+    <string name="wallpaper_updated">Tapeta bola zmenená.</string>
+    <string name="restore_photo_note">Tapeta nie je súčasťou zálohy rozloženia.</string>
 
     <string name="appearance">Vzhľad</string>
     <string name="appearance_light">Svetlý</string>
@@ -315,7 +320,6 @@
     </plurals>
     <string name="restore_includes_leading">Zahŕňa vašu stranu len pre rozložený telefón.</string>
     <string name="restore_settings_note">Obnoví sa aj rozloženie ikon, popisky, vyhľadávanie a nastavenia stavu.</string>
-    <string name="restore_photo_note">Vybraná fotka na pozadí spúšťača nie je súčasťou zálohy rozloženia.</string>
     <string name="restore_unavailable_apps">Nedostupné aplikácie (%1$d)</string>
     <string name="restore_unavailable_app">Nedostupná aplikácia</string>
     <string name="restore_missing_app">• %1$s — jej uložená pozícia zostane prázdna</string>
@@ -335,14 +339,11 @@
     <string name="photo_picker_unavailable">Výber fotiek nie je dostupný.</string>
     <string name="photo_selection_lost">Rozpracovaný výber fotky sa nepodarilo obnoviť.</string>
     <string name="photo_preview_lost">Rozpracovanú ukážku fotky sa nepodarilo obnoviť.</string>
-    <string name="photo_using_dunes">Používajú sa duny iDuo.</string>
-    <string name="photo_updated">Pozadie spúšťača bolo aktualizované.</string>
     <string name="photo_save_failed">Túto fotku sa nepodarilo uložiť.</string>
     <string name="photo_unusable">Túto fotku nie je možné použiť.</string>
     <string name="photo_preview_save_failed">Ukážku tejto fotky sa nepodarilo uložiť.</string>
     <string name="photo_no_pixels">Vybraný obrázok neobsahuje použiteľné pixely.</string>
     <string name="photo_too_large">Vybraný obrázok je príliš veľký.</string>
-    <string name="wallpaper_preview_unavailable">Systémová ukážka tapety nie je dostupná.</string>
 
     <!-- Discover -->
     <string name="discover">Discover</string>

@@ -51,7 +51,7 @@ class CustomizationNavigationIntegrationTest {
         compose.onNodeWithTag("home-cell-$empty").performSemanticsAction(SemanticsActions.OnLongClick)
         compose.onNodeWithTag("empty-space-wallpaper").performClick()
         compose.onNodeWithTag("background-choose").assertIsDisplayed()
-        compose.onNodeWithTag("wallpaper-preview").assertExists()
+        compose.onNodeWithTag("wallpaper-settings").assertExists()
         assertEquals(before, model().state.value.layout)
         assertEquals(idsBefore, model().state.value.widgetPlacements.map { it.slot to it.id })
     }

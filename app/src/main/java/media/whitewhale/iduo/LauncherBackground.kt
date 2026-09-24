@@ -31,7 +31,9 @@ private const val BACKGROUND_PREFS = "launcher_background"
 private const val BACKGROUND_ENABLED = "photoEnabled"
 private const val BACKGROUND_ID = "photoId"
 private const val BACKGROUND_FILE = "launcher-background.jpg"
-private const val MAX_BACKGROUND_EDGE = 2048
+private const val MAX_BACKGROUND_EDGE = 2560
+private const val MIRROR_ID = "systemWallpaperId"
+private const val MIRROR_BUNDLED = "mirrorsBundled"
 
 internal object LauncherBackgroundCache {
     @Volatile var bitmap: Bitmap? = null
@@ -71,6 +73,20 @@ internal fun loadLauncherBackground(context: Context): Bitmap? {
     return BitmapFactory.decodeFile(file.absolutePath)
 }
 
+/** Android's id for the Home wallpaper that iDuo set and mirrors, or null when there is no mirror. */
+internal fun mirroredWallpaperId(context: Context): Int? =
+    launcherBackgroundPreferences(context).getInt(MIRROR_ID, 0).takeIf { it > 0 }
+internal fun mirrorIsBundled(context: Context) = launcherBackgroundPreferences(context).getBoolean(MIRROR_BUNDLED, false)
+
+/** Main thread. The Home wallpaper is no longer one iDuo set, so its mirror would show the wrong image. */
+internal fun forgetWallpaperMirror(context: Context) {
+    launcherBackgroundPreferences(context).edit().putBoolean(BACKGROUND_ENABLED, false).remove(BACKGROUND_ID)
+        .remove(MIRROR_ID).remove(MIRROR_BUNDLED).apply()
+    // A Compose or Discover canvas may still be drawing the old bitmap.
+    LauncherBackgroundCache.changed(null)
+    launcherBackgroundFile(context).delete()
+}
+
 internal fun cachedLauncherBackground(context: Context): Bitmap? {
     val identity = launcherBackgroundIdentity(context)
     return LauncherBackgroundCache.bitmap?.takeIf {
@@ -78,11 +94,20 @@ internal fun cachedLauncherBackground(context: Context): Bitmap? {
     }
 }
 
+/** What the user asked iDuo to set as the Android wallpaper. */
+enum class WallpaperSource { PHOTO, DUNES }
+
 class LauncherBackgroundController(
     private val activity: ComponentActivity,
     private val onExternalResultChanged: (Boolean) -> Unit,
 ) : DefaultLifecycleObserver {
-    var photoSelected by mutableStateOf(launcherBackgroundEnabled(activity))
+    /** Whether a photo iDuo set is still the Home wallpaper, so its mirror can stand in for it. */
+    val photoSelected: Boolean get() {
+        LauncherBackgroundCache.revision.intValue
+        return launcherBackgroundEnabled(activity)
+    }
+    /** The wallpaper waiting for the user to choose Home, Lock or both screens. */
+    var targetRequest by mutableStateOf<WallpaperSource?>(null)
         private set
     var loading by mutableStateOf(false)
         private set
@@ -161,18 +186,40 @@ class LauncherBackgroundController(
         }
     }
 
-    fun reset() {
-        generation++; pickerPending = false; loading = false
-        discardPreview()
-        releasePreviewGrant()
-        // A Compose or wallpaper-service canvas may still be drawing the old bitmap.
-        LauncherBackgroundCache.changed(null)
-        launcherBackgroundFile(activity).delete()
-        prefs.edit().putBoolean(BACKGROUND_ENABLED, false).remove(BACKGROUND_ID).remove(PICKER_PENDING).remove(PENDING_URI)
-            .remove(PENDING_OPERATION).remove(PREVIEW_PHASE).remove(PREVIEW_FILE).apply()
-        photoSelected = false; errorMessage = null; successMessage = activity.getString(R.string.photo_using_dunes)
-        onExternalResultChanged(false)
-        cleanupStagedFiles()
+    /** Asks where the reviewed photo should go; [applyTo] then sets it. */
+    fun requestPhotoApply() { if (previewBitmap != null && !loading) targetRequest = WallpaperSource.PHOTO }
+    /** Asks where the bundled iDuo dunes should go; [applyTo] then sets them. */
+    fun requestDunes() { if (!loading && !previewPending) targetRequest = WallpaperSource.DUNES }
+    fun dismissTargetRequest() { targetRequest = null }
+
+    fun applyTo(target: WallpaperTarget) {
+        val source = targetRequest ?: return
+        targetRequest = null
+        when (source) {
+            WallpaperSource.PHOTO -> applyPreview(target)
+            WallpaperSource.DUNES -> applyDunes(target)
+        }
+    }
+
+    private fun applyDunes(target: WallpaperTarget) {
+        loading = true; errorMessage = null; successMessage = null
+        val context = activity.applicationContext
+        SystemWallpaper.beginApply()
+        activity.lifecycleScope.launch {
+            try {
+                val result = withContext(Dispatchers.IO) { runCatching { SystemWallpaper.setBundled(context, target) } }
+                loading = false
+                val homeId = result.getOrElse {
+                    errorMessage = activity.getString(R.string.wallpaper_set_failed)
+                    return@launch
+                }
+                if (homeId != null) {
+                    forgetWallpaperMirror(context)
+                    prefs.edit().putInt(MIRROR_ID, homeId).putBoolean(MIRROR_BUNDLED, true).apply()
+                }
+                successMessage = activity.getString(R.string.wallpaper_updated)
+            } finally { SystemWallpaper.endApply(context) }
+        }
     }
 
     fun clearMessage() { errorMessage = null; successMessage = null }
@@ -182,26 +229,55 @@ class LauncherBackgroundController(
         generation++; loading = false; clearPickerPending()
     }
 
-    fun applyPreview() {
+    private fun applyPreview(target: WallpaperTarget) {
         val staged = preview ?: return
         if (!previewPending || pendingOperation() != staged.operation ||
             previewFile()?.absolutePath != staged.file.absolutePath) return
+        val token = generation
+        val context = activity.applicationContext
+        loading = true; errorMessage = null; successMessage = null
+        SystemWallpaper.beginApply()
+        activity.lifecycleScope.launch {
+            try {
+                val result = withContext(Dispatchers.IO) { runCatching { SystemWallpaper.set(context, staged.bitmap, target) } }
+                loading = false
+                val homeId = result.getOrElse {
+                    errorMessage = activity.getString(R.string.wallpaper_set_failed)
+                    return@launch
+                }
+                // Android already shows the photo; a preview replaced meanwhile only loses its mirror.
+                if (token != generation || preview !== staged) return@launch
+                if (homeId == null) {
+                    // Only the lock screen changed: Home keeps its wallpaper and mirror.
+                    discardPreview()
+                    clearPreviewPersistence()
+                    cleanupStagedFiles()
+                } else commitMirror(staged, homeId)
+                successMessage = activity.getString(R.string.wallpaper_updated)
+            } finally { SystemWallpaper.endApply(context) }
+        }
+    }
+
+    private fun commitMirror(staged: StagedBackground, homeId: Int) {
         runCatching { staged.commit(launcherBackgroundFile(activity)) }
             .onSuccess {
                 releasePreviewGrant(staged.operation)
                 prefs.edit().putBoolean(BACKGROUND_ENABLED, true).putString(BACKGROUND_ID, staged.operation)
+                    .putInt(MIRROR_ID, homeId).remove(MIRROR_BUNDLED)
                     .remove(PENDING_URI).remove(PENDING_OPERATION).remove(PREVIEW_PHASE).remove(PREVIEW_FILE).apply()
                 preview = null
                 previewBitmap = null
                 previewPending = false
-                loading = false
                 LauncherBackgroundCache.changed(staged.bitmap, staged.operation)
-                photoSelected = true
-                errorMessage = null
-                successMessage = activity.getString(R.string.photo_updated)
                 cleanupStagedFiles()
             }
-            .onFailure { errorMessage = it.userMessage(activity.getString(R.string.photo_save_failed)) }
+            .onFailure {
+                // The wallpaper is set; without a mirror, stand-ins fall back to its colours.
+                forgetWallpaperMirror(activity)
+                discardPreview()
+                clearPreviewPersistence()
+                cleanupStagedFiles()
+            }
     }
 
     fun cancelPreview() {

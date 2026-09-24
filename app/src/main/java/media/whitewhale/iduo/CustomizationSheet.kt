@@ -32,7 +32,7 @@ internal enum class CustomizationPage { OVERVIEW, WALLPAPER, HOME, GESTURES, LAN
 internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, model: LauncherModel,
     isDefaultHome: Boolean, moreRowsFit: Boolean, page: CustomizationPage, onPage: (CustomizationPage) -> Unit,
     onMakeDefault: () -> Unit, onClose: () -> Unit, onEditPins: () -> Unit, onWidget: (Int) -> Unit,
-    onAddWidget: (Int) -> Unit, onRemoveWidget: (Int) -> Unit, onWallpaperPreview: () -> Unit,
+    onAddWidget: (Int) -> Unit, onRemoveWidget: (Int) -> Unit, onWallpaperSettings: () -> Unit,
     onExportLayout: () -> Unit, onImportLayout: () -> Unit,
     appearance: AppearanceState, onAppearanceMode: (AppearanceMode) -> Unit,
     onAppearanceManual: (String, Double, Double) -> Unit, onAppearanceDeviceLocation: () -> Unit,
@@ -89,8 +89,8 @@ internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, mo
                 }
                 CustomizationPage.WALLPAPER -> {
                     MiniHomePreview(backgrounds.previewBitmap, state, 228.dp)
-                    Text(stringResource(R.string.launcher_background), style = MaterialTheme.typography.titleMedium)
-                    Text(stringResource(R.string.launcher_background_detail), style = MaterialTheme.typography.bodySmall,
+                    Text(stringResource(R.string.wallpaper), style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.wallpaper_detail), style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Button(onClick = backgrounds::choosePhoto, enabled = !backgrounds.loading,
                         modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("background-choose")) {
@@ -98,12 +98,13 @@ internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, mo
                     }
                     if (backgrounds.previewPending) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(onClick = backgrounds::cancelPreview, Modifier.weight(1f).heightIn(min = 48.dp)
-                            .testTag("background-preview-cancel")) { Text(stringResource(R.string.cancel)) }
-                        Button(onClick = backgrounds::applyPreview, enabled = backgrounds.previewBitmap != null,
+                            .testTag("background-preview-cancel"), enabled = !backgrounds.loading) { Text(stringResource(R.string.cancel)) }
+                        Button(onClick = backgrounds::requestPhotoApply, enabled = backgrounds.previewBitmap != null && !backgrounds.loading,
                             modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("background-preview-apply")) { Text(stringResource(R.string.apply)) }
                     }
-                    if (backgrounds.photoSelected && !backgrounds.previewPending) OutlinedButton(onClick = backgrounds::reset,
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("background-reset")) { Text(stringResource(R.string.reset_to_dunes)) }
+                    if (!backgrounds.previewPending) OutlinedButton(onClick = backgrounds::requestDunes, enabled = !backgrounds.loading,
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("background-dunes")) { Text(stringResource(R.string.use_iduo_dunes)) }
+                    backgrounds.targetRequest?.let { WallpaperTargetDialog(backgrounds::applyTo, backgrounds::dismissTargetRequest) }
                     if (backgrounds.loading) LinearProgressIndicator(Modifier.fillMaxWidth().testTag("background-loading"))
                     (backgrounds.errorMessage ?: backgrounds.successMessage)?.let { message ->
                         TextButton(onClick = backgrounds::clearMessage, Modifier.fillMaxWidth().testTag("background-message")) { Text(message) }
@@ -112,8 +113,8 @@ internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, mo
                     Text(stringResource(R.string.android_wallpaper), style = MaterialTheme.typography.titleMedium)
                     Text(stringResource(R.string.android_wallpaper_detail),
                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    OutlinedButton(onClick = onWallpaperPreview, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                        .testTag("wallpaper-preview")) { Icon(Icons.Rounded.Wallpaper, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.preview_android_wallpaper)) }
+                    OutlinedButton(onClick = onWallpaperSettings, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                        .testTag("wallpaper-settings")) { Icon(Icons.Rounded.Wallpaper, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.open_wallpaper_settings)) }
                     HorizontalDivider(Modifier.padding(vertical = 6.dp))
                     AppearanceSettings(appearance, onAppearanceMode, onAppearanceManual, onAppearanceDeviceLocation, onAppearanceClear)
                 }
@@ -200,12 +201,26 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
     }
 }
 
+/** Asks where Android should show a wallpaper chosen in iDuo. */
+@Composable private fun WallpaperTargetDialog(onTarget: (WallpaperTarget) -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.wallpaper_target_title)) },
+        text = {
+            Column {
+                listOf(WallpaperTarget.HOME to R.string.wallpaper_target_home, WallpaperTarget.LOCK to R.string.wallpaper_target_lock,
+                    WallpaperTarget.BOTH to R.string.wallpaper_target_both).forEach { (target, label) ->
+                    TextButton(onClick = { onTarget(target) }, Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                        .testTag("wallpaper-target-${target.name.lowercase()}")) {
+                        Text(stringResource(label), Modifier.fillMaxWidth())
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } })
+}
+
 @Composable private fun MiniHomePreview(stagedBitmap: android.graphics.Bitmap?, state: LauncherState,
     previewHeight: androidx.compose.ui.unit.Dp) {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    val backgroundRevision = LauncherBackgroundCache.revision.intValue
-    val committedBitmap = remember(backgroundRevision) { cachedLauncherBackground(context) }
-    val bitmap = stagedBitmap ?: committedBitmap
     val apps = remember(state.apps) { state.apps.associateBy { it.id } }
     val homeIcons = state.homeSlots.mapNotNull { id -> id?.let(apps::get) }.take(8)
     val dockIcons = state.dock.mapNotNull { id -> id?.let(apps::get) }
@@ -214,8 +229,8 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Box(Modifier.height(previewHeight).width(previewHeight * .632f).clip(RoundedCornerShape(unit(24f)))
             .testTag("customization-home-preview")) {
-            DuneWallpaper()
-            bitmap?.let { Image(it.asImageBitmap(), null, Modifier.matchParentSize(),
+            WallpaperStandIn()
+            stagedBitmap?.let { Image(it.asImageBitmap(), null, Modifier.matchParentSize(),
                 contentScale = androidx.compose.ui.layout.ContentScale.Crop) }
             Column(Modifier.fillMaxSize().padding(start = unit(16f), top = unit(18f), end = unit(54f)),
                 verticalArrangement = Arrangement.spacedBy(unit(10f))) {

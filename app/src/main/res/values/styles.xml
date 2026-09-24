@@ -4,7 +4,9 @@
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
         <item name="android:windowActionModeOverlay">true</item>
-        <item name="android:windowBackground">#567587</item>
+        <!-- Launcher windows show Android's wallpaper; iDuo draws no background of its own. -->
+        <item name="android:windowShowWallpaper">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorAccent">#30596D</item>
     </style>
     <style name="Theme.Duo.Discover" parent="Theme.Duo">

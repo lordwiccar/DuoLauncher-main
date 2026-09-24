@@ -99,8 +99,8 @@ class AppearanceBackgroundIntegrationTest {
             val bytes = ByteArrayOutputStream().also { bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it) }.toByteArray()
             file.writeBytes(bytes); backgroundPrefs.edit().putBoolean("photoEnabled", true).commit()
             compose.activityRule.scenario.recreate(); ready(); settings()
-            compose.onNodeWithTag("background-reset").performScrollTo().assertIsDisplayed().performClick()
-            assertFalse(file.exists()); assertFalse(backgroundPrefs.getBoolean("photoEnabled", true))
+            // A photo iDuo did not set as Android's wallpaper cannot stand in for it.
+            compose.waitUntil(5_000) { !file.exists() }; assertFalse(backgroundPrefs.getBoolean("photoEnabled", true))
 
             backgroundPrefs.edit().putBoolean("pickerPending", true).commit()
             compose.activityRule.scenario.recreate(); ready()
@@ -205,7 +205,7 @@ class AppearanceBackgroundIntegrationTest {
             }
             assertArrayEquals("Recreation must not commit the preview", priorBytes, privatePhoto.readBytes())
             assertEquals(priorId, backgroundPrefs.getString("photoId", null))
-            compose.runOnUiThread { compose.activity.backgrounds.applyPreview() }
+            compose.runOnUiThread { compose.activity.backgrounds.run { requestPhotoApply(); applyTo(WallpaperTarget.HOME) } }
             compose.waitUntil(5_000) {
                 !compose.activity.backgrounds.previewPending &&
                     backgroundPrefs.getString("photoId", null) != priorId

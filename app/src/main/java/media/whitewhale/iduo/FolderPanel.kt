@@ -23,6 +23,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
@@ -111,7 +114,14 @@ internal fun FolderPanel(
         onDispose { if (drag.activeSourceScope == folder.id) drag.activeSourceScope = null }
     }
     val closeLabel = stringResource(R.string.close_folder)
-    Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = .28f * opening.value.coerceIn(0f, 1f)))
+    // The panel lives in the safe area, but the dim must also cover the wallpaper under the system bars.
+    val bars = WindowInsets.safeDrawing
+    val scrimLayout = LocalLayoutDirection.current
+    Box(Modifier.fillMaxSize().drawBehind {
+        val left = bars.getLeft(this, scrimLayout).toFloat(); val top = bars.getTop(this).toFloat()
+        drawRect(Color.Black.copy(alpha = .28f * opening.value.coerceIn(0f, 1f)), Offset(-left, -top),
+            Size(size.width + left + bars.getRight(this, scrimLayout), size.height + top + bars.getBottom(this)))
+    }
         .clickable(
             interactionSource = remember { MutableInteractionSource() },
             indication = null,

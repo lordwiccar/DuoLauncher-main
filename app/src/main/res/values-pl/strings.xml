@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- System integration -->
-    <string name="dune_wallpaper_label">Wydmy iDuo</string>
-    <string name="dune_wallpaper_description">Wydmy iDuo — krajobraz launchera dopasowany do Twojego ekranu.</string>
     <string name="shade_service_label">Gesty panelu iDuo Launcher</string>
     <string name="shade_service_description">Pozwala gestom na ekranie głównym iDuo Launcher otwierać systemowe powiadomienia i panel Szybkich ustawień. Nie odczytuje zawartości ekranu ani nie obserwuje aktywności w innych aplikacjach.</string>
 
@@ -50,14 +48,21 @@
     <string name="set_duo_as_home">Ustaw iDuo jako ekran główny</string>
     <string name="undo_layout_change">Cofnij ostatnią zmianę układu</string>
 
-    <string name="launcher_background">Tło launchera</string>
-    <string name="launcher_background_detail">Zmienia obraz za ekranami głównymi iDuo.</string>
     <string name="choose_photo">Wybierz zdjęcie</string>
     <string name="choose_different_photo">Wybierz inne zdjęcie</string>
-    <string name="reset_to_dunes">Przywróć wydmy iDuo</string>
     <string name="android_wallpaper">Tapeta Androida</string>
-    <string name="android_wallpaper_detail">Otwiera podgląd Androida, aby zmienić tapetę telefonu. Nie zmienia tła launchera iDuo.</string>
-    <string name="preview_android_wallpaper">Podgląd tapety Androida</string>
+    <string name="wallpaper_detail">iDuo wyświetla tapetę Androida. Zdjęcie lub wydmy iDuo wybrane tutaj zostaną ustawione jako tapeta Androida.</string>
+    <string name="use_iduo_dunes">Użyj wydm iDuo</string>
+    <string name="android_wallpaper_detail">W ustawieniach Androida możesz wybrać dowolną tapetę, także animowaną. iDuo od razu ją wyświetli.</string>
+    <string name="open_wallpaper_settings">Otwórz ustawienia tapety</string>
+    <string name="wallpaper_settings_unavailable">Ustawienia tapety Androida są niedostępne.</string>
+    <string name="wallpaper_target_title">Ustaw tapetę na</string>
+    <string name="wallpaper_target_home">Ekranie głównym</string>
+    <string name="wallpaper_target_lock">Ekranie blokady</string>
+    <string name="wallpaper_target_both">Ekranie głównym i ekranie blokady</string>
+    <string name="wallpaper_set_failed">Android nie przyjął tapety.</string>
+    <string name="wallpaper_updated">Tapeta została zmieniona.</string>
+    <string name="restore_photo_note">Tapeta nie jest częścią kopii zapasowej układu.</string>
 
     <string name="appearance">Wygląd</string>
     <string name="appearance_light">Jasny</string>
@@ -315,7 +320,6 @@
     </plurals>
     <string name="restore_includes_leading">Obejmuje Twoją stronę tylko dla rozłożonego telefonu.</string>
     <string name="restore_settings_note">Przywrócone zostaną też układ ikon, etykiety, wyszukiwanie i ustawienia stanu.</string>
-    <string name="restore_photo_note">Wybrane zdjęcie tła launchera nie jest częścią kopii zapasowej układu.</string>
     <string name="restore_unavailable_apps">Niedostępne aplikacje (%1$d)</string>
     <string name="restore_unavailable_app">Niedostępna aplikacja</string>
     <string name="restore_missing_app">• %1$s — jej zapisana pozycja pozostanie pusta</string>
@@ -335,14 +339,11 @@
     <string name="photo_picker_unavailable">Wybór zdjęć jest niedostępny.</string>
     <string name="photo_selection_lost">Nie udało się przywrócić rozpoczętego wyboru zdjęcia.</string>
     <string name="photo_preview_lost">Nie udało się przywrócić rozpoczętego podglądu zdjęcia.</string>
-    <string name="photo_using_dunes">Używane są wydmy iDuo.</string>
-    <string name="photo_updated">Tło launchera zostało zaktualizowane.</string>
     <string name="photo_save_failed">Nie udało się zapisać tego zdjęcia.</string>
     <string name="photo_unusable">Nie można użyć tego zdjęcia.</string>
     <string name="photo_preview_save_failed">Nie udało się zapisać podglądu tego zdjęcia.</string>
     <string name="photo_no_pixels">Wybrany obraz nie zawiera użytecznych pikseli.</string>
     <string name="photo_too_large">Wybrany obraz jest za duży.</string>
-    <string name="wallpaper_preview_unavailable">Systemowy podgląd tapety jest niedostępny.</string>
 
     <!-- Discover -->
     <string name="discover">Discover</string>
