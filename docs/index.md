@@ -9,6 +9,6 @@ A foldable-first Android Home screen with a right-side dock, folders, widgets, a
 - [Privacy policy](privacy-policy.html)
 - [User guide](user-guide.html)
 - [Troubleshooting](troubleshooting.html)
-- [Source code](https://github.com/)
+- [Source code](https://github.com/lordwiccar/iduo-launcher)
 
 Contact: [studio@whitewhale.media](mailto:studio@whitewhale.media)
