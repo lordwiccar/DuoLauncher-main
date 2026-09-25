@@ -59,7 +59,7 @@ configuration, and the isolated Discover probe are excluded. The probe remains o
 working tree and does not participate in normal launcher builds.
 
 The [user guide](user-guide.md), [troubleshooting](troubleshooting.md), [contributor code map](architecture.md),
-and [beta notes](releases/0.15.0-beta01.md) are part of the explicit public allowlist.
+[privacy policy](privacy-policy.md), [1.0.0 notes](releases/1.0.0.md) and [beta notes](releases/0.15.0-beta01.md) are part of the explicit public allowlist.
 
 ## GitHub publication
 

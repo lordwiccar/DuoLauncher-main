@@ -2,8 +2,8 @@
 set -euo pipefail
 
 repository_root=$(cd "$(dirname "$0")/.." && pwd -P)
-version=0.7.0
-output_dir=${1:-"$repository_root/dist/DuoLauncher-$version"}
+version=1.0.0
+output_dir=${1:-"$repository_root/dist/iDuoLauncher-$version"}
 
 for variable_name in DUO_RELEASE_STORE_FILE DUO_RELEASE_STORE_PASSWORD DUO_RELEASE_KEY_ALIAS DUO_RELEASE_KEY_PASSWORD; do
     if [[ -z "${!variable_name:-}" ]]; then
@@ -31,10 +31,11 @@ if [[ -e "$output_dir" ]]; then
     exit 1
 fi
 
-"$repository_root/scripts/gradle.sh" :app:assembleRelease
+"$repository_root/scripts/gradle.sh" :app:assembleRelease :app:bundleRelease
 apk_source="$repository_root/app/build/outputs/apk/release/app-release.apk"
-if [[ ! -f "$apk_source" ]]; then
-    echo "Signed release APK was not produced at the expected path." >&2
+bundle_source="$repository_root/app/build/outputs/bundle/release/app-release.aab"
+if [[ ! -f "$apk_source" || ! -f "$bundle_source" ]]; then
+    echo "Signed release APK or Play bundle was not produced at the expected path." >&2
     exit 1
 fi
 
@@ -47,16 +48,18 @@ trap cleanup EXIT
 release_name=$(basename "$output_dir")
 package_dir="$staging_dir/$release_name"
 mkdir -p "$package_dir"
-apk_name="DuoLauncher-$version-release.apk"
-source_name="DuoLauncher-$version-source"
+apk_name="iDuoLauncher-$version-release.apk"
+bundle_name="iDuoLauncher-$version-release.aab"
+source_name="iDuoLauncher-$version-source"
 cp -p "$apk_source" "$package_dir/$apk_name"
+cp -p "$bundle_source" "$package_dir/$bundle_name"
 "$repository_root/scripts/export-public-source.sh" "$staging_dir/$source_name"
 (cd "$staging_dir" && COPYFILE_DISABLE=1 tar -czf "$package_dir/$source_name.tar.gz" "$source_name")
 
 if command -v sha256sum >/dev/null 2>&1; then
-    (cd "$package_dir" && sha256sum "$apk_name" "$source_name.tar.gz" > SHA256SUMS.txt)
+    (cd "$package_dir" && sha256sum "$apk_name" "$bundle_name" "$source_name.tar.gz" > SHA256SUMS.txt)
 elif command -v shasum >/dev/null 2>&1; then
-    (cd "$package_dir" && shasum -a 256 "$apk_name" "$source_name.tar.gz" > SHA256SUMS.txt)
+    (cd "$package_dir" && shasum -a 256 "$apk_name" "$bundle_name" "$source_name.tar.gz" > SHA256SUMS.txt)
 else
     echo "Neither sha256sum nor shasum is available." >&2
     exit 1

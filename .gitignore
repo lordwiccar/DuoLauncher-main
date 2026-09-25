@@ -8,6 +8,7 @@ local.properties
 __pycache__/
 artifacts/
 dist/
+design/play/
 AGENTS.md
 research/
 discover-probe/
@@ -16,9 +17,13 @@ docs/*
 !docs/user-guide.md
 !docs/troubleshooting.md
 !docs/architecture.md
+!docs/privacy-policy.md
+!docs/index.md
+!docs/_config.yml
 !docs/releases/
 docs/releases/*
 !docs/releases/0.15.0-beta01.md
+!docs/releases/1.0.0.md
 !docs/images/
 docs/images/*
 !docs/images/*.png
