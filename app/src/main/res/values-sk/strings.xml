@@ -14,15 +14,12 @@
     <string name="replace">Nahradiť</string>
     <string name="remove">Odobrať</string>
     <string name="resume">Pokračovať</string>
-    <string name="retry">Skúsiť znova</string>
     <string name="place">Umiestniť</string>
     <string name="reconnect">Znova pripojiť</string>
     <string name="not_now">Teraz nie</string>
     <string name="turn_on">Zapnúť</string>
     <string name="open_settings">Otvoriť nastavenia</string>
-    <string name="open_google">Otvoriť Google</string>
     <string name="back_to_home">Späť na plochu</string>
-    <string name="stay_on_home">Zostať na ploche</string>
     <string name="value_dp">%1$d dp</string>
     <string name="value_percent">%1$d %%</string>
 
@@ -42,7 +39,7 @@
     <string name="customize_backup">Záloha</string>
     <string name="customize_backup_detail">Uložiť alebo obnoviť toto rozloženie</string>
     <string name="customize_help">Pomocník a nastavenie</string>
-    <string name="customize_help_detail">Domovská aplikácia, miniaplikácie, gestá a Discover</string>
+    <string name="customize_help_detail">Domovská aplikácia, miniaplikácie, gestá a správy</string>
     <string name="set_as_home_app">Nastaviť ako domovskú aplikáciu</string>
     <string name="change_home_app">Zmeniť domovskú aplikáciu</string>
     <string name="set_duo_as_home">Nastaviť iDuo ako plochu</string>
@@ -128,7 +125,8 @@
     <string name="help_shade_title">Upozornenia a rýchle nastavenia</string>
     <string name="help_shade">Potiahnite na ploche nadol. Prvýkrát iDuo vysvetlí voliteľné nastavenie Dostupnosti v Androide. Služba iba otvára systémové panely.</string>
     <string name="help_shade_setup">Nastaviť gestá panela</string>
-    <string name="help_discover">Potiahnite doprava z prvej strany plochy. Ak Google kanál neposkytne, iDuo ponúkne návrat na plochu a možnosti obnovenia.</string>
+    <string name="help_news_title">Stránka so správami</string>
+    <string name="help_news">Potiahnite doprava z prvej strany plochy a zobrazia sa správy. V Gestá a vyhľadávanie → Ľavá stránka zvolíte Google News alebo vlastné RSS; ikona nastavení na stránke vyberá edíciu, rubriky alebo zdroje.</string>
 
     <!-- Apps and profiles -->
     <string name="all_apps">Všetky aplikácie</string>
@@ -196,7 +194,20 @@
     <string name="all_apps_view_list">Zoznam</string>
     <string name="all_apps_view_grid">Mriežka po stránkach</string>
     <string name="left_page">Ľavá stránka</string>
-    <string name="left_page_rss">Čítačka RSS</string>
+    <string name="left_page_rss">Vlastné RSS</string>
+    <string name="news_settings">Nastavenia správ</string>
+    <string name="news_edition">Edícia</string>
+    <string name="news_topics">Rubriky</string>
+    <string name="news_source_note">Titulky pochádzajú z Google News. Články sa otvárajú v prehliadači.</string>
+    <string name="news_topic_top">Hlavné správy</string>
+    <string name="news_topic_world">Svet</string>
+    <string name="news_topic_nation">Domáce</string>
+    <string name="news_topic_business">Biznis</string>
+    <string name="news_topic_technology">Technológie</string>
+    <string name="news_topic_science">Veda</string>
+    <string name="news_topic_health">Zdravie</string>
+    <string name="news_topic_sports">Šport</string>
+    <string name="news_topic_entertainment">Zábava</string>
     <string name="rss_title">Správy</string>
     <string name="rss_manage">Spravovať zdroje</string>
     <string name="rss_sources">Zdroje</string>
@@ -364,24 +375,6 @@
     <string name="photo_no_pixels">Vybraný obrázok neobsahuje použiteľné pixely.</string>
     <string name="photo_too_large">Vybraný obrázok je príliš veľký.</string>
 
-    <!-- Discover -->
-    <string name="discover">Discover</string>
-    <string name="discover_connecting">Pripája sa k Discover…</string>
-    <string name="discover_unavailable">Discover teraz nie je dostupný.</string>
-    <string name="discover_rejected">Google neprijal pripojenie ku kanálu. Reštartujte Google a skúste to znova.</string>
-    <string name="discover_disconnected">Discover sa odpojil. Klepnutím na Skúsiť znova sa znova pripojíte.</string>
-    <string name="discover_no_feed">Aplikácia Google neposkytla kanál.</string>
-    <string name="discover_install_google">Ak chcete používať Discover, nainštalujte alebo povoľte aplikáciu Google.</string>
-    <string name="discover_connect_failed">Aplikácia Google sa nemohla pripojiť k Discover.</string>
-    <string name="discover_slow">Discover sa načítava dlhšie. Môžete to skúsiť znova alebo otvoriť Google.</string>
-    <string name="discover_version">Táto verzia aplikácie Google nedokázala otvoriť Discover.</string>
-    <string name="discover_start_failed">Discover sa nepodarilo spustiť. Klepnutím na Skúsiť znova sa znova pripojíte.</string>
-    <string name="discover_no_fit">Discover sa nezmestil vedľa doku.</string>
-    <string name="discover_no_fit_return">Discover sa nezmestil vedľa doku. Vráťte sa na plochu a skúste to znova.</string>
-    <string name="discover_device_unsupported">Toto zariadenie nedokáže zobraziť Discover vedľa doku.</string>
-    <string name="install_google_first">Najprv nainštalujte alebo povoľte aplikáciu Google.</string>
-    <string name="discover_fallback_title">Discover tu nie je k dispozícii</string>
-    <string name="discover_fallback_message">iDuo na tomto zariadení nedokáže umiestniť kanál Discover vedľa plochy. Môžete otvoriť aplikáciu Google alebo zostať na ploche.</string>
 
     <!-- Shade gestures -->
     <string name="shade_setup_title">Zapnúť gestá panela</string>

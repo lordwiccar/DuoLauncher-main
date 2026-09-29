@@ -2,7 +2,7 @@
 
 A native Android launcher built around a right-side dock and a home screen that makes room when you unfold your phone.
 
-**Version 1.0.0 · Android 12 or later.** Built and tested on the Galaxy Z Fold 7 (cover and inner displays) and a matching emulator. Google Discover depends on the installed Google app and device support for activity embedding; an RSS reader is available as an alternative left page.
+**Version 1.0.0 · Android 12 or later.** Built and tested on the Galaxy Z Fold 7 (cover and inner displays) and a matching emulator. The left page shows Google News headlines or your own RSS feeds.
 
 <p>
   <img src="docs/images/iduo-home.png" width="300" alt="iDuo Home with widgets, a folder and the right-side dock">
@@ -18,7 +18,7 @@ A native Android launcher built around a right-side dock and a home screen that 
 - Overlapping unfolded page pairs: an extra workspace beside Home 1, then Home 1 beside Home 2, and so on.
 - Android widgets, visual widget selection, resizing, native scrolling, and drag-and-drop between pages.
 - App dragging, pages created during an edge drag, Home folders made by dropping one app onto another, and separate personal/work catalogs where device policy permits.
-- All apps as an alphabetical list or a paged grid, Google search with a local app-search fallback, and a left page with live Google Discover or a built-in RSS reader.
+- All apps as an alphabetical list or a paged grid, Google search with a local app-search fallback, and a left news page with Google News or your own RSS feeds.
 - A 4 × 4, 4 × 5 or 4 × 6 Home grid and four to eight dock apps.
 - Android's own wallpaper on Home, set from a photo or the bundled dunes; light/dark/system or sunrise/sunset appearance; and layout export/import.
 - English, Czech, Slovak, Polish, and German, following the system language or chosen in **Language**.
@@ -42,8 +42,8 @@ Updates install over the existing app when they are signed with the same key. Un
 | --- | --- |
 | Change pages | Swipe horizontally across Home, the dock, or right rail; one page per gesture |
 | All apps | Swipe past the last Home page or tap its page control |
-| Discover | Swipe right from the first Home page or tap the compass |
-| Return from Discover | Swipe left, use the right-pointing arrow, or press Back |
+| News page | Swipe right from the first Home page or tap the news icon |
+| Return from the news page | Swipe left, use the right-pointing arrow, or press Back |
 | Rearrange apps/widgets | Hold, then drag; pause at the screen edge to change or create a page |
 | Add to the dock | Drag into a vacancy; move an app out first when the dock is full |
 | Scroll a widget | Swipe vertically inside its content; hold still to pick it up |
@@ -60,13 +60,13 @@ No launcher account, server, advertising, analytics, or automatic crash-upload s
 - **Shade gestures:** the optional accessibility service opens notifications and Quick Settings. It cannot read window contents or inject gestures.
 - **Sunrise/sunset:** manually enter coordinates or explicitly request approximate location. There is no background location request.
 - **Photos:** the system picker grants access to chosen images, without whole-library access.
-- **Google features:** the installed Google app's account, network, and privacy settings apply.
+- **News:** Google News headlines are fetched from news.google.com over HTTPS, and your own RSS feeds directly from their websites. Articles open in your browser.
 
 Read [data and permissions](PRIVACY.md) before sharing backups or diagnostics.
 
 ## Known limits
 
-- Discover can differ across Google, Android, and vendor updates. Its smooth embedding transition includes a version-scoped compatibility workaround; it is not a portable SystemUI API. Recovery controls let you return Home when unavailable.
+- Google News headlines come from Google's public RSS feeds, which carry no pictures; your own feeds show pictures when they provide them.
 - Work apps/widgets remain subject to administrator policy. Private Space is not supported.
 - Icon packs and notification dots are not implemented. Folders cannot nest or occupy dock slots.
 - Imported Android widgets require binding again. Cross-installation work entries may require manual placement. Backups exclude photo backgrounds and system widget capabilities.

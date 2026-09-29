@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Replace Google Discover on the left page with Google News. Discover could not work in Play builds, because Google only lets allow-listed launchers embed it. The news page now shows Google News headlines for a chosen edition and sections, or your own RSS feeds.
+- Show each article's publisher and drop summaries that only repeat the headline.
+- Remove the Discover host activities, the Google app overlay connection and the AndroidX Window dependency.
+
 ## 1.0.0
 
 First release of iDuo Launcher, and the first release on Google Play.

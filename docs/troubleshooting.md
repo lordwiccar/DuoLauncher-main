@@ -16,16 +16,12 @@ Android's [app-signing documentation](https://source.android.com/docs/security/f
 
 Do not uninstall or clear storage from a configured installation just to test a differently signed APK: that removes its layout, selected launcher photo, and Android widget bindings. Keep the configured install and test the other signer on a separate device or disposable emulator. If you deliberately replace the install, save a layout backup first, but expect provider widgets to require **Reconnect** and the launcher photo to be absent from the backup.
 
-## Discover is missing or has no feed
+## The news page shows no articles
 
-Discover requires the installed Google app plus device support for iDuo's embedding path. Google account, network, app settings, Android, and vendor updates can affect it.
+The news page needs an internet connection. Pull down on the list or use the refresh button to try again. If some sources fail, the page says so and keeps their earlier articles.
 
-- If a recovery card appears, choose **Retry**.
-- Choose **Open Google** to check whether the Google app itself can show content.
-- Choose **Back to Home**, press Back, or use the return arrow to leave Discover.
-- If **Open Google** is absent, the Google app has no launchable activity available to iDuo.
-
-A recovery screen proves that iDuo can return safely; it does not prove that the device supports the live embedded feed. A short swipe that begins inside Google's feed can also rebound because Google owns that gesture. Try a deliberate swipe, the iDuo-owned dock or rail, or the return arrow.
+- **Google News:** open the settings icon on the page and check the edition and sections. At least one section always stays selected.
+- **My RSS feeds:** a source marked with a warning could not be loaded. Remove it and add it again, or check that the website still publishes an RSS or Atom feed. Only HTTPS sources can be added.
 
 ## The search button does not open Google
 

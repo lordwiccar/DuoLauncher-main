@@ -14,15 +14,12 @@
     <string name="replace">Ersetzen</string>
     <string name="remove">Entfernen</string>
     <string name="resume">Fortsetzen</string>
-    <string name="retry">Erneut versuchen</string>
     <string name="place">Platzieren</string>
     <string name="reconnect">Neu verbinden</string>
     <string name="not_now">Nicht jetzt</string>
     <string name="turn_on">Aktivieren</string>
     <string name="open_settings">Einstellungen öffnen</string>
-    <string name="open_google">Google öffnen</string>
     <string name="back_to_home">Zurück zum Startbildschirm</string>
-    <string name="stay_on_home">Auf dem Startbildschirm bleiben</string>
     <string name="value_dp">%1$d dp</string>
     <string name="value_percent">%1$d %%</string>
 
@@ -42,7 +39,7 @@
     <string name="customize_backup">Sicherung</string>
     <string name="customize_backup_detail">Dieses Layout speichern oder wiederherstellen</string>
     <string name="customize_help">Hilfe &amp; Einrichtung</string>
-    <string name="customize_help_detail">Start-App, Widgets, Gesten und Discover</string>
+    <string name="customize_help_detail">Start-App, Widgets, Gesten und Nachrichten</string>
     <string name="set_as_home_app">Als Start-App festlegen</string>
     <string name="change_home_app">Start-App ändern</string>
     <string name="set_duo_as_home">iDuo als Startbildschirm festlegen</string>
@@ -128,7 +125,8 @@
     <string name="help_shade_title">Benachrichtigungen und Schnelleinstellungen</string>
     <string name="help_shade">Wische auf dem Startbildschirm nach unten. Beim ersten Mal erklärt iDuo die optionale Bedienungshilfen-Einstellung von Android. Der Dienst öffnet nur die Systemleisten.</string>
     <string name="help_shade_setup">Leistengesten einrichten</string>
-    <string name="help_discover">Wische auf der ersten Startbildschirmseite nach rechts. Falls Google den Feed nicht liefert, bietet iDuo eine Rückkehr zum Startbildschirm und Wiederherstellungsoptionen.</string>
+    <string name="help_news_title">Nachrichtenseite</string>
+    <string name="help_news">Wische auf der ersten Startbildschirmseite nach rechts, um Nachrichten zu sehen. Unter Gesten und Suche → Linke Seite wählst du Google News oder eigene RSS-Feeds; das Einstellungssymbol auf der Seite wählt Ausgabe, Rubriken oder Quellen.</string>
 
     <!-- Apps and profiles -->
     <string name="all_apps">Alle Apps</string>
@@ -194,7 +192,20 @@
     <string name="all_apps_view_list">Liste</string>
     <string name="all_apps_view_grid">Raster mit Seiten</string>
     <string name="left_page">Linke Seite</string>
-    <string name="left_page_rss">RSS-Reader</string>
+    <string name="left_page_rss">Eigene RSS-Feeds</string>
+    <string name="news_settings">Nachrichten-Einstellungen</string>
+    <string name="news_edition">Ausgabe</string>
+    <string name="news_topics">Rubriken</string>
+    <string name="news_source_note">Schlagzeilen stammen von Google News. Artikel öffnen sich im Browser.</string>
+    <string name="news_topic_top">Top-Meldungen</string>
+    <string name="news_topic_world">Welt</string>
+    <string name="news_topic_nation">Inland</string>
+    <string name="news_topic_business">Wirtschaft</string>
+    <string name="news_topic_technology">Technik</string>
+    <string name="news_topic_science">Wissenschaft</string>
+    <string name="news_topic_health">Gesundheit</string>
+    <string name="news_topic_sports">Sport</string>
+    <string name="news_topic_entertainment">Unterhaltung</string>
     <string name="rss_title">Nachrichten</string>
     <string name="rss_manage">Quellen verwalten</string>
     <string name="rss_sources">Quellen</string>
@@ -348,24 +359,6 @@
     <string name="photo_no_pixels">Das ausgewählte Bild enthält keine verwendbaren Pixel.</string>
     <string name="photo_too_large">Das ausgewählte Bild ist zu groß.</string>
 
-    <!-- Discover -->
-    <string name="discover">Discover</string>
-    <string name="discover_connecting">Verbindung mit Discover wird hergestellt…</string>
-    <string name="discover_unavailable">Discover ist gerade nicht verfügbar.</string>
-    <string name="discover_rejected">Google hat die Feed-Verbindung nicht angenommen. Starte Google neu und versuche es erneut.</string>
-    <string name="discover_disconnected">Discover wurde getrennt. Tippe auf „Erneut versuchen“, um die Verbindung wiederherzustellen.</string>
-    <string name="discover_no_feed">Die Google App hat keinen Feed bereitgestellt.</string>
-    <string name="discover_install_google">Installiere oder aktiviere die Google App, um Discover zu nutzen.</string>
-    <string name="discover_connect_failed">Die Google App konnte keine Verbindung zu Discover herstellen.</string>
-    <string name="discover_slow">Discover braucht etwas länger. Du kannst es erneut versuchen oder Google öffnen.</string>
-    <string name="discover_version">Diese Version der Google App konnte Discover nicht öffnen.</string>
-    <string name="discover_start_failed">Discover konnte nicht gestartet werden. Tippe auf „Erneut versuchen“, um die Verbindung wiederherzustellen.</string>
-    <string name="discover_no_fit">Discover passte nicht neben das Dock.</string>
-    <string name="discover_no_fit_return">Discover passte nicht neben das Dock. Kehre zum Startbildschirm zurück und versuche es erneut.</string>
-    <string name="discover_device_unsupported">Dieses Gerät kann Discover nicht neben dem Dock anzeigen.</string>
-    <string name="install_google_first">Installiere oder aktiviere zuerst die Google App.</string>
-    <string name="discover_fallback_title">Discover ist hier nicht verfügbar</string>
-    <string name="discover_fallback_message">iDuo kann den Discover-Feed auf diesem Gerät nicht neben dem Startbildschirm platzieren. Du kannst die Google App öffnen oder auf dem Startbildschirm bleiben.</string>
 
     <!-- Shade gestures -->
     <string name="shade_setup_title">Leistengesten aktivieren</string>

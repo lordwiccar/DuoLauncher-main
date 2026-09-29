@@ -11,12 +11,12 @@ To make iDuo the launcher, choose **Set as home app** in customization, or open 
 ## Move around Home
 
 - Swipe horizontally across Home, the dock, or the right rail to move one page per gesture.
-- Swipe right from Home 1 for Discover. Swipe left, press Back, or use its right-pointing arrow to return.
-- **Gestures & search → Left page** chooses between **Google Discover** and iDuo's **RSS reader**. In the reader, the small settings icon at the top left manages sources: type a feed address, or a website address and iDuo finds its feed. Pull down or use the refresh button to update; tap an article to open it in the browser.
+- Swipe right from Home 1 for the news page. Swipe left, press Back, or use its right-pointing arrow to return.
+- **Gestures & search → Left page** chooses between **Google News** and **My RSS feeds**. On the page, the small settings icon at the top left picks the Google News edition and sections, or manages your own sources: type a feed address, or a website address and iDuo finds its feed. Pull down or use the refresh button to update; tap an article to open it in the browser.
 - Swipe past the last Home page for **All apps**. Its **Search apps** field always searches installed apps locally.
 - **Home layout → All apps view** switches All apps between an alphabetical **List** and a **Grid in pages** that you swipe sideways; swiping past its first page returns to Home.
-- The dock and its search control stay on the right. The page controls also open Discover or All apps.
-- Pressing the system Home control from an app returns to the Home page or unfolded pair you last had visible. From All apps, search, or Discover it returns to the last Home view.
+- The dock and its search control stay on the right. The page controls also open the news page or All apps.
+- Pressing the system Home control from an app returns to the Home page or unfolded pair you last had visible. From All apps, search, or the news page it returns to the last Home view.
 
 ## Customize Home
 
@@ -26,7 +26,7 @@ Long press an empty Home cell or any bare wallpaper on Home, such as the space b
 - **Home layout** for the number of dock apps (4–8), **Grid layout** (4 × 4, 4 × 5 or 4 × 6 apps below the widget band, chosen on a scrolling wheel; the unfolded screen shows two pages side by side), icon size, row spacing, dock geometry, Home apps, and widgets on the visible page.
 - **Gestures & search** for app names, the upper-right status display, and Google search behavior.
 - **Backup** to save or restore the layout.
-- **Help & setup** for Home selection, widgets, shade gestures, and Discover.
+- **Help & setup** for Home selection, widgets, shade gestures, and the news page.
 
 After a layout edit, **Undo last layout change** appears in customization. It covers the latest supported layout change, so use it before making another edit.
 

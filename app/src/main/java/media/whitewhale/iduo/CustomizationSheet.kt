@@ -124,8 +124,8 @@ internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, mo
                 CustomizationPage.GESTURES -> {
                     Text(stringResource(R.string.left_page), style = MaterialTheme.typography.bodyMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        FilterChip(state.leftPage == LeftPage.DISCOVER, { model.setLeftPage(LeftPage.DISCOVER) },
-                            label = { Text(stringResource(R.string.left_page_discover)) }, modifier = Modifier.testTag("left-page-discover"))
+                        FilterChip(state.leftPage == LeftPage.GOOGLE_NEWS, { model.setLeftPage(LeftPage.GOOGLE_NEWS) },
+                            label = { Text(stringResource(R.string.left_page_google_news)) }, modifier = Modifier.testTag("left-page-google-news"))
                         FilterChip(state.leftPage == LeftPage.RSS, { model.setLeftPage(LeftPage.RSS) },
                             label = { Text(stringResource(R.string.left_page_rss)) }, modifier = Modifier.testTag("left-page-rss"))
                     }
@@ -181,7 +181,7 @@ private fun LauncherHelp(
     TextButton(onClick = onShadeSetup, Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("help-shade-setup")) {
         Text(stringResource(R.string.help_shade_setup))
     }
-    HelpSection(Icons.Rounded.Explore, stringResource(R.string.discover), stringResource(R.string.help_discover))
+    HelpSection(Icons.Rounded.Newspaper, stringResource(R.string.help_news_title), stringResource(R.string.help_news))
 }
 
 @Composable

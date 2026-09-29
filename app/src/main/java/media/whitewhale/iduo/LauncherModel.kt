@@ -24,8 +24,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.text.Collator
 
-/** Home's left page: Google's Discover feed, or iDuo's own RSS reader. */
-enum class LeftPage { DISCOVER, RSS }
+/** Home's left page: Google News headlines, or the user's own RSS sources. */
+enum class LeftPage { GOOGLE_NEWS, RSS }
 
 data class AppEntry(
     val id: String,
@@ -64,7 +64,7 @@ data class LauncherState(
     /** All apps as horizontal pages of a grid instead of a vertical list. */
     val libraryGrid: Boolean = false,
     /** What Home's left page shows. */
-    val leftPage: LeftPage = LeftPage.DISCOVER,
+    val leftPage: LeftPage = LeftPage.GOOGLE_NEWS,
     val loading: Boolean = true,
     val error: String? = null,
 ) {
@@ -675,7 +675,8 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             folderTransparency = j.optDouble("folderTransparency", DEFAULT_FOLDER_TRANSPARENCY.toDouble()).toFloat()
                 .takeIf { it.isFinite() }?.coerceIn(0f, MAX_FOLDER_TRANSPARENCY) ?: DEFAULT_FOLDER_TRANSPARENCY,
             libraryGrid = j.optBoolean("libraryGrid", false),
-            leftPage = LeftPage.entries.firstOrNull { it.name == j.optString("leftPage") } ?: LeftPage.DISCOVER)
+            // Layouts from before Google News chose "DISCOVER", which now falls back to Google News.
+            leftPage = LeftPage.entries.firstOrNull { it.name == j.optString("leftPage") } ?: LeftPage.GOOGLE_NEWS)
             .let { it.copy(homeRows = maxOf(it.homeRows, it.layout.requiredRows())) }
     }.getOrElse {
         statePayloadInvalid = legacyRaw != null

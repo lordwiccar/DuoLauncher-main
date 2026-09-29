@@ -14,15 +14,12 @@
     <string name="replace">Zastąp</string>
     <string name="remove">Usuń</string>
     <string name="resume">Wznów</string>
-    <string name="retry">Spróbuj ponownie</string>
     <string name="place">Umieść</string>
     <string name="reconnect">Połącz ponownie</string>
     <string name="not_now">Nie teraz</string>
     <string name="turn_on">Włącz</string>
     <string name="open_settings">Otwórz ustawienia</string>
-    <string name="open_google">Otwórz Google</string>
     <string name="back_to_home">Wróć do ekranu głównego</string>
-    <string name="stay_on_home">Zostań na ekranie głównym</string>
     <string name="value_dp">%1$d dp</string>
     <string name="value_percent">%1$d%%</string>
 
@@ -42,7 +39,7 @@
     <string name="customize_backup">Kopia zapasowa</string>
     <string name="customize_backup_detail">Zapisz lub przywróć ten układ</string>
     <string name="customize_help">Pomoc i konfiguracja</string>
-    <string name="customize_help_detail">Aplikacja ekranu głównego, widżety, gesty i Discover</string>
+    <string name="customize_help_detail">Aplikacja ekranu głównego, widżety, gesty i wiadomości</string>
     <string name="set_as_home_app">Ustaw jako aplikację ekranu głównego</string>
     <string name="change_home_app">Zmień aplikację ekranu głównego</string>
     <string name="set_duo_as_home">Ustaw iDuo jako ekran główny</string>
@@ -128,7 +125,8 @@
     <string name="help_shade_title">Powiadomienia i szybkie ustawienia</string>
     <string name="help_shade">Przesuń w dół na ekranie głównym. Za pierwszym razem iDuo wyjaśni opcjonalne ustawienie Ułatwień dostępu w Androidzie. Usługa jedynie otwiera panele systemowe.</string>
     <string name="help_shade_setup">Skonfiguruj gesty panelu</string>
-    <string name="help_discover">Przesuń w prawo z pierwszej strony ekranu głównego. Jeśli Google nie dostarczy kanału, iDuo zapewni powrót do ekranu głównego i opcje naprawy.</string>
+    <string name="help_news_title">Strona z wiadomościami</string>
+    <string name="help_news">Przesuń w prawo z pierwszej strony ekranu głównego, aby zobaczyć wiadomości. W Gesty i wyszukiwanie → Lewa strona wybierzesz Google News lub własne RSS; ikona ustawień na stronie wybiera wydanie, działy lub źródła.</string>
 
     <!-- Apps and profiles -->
     <string name="all_apps">Wszystkie aplikacje</string>
@@ -196,7 +194,20 @@
     <string name="all_apps_view_list">Lista</string>
     <string name="all_apps_view_grid">Siatka ze stronami</string>
     <string name="left_page">Lewa strona</string>
-    <string name="left_page_rss">Czytnik RSS</string>
+    <string name="left_page_rss">Własne RSS</string>
+    <string name="news_settings">Ustawienia wiadomości</string>
+    <string name="news_edition">Wydanie</string>
+    <string name="news_topics">Działy</string>
+    <string name="news_source_note">Nagłówki pochodzą z Google News. Artykuły otwierają się w przeglądarce.</string>
+    <string name="news_topic_top">Najważniejsze</string>
+    <string name="news_topic_world">Świat</string>
+    <string name="news_topic_nation">Kraj</string>
+    <string name="news_topic_business">Biznes</string>
+    <string name="news_topic_technology">Technologia</string>
+    <string name="news_topic_science">Nauka</string>
+    <string name="news_topic_health">Zdrowie</string>
+    <string name="news_topic_sports">Sport</string>
+    <string name="news_topic_entertainment">Rozrywka</string>
     <string name="rss_title">Wiadomości</string>
     <string name="rss_manage">Zarządzaj źródłami</string>
     <string name="rss_sources">Źródła</string>
@@ -364,24 +375,6 @@
     <string name="photo_no_pixels">Wybrany obraz nie zawiera użytecznych pikseli.</string>
     <string name="photo_too_large">Wybrany obraz jest za duży.</string>
 
-    <!-- Discover -->
-    <string name="discover">Discover</string>
-    <string name="discover_connecting">Łączenie z Discover…</string>
-    <string name="discover_unavailable">Discover jest teraz niedostępny.</string>
-    <string name="discover_rejected">Google nie zaakceptował połączenia z kanałem. Uruchom ponownie Google i spróbuj jeszcze raz.</string>
-    <string name="discover_disconnected">Rozłączono z Discover. Kliknij Spróbuj ponownie, aby połączyć się jeszcze raz.</string>
-    <string name="discover_no_feed">Aplikacja Google nie dostarczyła kanału.</string>
-    <string name="discover_install_google">Zainstaluj lub włącz aplikację Google, aby korzystać z Discover.</string>
-    <string name="discover_connect_failed">Aplikacja Google nie mogła połączyć się z Discover.</string>
-    <string name="discover_slow">Discover wczytuje się dłużej. Możesz spróbować ponownie lub otworzyć Google.</string>
-    <string name="discover_version">Ta wersja aplikacji Google nie mogła otworzyć Discover.</string>
-    <string name="discover_start_failed">Nie udało się uruchomić Discover. Kliknij Spróbuj ponownie, aby połączyć się jeszcze raz.</string>
-    <string name="discover_no_fit">Discover nie zmieścił się obok doku.</string>
-    <string name="discover_no_fit_return">Discover nie zmieścił się obok doku. Wróć do ekranu głównego i spróbuj ponownie.</string>
-    <string name="discover_device_unsupported">To urządzenie nie może wyświetlić Discover obok doku.</string>
-    <string name="install_google_first">Najpierw zainstaluj lub włącz aplikację Google.</string>
-    <string name="discover_fallback_title">Discover nie jest tu dostępny</string>
-    <string name="discover_fallback_message">iDuo nie może umieścić kanału Discover obok ekranu głównego na tym urządzeniu. Możesz otworzyć aplikację Google lub zostać na ekranie głównym.</string>
 
     <!-- Shade gestures -->
     <string name="shade_setup_title">Włącz gesty panelu</string>
