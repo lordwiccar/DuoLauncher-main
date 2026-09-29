@@ -196,6 +196,7 @@
     <string name="left_page_google_news" translatable="false">Google News</string>
     <string name="news_settings">News settings</string>
     <string name="news_edition">Edition</string>
+    <string name="news_edition_search">Search countries</string>
     <string name="news_topics">Sections</string>
     <string name="news_source_note">Headlines come from Google News. Articles open in your browser.</string>
     <string name="news_topic_top">Top stories</string>

@@ -7,18 +7,108 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import java.util.Locale
 
-/** A Google News edition: its country ([gl]), language, and the `hl` value Google expects. */
-enum class NewsEdition(val gl: String, val language: String, val hl: String, val label: String) {
-    CZ("CZ", "cs", "cs", "Česko"),
-    SK("SK", "sk", "sk", "Slovensko"),
-    PL("PL", "pl", "pl", "Polska"),
-    DE("DE", "de", "de", "Deutschland"),
-    AT("AT", "de", "de", "Österreich"),
-    CH("CH", "de", "de", "Schweiz"),
-    US("US", "en", "en-US", "United States"),
-    GB("GB", "en", "en-GB", "United Kingdom");
+/**
+ * A Google News edition: the `hl` language Google expects, the country ([gl]) and the edition id
+ * ([ceid]). Every entry was checked to return its own headlines; Google silently falls back to
+ * another edition for unsupported combinations, which are therefore not listed.
+ */
+enum class NewsEdition(val hl: String, val gl: String, val ceid: String) {
+    US("en-US", "US", "US:en"),
+    US_ES("es-419", "US", "US:es-419"),
+    CA("en-CA", "CA", "CA:en"),
+    CA_FR("fr-CA", "CA", "CA:fr"),
+    MX("es-419", "MX", "MX:es-419"),
+    BR("pt-BR", "BR", "BR:pt-419"),
+    AR("es-419", "AR", "AR:es-419"),
+    CO("es-419", "CO", "CO:es-419"),
+    CL("es-419", "CL", "CL:es-419"),
+    PE("es-419", "PE", "PE:es-419"),
+    VE("es-419", "VE", "VE:es-419"),
+    CU("es-419", "CU", "CU:es-419"),
+    GB("en-GB", "GB", "GB:en"),
+    IE("en-IE", "IE", "IE:en"),
+    DE("de", "DE", "DE:de"),
+    AT("de", "AT", "AT:de"),
+    CH("de", "CH", "CH:de"),
+    CH_FR("fr", "CH", "CH:fr"),
+    FR("fr", "FR", "FR:fr"),
+    BE("fr", "BE", "BE:fr"),
+    BE_NL("nl", "BE", "BE:nl"),
+    NL("nl", "NL", "NL:nl"),
+    IT("it", "IT", "IT:it"),
+    ES("es", "ES", "ES:es"),
+    PT("pt-PT", "PT", "PT:pt-150"),
+    PL("pl", "PL", "PL:pl"),
+    CZ("cs", "CZ", "CZ:cs"),
+    SK("sk", "SK", "SK:sk"),
+    HU("hu", "HU", "HU:hu"),
+    RO("ro", "RO", "RO:ro"),
+    BG("bg", "BG", "BG:bg"),
+    GR("el", "GR", "GR:el"),
+    SI("sl", "SI", "SI:sl"),
+    RS("sr", "RS", "RS:sr"),
+    SE("sv", "SE", "SE:sv"),
+    NO("no", "NO", "NO:no"),
+    FI("fi", "FI", "FI:fi"),
+    EE("et", "EE", "EE:et"),
+    LV("lv", "LV", "LV:lv"),
+    LT("lt", "LT", "LT:lt"),
+    UA("uk", "UA", "UA:uk"),
+    UA_RU("ru", "UA", "UA:ru"),
+    RU("ru", "RU", "RU:ru"),
+    TR("tr", "TR", "TR:tr"),
+    IL("he", "IL", "IL:he"),
+    IL_EN("en-IL", "IL", "IL:en"),
+    EG("ar", "EG", "EG:ar"),
+    SA("ar", "SA", "SA:ar"),
+    AE("ar", "AE", "AE:ar"),
+    LB("ar", "LB", "LB:ar"),
+    MA("ar", "MA", "MA:ar"),
+    MA_FR("fr", "MA", "MA:fr"),
+    SN("fr", "SN", "SN:fr"),
+    NG("en-NG", "NG", "NG:en"),
+    GH("en-GH", "GH", "GH:en"),
+    KE("en-KE", "KE", "KE:en"),
+    UG("en-UG", "UG", "UG:en"),
+    TZ("en-TZ", "TZ", "TZ:en"),
+    ET("en-ET", "ET", "ET:en"),
+    ZA("en-ZA", "ZA", "ZA:en"),
+    NA("en-NA", "NA", "NA:en"),
+    BW("en-BW", "BW", "BW:en"),
+    ZW("en-ZW", "ZW", "ZW:en"),
+    IN("en-IN", "IN", "IN:en"),
+    IN_HI("hi", "IN", "IN:hi"),
+    IN_BN("bn", "IN", "IN:bn"),
+    IN_TA("ta", "IN", "IN:ta"),
+    IN_TE("te", "IN", "IN:te"),
+    IN_MR("mr", "IN", "IN:mr"),
+    IN_ML("ml", "IN", "IN:ml"),
+    PK("en-PK", "PK", "PK:en"),
+    BD("bn", "BD", "BD:bn"),
+    JP("ja", "JP", "JP:ja"),
+    KR("ko", "KR", "KR:ko"),
+    CN("zh-CN", "CN", "CN:zh-Hans"),
+    TW("zh-TW", "TW", "TW:zh-Hant"),
+    HK("zh-HK", "HK", "HK:zh-Hant"),
+    TH("th", "TH", "TH:th"),
+    VN("vi", "VN", "VN:vi"),
+    ID("id", "ID", "ID:id"),
+    MY("en-MY", "MY", "MY:en"),
+    MY_MS("ms", "MY", "MY:ms"),
+    SG("en-SG", "SG", "SG:en"),
+    PH("en-PH", "PH", "PH:en"),
+    AU("en-AU", "AU", "AU:en"),
+    NZ("en-NZ", "NZ", "NZ:en");
 
-    val ceid get() = "$gl:$language"
+    /** The edition's base language, as in [Locale.getLanguage]. */
+    val language get() = ceid.substringAfter(':').substringBefore('-')
+}
+
+/** "Country" or, where a country has several editions, "Country (language)", in [locale]. */
+fun NewsEdition.label(locale: Locale): String {
+    val country = Locale("", gl).getDisplayCountry(locale)
+    if (NewsEdition.entries.count { it.gl == gl } == 1) return country
+    return "$country (${Locale.forLanguageTag(hl).getDisplayLanguage(locale)})"
 }
 
 /** Google News sections; [TOP] is the edition's front page, the rest are its topic sections. */
@@ -41,11 +131,18 @@ fun googleNewsFeedUrl(edition: NewsEdition, topic: NewsTopic): String {
     else "https://news.google.com/rss/headlines/section/topic/${topic.section}?$query"
 }
 
-/** The edition for a language and country: an exact match, else the language's first edition, else the US. */
-fun defaultNewsEdition(language: String, country: String): NewsEdition =
-    NewsEdition.entries.firstOrNull { it.language == language && it.gl.equals(country, ignoreCase = true) }
-        ?: NewsEdition.entries.firstOrNull { it.language == language }
+/**
+ * The edition for a language and country: an exact match, else the language's first edition, else
+ * the country's first edition, else the US.
+ */
+fun defaultNewsEdition(language: String, country: String): NewsEdition {
+    // Older Android versions report Hebrew with its legacy code.
+    val lang = if (language == "iw") "he" else language
+    return NewsEdition.entries.firstOrNull { it.language == lang && it.gl.equals(country, ignoreCase = true) }
+        ?: NewsEdition.entries.firstOrNull { it.language == lang }
+        ?: NewsEdition.entries.firstOrNull { it.gl.equals(country, ignoreCase = true) }
         ?: NewsEdition.US
+}
 
 /** Sources for the chosen sections, in [NewsTopic] order so the list is stable. */
 fun googleNewsSources(edition: NewsEdition, topics: Set<NewsTopic>): List<RssSource> =

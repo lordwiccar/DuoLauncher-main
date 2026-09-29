@@ -37,6 +37,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.ArrowDropDown
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
@@ -218,12 +221,15 @@ private fun GoogleNewsEditor(modifier: Modifier) {
     val context = LocalContext.current
     Column(modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(top = 8.dp, bottom = 12.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        val locale = LocalConfiguration.current.locales[0]
+        var choosingEdition by rememberSaveable { mutableStateOf(false) }
         Text(stringResource(R.string.news_edition), style = MaterialTheme.typography.titleSmall)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            NewsEdition.entries.forEach { edition ->
-                FilterChip(GoogleNewsSettings.edition == edition, { GoogleNewsSettings.setEdition(context, edition) },
-                    label = { Text(edition.label) }, modifier = Modifier.testTag("news-edition-${edition.name}"))
-            }
+        OutlinedButton(onClick = { choosingEdition = true }, Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("news-edition")) {
+            Text(GoogleNewsSettings.edition.label(locale), Modifier.weight(1f))
+            Icon(Icons.Rounded.ArrowDropDown, null)
+        }
+        if (choosingEdition) NewsEditionDialog(locale, onDismiss = { choosingEdition = false }) {
+            GoogleNewsSettings.setEdition(context, it); choosingEdition = false
         }
         Text(stringResource(R.string.news_topics), Modifier.padding(top = 6.dp), style = MaterialTheme.typography.titleSmall)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -235,4 +241,35 @@ private fun GoogleNewsEditor(modifier: Modifier) {
         Text(stringResource(R.string.news_source_note), Modifier.padding(top = 6.dp),
             style = MaterialTheme.typography.bodySmall, color = Ink.copy(alpha = .75f))
     }
+}
+
+/** Every edition, sorted by its name in [locale], with a filter for the long list. */
+@Composable
+private fun NewsEditionDialog(locale: java.util.Locale, onDismiss: () -> Unit, onChoose: (NewsEdition) -> Unit) {
+    var query by rememberSaveable { mutableStateOf("") }
+    val sorted = remember(locale) {
+        val collator = java.text.Collator.getInstance(locale)
+        NewsEdition.entries.map { it to it.label(locale) }.sortedWith { a, b -> collator.compare(a.second, b.second) }
+    }
+    val shown = remember(sorted, query) { sorted.filter { it.second.contains(query.trim(), ignoreCase = true) } }
+    AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.news_edition)) },
+        text = {
+            Column {
+                OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth().testTag("news-edition-search"), singleLine = true,
+                    placeholder = { Text(stringResource(R.string.news_edition_search)) },
+                    leadingIcon = { Icon(Icons.Rounded.Search, null) })
+                LazyColumn(Modifier.fillMaxWidth().heightIn(max = 420.dp).padding(top = 8.dp)) {
+                    items(shown, key = { it.first.name }) { (edition, label) ->
+                        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clip(RoundedCornerShape(12.dp))
+                            .clickable { onChoose(edition) }.testTag("news-edition-${edition.name}"),
+                            verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(selected = GoogleNewsSettings.edition == edition, onClick = { onChoose(edition) })
+                            Text(label, Modifier.padding(start = 4.dp))
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } })
 }

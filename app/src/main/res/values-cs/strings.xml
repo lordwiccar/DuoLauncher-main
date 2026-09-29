@@ -197,6 +197,7 @@
     <string name="left_page_rss">Vlastní RSS</string>
     <string name="news_settings">Nastavení zpráv</string>
     <string name="news_edition">Edice</string>
+    <string name="news_edition_search">Hledat zemi</string>
     <string name="news_topics">Rubriky</string>
     <string name="news_source_note">Titulky pocházejí z Google News. Články se otevírají v prohlížeči.</string>
     <string name="news_topic_top">Hlavní zprávy</string>

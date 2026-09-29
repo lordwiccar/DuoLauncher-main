@@ -195,6 +195,7 @@
     <string name="left_page_rss">Eigene RSS-Feeds</string>
     <string name="news_settings">Nachrichten-Einstellungen</string>
     <string name="news_edition">Ausgabe</string>
+    <string name="news_edition_search">Land suchen</string>
     <string name="news_topics">Rubriken</string>
     <string name="news_source_note">Schlagzeilen stammen von Google News. Artikel öffnen sich im Browser.</string>
     <string name="news_topic_top">Top-Meldungen</string>

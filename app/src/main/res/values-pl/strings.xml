@@ -197,6 +197,7 @@
     <string name="left_page_rss">Własne RSS</string>
     <string name="news_settings">Ustawienia wiadomości</string>
     <string name="news_edition">Wydanie</string>
+    <string name="news_edition_search">Szukaj kraju</string>
     <string name="news_topics">Działy</string>
     <string name="news_source_note">Nagłówki pochodzą z Google News. Artykuły otwierają się w przeglądarce.</string>
     <string name="news_topic_top">Najważniejsze</string>

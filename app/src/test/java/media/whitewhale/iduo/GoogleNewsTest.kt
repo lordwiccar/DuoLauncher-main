@@ -14,7 +14,18 @@ class GoogleNewsTest {
         assertEquals(NewsEdition.AT, defaultNewsEdition("de", "AT"))
         assertEquals(NewsEdition.DE, defaultNewsEdition("de", "FR"))
         assertEquals(NewsEdition.CZ, defaultNewsEdition("cs", "US"))
-        assertEquals(NewsEdition.US, defaultNewsEdition("fr", "FR"))
+        assertEquals(NewsEdition.FR, defaultNewsEdition("fr", "FR"))
+        assertEquals(NewsEdition.CA_FR, defaultNewsEdition("fr", "CA"))
+        assertEquals(NewsEdition.IL, defaultNewsEdition("iw", "IL"))
+        // No Croatian edition: fall back to the country, then to the US.
+        assertEquals(NewsEdition.CZ, defaultNewsEdition("hr", "CZ"))
+        assertEquals(NewsEdition.US, defaultNewsEdition("hr", "HR"))
+    }
+
+    @Test fun everyEditionIsUniqueAndLabelledByCountry() {
+        assertEquals(NewsEdition.entries.size, NewsEdition.entries.map { it.ceid }.toSet().size)
+        assertEquals("Czechia", NewsEdition.CZ.label(java.util.Locale.ENGLISH))
+        assertEquals("Canada (French)", NewsEdition.CA_FR.label(java.util.Locale.ENGLISH))
     }
 
     @Test fun sourcesFollowSectionOrder() {
