@@ -19,13 +19,18 @@ class AboutTest {
             ## 1.0.0
 
             First release.
+
+            ### Settings
+            - New look.
         """.trimIndent())
         assertEquals(listOf("Unreleased", "1.0.0"), releases.map { it.title })
         assertEquals(listOf(
             ChangelogEntry("Add search, see the guide.", bullet = true),
             ChangelogEntry("Rename media.whitewhale.iduo across the app.", bullet = true),
         ), releases[0].entries)
-        assertEquals(listOf(ChangelogEntry("First release.", bullet = false)), releases[1].entries)
+        assertEquals(listOf(ChangelogEntry("First release.", bullet = false),
+            ChangelogEntry("Settings", bullet = false, heading = true),
+            ChangelogEntry("New look.", bullet = true)), releases[1].entries)
     }
 
     /** The app shows bundled copies; they must match the files published with the source. */
@@ -36,9 +41,11 @@ class AboutTest {
         assertEquals(text("../THIRD_PARTY_NOTICES.md"), text("src/main/assets/licenses/THIRD-PARTY-NOTICES.txt"))
     }
 
-    @Test fun realChangelogStartsWithTheNextVersion() {
+    /** The changelog opens with this version's section, or with the work still to be released. */
+    @Test fun realChangelogStartsWithTheCurrentVersion() {
+        val version = Regex("versionName = \"([^\"]+)\"").find(File("build.gradle.kts").readText())!!.groupValues[1]
         val releases = parseChangelog(File("src/main/assets/CHANGELOG.md").readText())
-        assertEquals("Unreleased", releases.first().title)
-        assertTrue(releases.any { it.title == "1.0.0" && it.entries.isNotEmpty() })
+        assertTrue(releases.first().title in listOf(version, "Unreleased"))
+        assertTrue(releases.any { it.title == version && it.entries.isNotEmpty() })
     }
 }

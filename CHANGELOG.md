@@ -1,14 +1,23 @@
 # Changelog
 
-## Unreleased
+## 1.1.0
 
-- Redesign Settings. It opens over the whole screen, groups its sections into Customization, Controls and System & support, shows each section's current setting, and finds any setting by name. The inner screen shows the list beside the open section. Home keeps a live preview and the Cover or Inner screen choice at the top, the dock has its own section, each Home gesture has its own switch next to the status of the Home gestures service, and the news page is set up directly in Settings.
+Second release on Google Play (version code 3).
+
+### Settings
+- Redesign Settings. It opens over the whole screen, groups its sections into Customization, Controls and System & support, shows each section's current setting, and finds any setting by name. The inner screen shows the list beside the open section.
+- Home keeps a live preview and the Cover or Inner screen choice at the top, the dock has its own section, each Home gesture has its own switch next to the status of the Home gestures service, and the news page is set up directly in Settings. Cards at the top point out when iDuo is not the Home app or Home gestures are off.
 - Animate Settings: it rises from the bottom and slides away when closed, pages slide in from the right on the cover screen and cross-fade beside the list on the inner screen, and the predictive back gesture shrinks the page as you swipe.
-- The app-search choice of the search button now opens Home search instead of All apps.
-- Add About & feedback to customization: About, with the version, the developer, the original Duo Launcher project and the licences; an in-app Changelog; and Send feedback, which opens a Google form.
-- Lock the screen with a double tap on empty Home space, through the optional accessibility service (now "Home gestures"), so fingerprint and face unlock stay available. It can be turned off under Gestures & search.
+- Add About, with the version, the developer, the original Duo Launcher project and the licences; an in-app Changelog; and Send feedback, which opens a Google form. They sit under Help & information.
+
+### Search and gestures
 - Add Home search: swipe up on Home, find apps as you type (ignoring accents), and send the phrase to Google with the search key or the magnifier.
-- Replace Google Discover on the left page with Google News. Discover could not work in Play builds, because Google only lets allow-listed launchers embed it. The news page now shows Google News headlines for a chosen edition and sections, or your own RSS feeds.
+- The app-search choice of the search button opens Home search instead of All apps.
+- Lock the screen with a double tap on empty Home space, through the optional accessibility service (now "Home gestures"), so fingerprint and face unlock stay available.
+- Swipe down, double tap and swipe up can each be turned off.
+
+### News page
+- Replace Google Discover on the left page with Google News. Discover could not work in Play builds, because Google only lets allow-listed launchers embed it. The news page shows Google News headlines for a chosen edition and sections, or your own RSS feeds.
 - Offer 86 Google News editions from around the world, each checked to serve its own headlines, in a searchable list named in the app's language.
 - Show each article's publisher and drop summaries that only repeat the headline.
 - Remove the Discover host activities, the Google app overlay connection and the AndroidX Window dependency.

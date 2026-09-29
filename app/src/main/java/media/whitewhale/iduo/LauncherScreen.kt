@@ -470,6 +470,11 @@ fun LauncherScreen(
                 if (state.doubleTapLock && pagerInputEnabled && page in 0 until visibleHomePages &&
                     (region == null || region.target is DropTarget.Home && !region.movable)) launcherActivity.lockScreen()
             }
+            SideEffect {
+                drag.onEmptyCellDoubleTap = {
+                    if (state.doubleTapLock && pagerInputEnabled && pager.currentPage in 0 until visibleHomePages) launcherActivity.lockScreen()
+                }
+            }
             val openHomeOptionsAt by rememberUpdatedState { point: Offset, width: Int ->
                 val page = pager.currentPage
                 val targetPage = if (geometry.expanded && point.x < width / 2f) page - 1 else page
@@ -1502,7 +1507,9 @@ private fun SharedHomeGrid(
                 .width(cellWidth).height(cellHeight.dp).testTag("home-cell-$globalIndex")
                 .dropRegion(drag, cell, savedApp?.id ?: savedFolder?.id, page)
                 .combinedClickable(onClick = { savedFolder?.let { onFolder(it.id) } },
-                    onLongClick = { if (savedId == null && !drag.active) onEmptyWidget(globalIndex) })
+                    onLongClick = { if (savedId == null && !drag.active) onEmptyWidget(globalIndex) },
+                    // Only an empty cell listens for a double tap, so a folder still opens at once.
+                    onDoubleClick = if (savedId == null) ({ if (!drag.active) drag.onEmptyCellDoubleTap() }) else null)
                 .background(if (highlighted) Glass.copy(alpha = .25f) else Color.Transparent, RoundedCornerShape(16.dp))
                 .border(if (highlighted) 2.dp else 0.dp,
                     if (highlighted) Color.White.copy(alpha = .8f) else Color.Transparent, RoundedCornerShape(16.dp)),

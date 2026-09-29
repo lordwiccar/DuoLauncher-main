@@ -34,10 +34,11 @@ internal const val FEEDBACK_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf-s
 
 /** One release in CHANGELOG.md: its heading and its entries, each a paragraph or a bullet. */
 internal data class ChangelogRelease(val title: String, val entries: List<ChangelogEntry>)
-internal data class ChangelogEntry(val text: String, val bullet: Boolean)
+internal data class ChangelogEntry(val text: String, val bullet: Boolean, val heading: Boolean = false)
 
 /**
- * Reads the project's Markdown changelog: `##` headings start releases, `- ` lines are bullets,
+ * Reads the project's Markdown changelog: `##` headings start releases, `###` headings group their
+ * entries, `- ` lines are bullets,
  * other lines join into paragraphs. Emphasis and code marks are dropped for plain display.
  */
 internal fun parseChangelog(markdown: String): List<ChangelogRelease> {
@@ -59,6 +60,9 @@ internal fun parseChangelog(markdown: String): List<ChangelogRelease> {
         val line = raw.trimEnd()
         when {
             line.startsWith("## ") -> { flushRelease(); title = line.removePrefix("## ").trim() }
+            line.startsWith("### ") -> {
+                flushEntry(); entries += ChangelogEntry(plainMarkdown(line.removePrefix("### ").trim()), bullet = false, heading = true)
+            }
             line.startsWith("# ") -> flushEntry()
             line.isBlank() -> flushEntry()
             line.startsWith("- ") || line.startsWith("* ") -> {
@@ -155,7 +159,9 @@ internal fun ChangelogPage() {
             style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(top = 8.dp).testTag("changelog-${release.title}"))
         release.entries.forEach { entry ->
-            if (entry.bullet) Row {
+            if (entry.heading) Text(entry.text, Modifier.padding(top = 4.dp), style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold)
+            else if (entry.bullet) Row {
                 Text("•", Modifier.width(16.dp), style = MaterialTheme.typography.bodyMedium)
                 Text(entry.text, style = MaterialTheme.typography.bodyMedium)
             } else Text(entry.text, style = MaterialTheme.typography.bodyMedium,

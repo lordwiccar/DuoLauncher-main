@@ -15,6 +15,6 @@ iDuo Launcher source uses the MIT license in LICENSE. It builds on Duo Launcher 
 
 The Gradle dependency graph records the resolved artifact versions. Test and build tools are not application features; their upstream distributions provide their respective notices.
 
-The default wallpaper and launcher icon are generated locally from project drawing code/resources. Installed application icons and widget content belong to their respective providers. Google search runs in the installed Google application, and Google News headlines are fetched from Google's public feeds; neither is redistributed here.
+The bundled dunes wallpaper (a photograph edited with AI tools) and the launcher icon were made for this project and are distributed with it. Installed application icons and widget content belong to their respective providers. Google search runs in the installed Google application, and Google News headlines are fetched from Google's public feeds; neither is redistributed here.
 
 Private design-study images, copied reference files, device captures, and probe research are excluded from the public source package. Apple, Google, Android, Samsung, and other referenced names are trademarks of their respective owners; this project is unaffiliated with those companies.

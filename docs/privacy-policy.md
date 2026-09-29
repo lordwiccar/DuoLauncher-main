@@ -23,6 +23,7 @@ The following information is used only on your device and is never sent to the d
 - **Wallpaper photo.** When you choose a photo, Android's photo picker gives the app access only to that image. The app sets it as your Android wallpaper on the screens you choose and keeps a private copy on the device to draw transitions.
 - **Approximate location (optional).** Only if you tap "Use device location" for the sunrise/sunset appearance, the app requests approximate location once to calculate sunrise and sunset times on the device. Coordinates you enter or obtain are stored on the device until you clear them. There is no background location access.
 - **News settings and articles.** Your Google News edition and sections, the RSS addresses you add, and the most recently downloaded headlines are stored on the device.
+- **Searches.** What you type in Home search or in Settings search is matched against your apps and settings on the device and is not stored.
 
 ## Internet use (news page)
 
@@ -34,6 +35,8 @@ When you open Home's left news page, the app downloads headlines **directly over
 Nothing passes through a server of the developer, and no personal data from the app is sent. Opening an article hands its link to your browser.
 
 ## Other apps and widgets
+
+**Home search** looks for apps on the device. Only when you press the search key or the magnifier does it hand the phrase to the Google app, or to your browser if the Google app is missing, which then shows Google's results under Google's privacy policy.
 
 Google search, the apps you open, and **widgets** are provided by their own apps, which control their content, accounts and network use.
 
@@ -95,6 +98,7 @@ Následující informace se používají jen ve vašem zařízení a nikdy se ne
 - **Fotka tapety.** Při výběru fotky dá systémový výběr fotek aplikaci přístup jen k této fotce. Aplikace ji nastaví jako tapetu Androidu na zvolené obrazovky a ponechá si její kopii v zařízení pro vykreslení přechodů.
 - **Přibližná poloha (volitelná).** Jen pokud klepnete na „Použít polohu zařízení“ u vzhledu podle východu a západu slunce, aplikace jednorázově požádá o přibližnou polohu a časy vypočítá v zařízení. Souřadnice zůstanou v zařízení, dokud je nesmažete. Poloha na pozadí se nepoužívá.
 - **Nastavení zpráv a články.** Zvolená edice a rubriky Google News, přidané adresy RSS a naposledy stažené titulky jsou uložené v zařízení.
+- **Hledání.** Co napíšete do hledání na ploše nebo v Nastavení, se porovnává s aplikacemi a nastaveními v zařízení a neukládá se.
 
 ## Použití internetu (stránka se zprávami)
 
@@ -106,6 +110,8 @@ Když otevřete levou stránku plochy se zprávami, aplikace stáhne titulky **p
 Nic neprochází serverem vývojáře a z aplikace se neodesílají žádné osobní údaje. Otevření článku předá odkaz vašemu prohlížeči.
 
 ## Ostatní aplikace a widgety
+
+**Hledání na ploše** hledá aplikace v zařízení. Teprve když stisknete klávesu hledání nebo lupu, předá výraz aplikaci Google, případně prohlížeči, pokud aplikace Google chybí; výsledky Googlu se pak řídí zásadami ochrany soukromí Googlu.
 
 Vyhledávání Google, spouštěné aplikace a **widgety** poskytují jejich vlastní aplikace, které řídí svůj obsah, účty a síťový provoz.
 

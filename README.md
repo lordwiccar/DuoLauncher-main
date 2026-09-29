@@ -2,15 +2,16 @@
 
 A native Android launcher built around a right-side dock and a home screen that makes room when you unfold your phone.
 
-**Version 1.0.0 · Android 12 or later.** Built and tested on the Galaxy Z Fold 7 (cover and inner displays) and a matching emulator. The left page shows Google News headlines or your own RSS feeds.
+**Version 1.1.0 · Android 12 or later.** Built and tested on the Galaxy Z Fold 7 (cover and inner displays) and a matching emulator. The left page shows Google News headlines or your own RSS feeds.
 
 <p>
-  <img src="docs/images/iduo-home.png" width="300" alt="iDuo Home with widgets, a folder and the right-side dock">
+  <img src="docs/images/iduo-home.png" width="300" alt="iDuo Home with widgets and the right-side dock">
   <img src="docs/images/iduo-all-apps.png" width="300" alt="All apps as a paged grid">
   <img src="docs/images/iduo-folder.png" width="300" alt="An open folder over the blurred Home screen">
+  <img src="docs/images/iduo-settings.png" width="300" alt="Settings on the inner screen, with the section list beside Home settings and a live preview">
 </p>
 
-**Start here:** [User guide](docs/user-guide.md) · [Troubleshooting](docs/troubleshooting.md) · [Release notes](docs/releases/1.0.0.md) · [Privacy policy](docs/privacy-policy.md)
+**Start here:** [User guide](docs/user-guide.md) · [Troubleshooting](docs/troubleshooting.md) · [Release notes](docs/releases/1.1.0.md) · [Privacy policy](docs/privacy-policy.md)
 
 ## Features
 
@@ -18,7 +19,8 @@ A native Android launcher built around a right-side dock and a home screen that 
 - Overlapping unfolded page pairs: an extra workspace beside Home 1, then Home 1 beside Home 2, and so on.
 - Android widgets, visual widget selection, resizing, native scrolling, and drag-and-drop between pages.
 - App dragging, pages created during an edge drag, Home folders made by dropping one app onto another, and separate personal/work catalogs where device policy permits.
-- All apps as an alphabetical list or a paged grid, Google search with a local app-search fallback, and a left news page with Google News or your own RSS feeds.
+- All apps as an alphabetical list or a paged grid, Home search for apps and Google with a swipe up, and a left news page with Google News or your own RSS feeds.
+- Full-screen Settings with search, a live Home preview, and a list beside the open section on the inner screen.
 - A 4 × 4, 4 × 5 or 4 × 6 Home grid and four to eight dock apps.
 - Android's own wallpaper on Home, set from a photo or the bundled dunes; light/dark/system or sunrise/sunset appearance; and layout export/import.
 - English, Czech, Slovak, Polish, and German, following the system language or chosen in **Language**.
@@ -84,7 +86,7 @@ Use JDK 17 or Android Studio's bundled JDK, Android SDK 36, and the included Gra
 
 The debug APK is at `app/build/outputs/apk/debug/app-debug.apk`. Release builds use R8 and resource shrinking; private signing material stays outside the repository. Follow [release instructions](docs/public-release.md) for signing and public-source export.
 
-The project uses Kotlin, Jetpack Compose, AndroidX Window, and native widget hosting. Instrumentation runs on disposable emulators. Some integration fixtures require Google, Clock, Chrome, and a configured emulator; they are not commands for your everyday phone.
+The project uses Kotlin, Jetpack Compose, and native widget hosting. Instrumentation runs on disposable emulators. Some integration fixtures require Google, Clock, Chrome, and a configured emulator; they are not commands for your everyday phone.
 
 The [contributor code map](docs/architecture.md) explains the main components, data ownership and gesture/widget constraints.
 
