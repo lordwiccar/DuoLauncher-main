@@ -125,6 +125,9 @@
     <string name="help_shade_title">Notifications and quick settings</string>
     <string name="help_shade">Swipe down on Home. The first time, iDuo explains Android’s optional Accessibility setting. The service only opens the system panels.</string>
     <string name="help_shade_setup">Set up shade gestures</string>
+    <string name="help_search_title">Search</string>
+    <string name="help_search">Swipe up on Home to search. Matching apps appear as you type; the search key or the magnifier searches Google.</string>
+    <string name="spotlight_hint">Search apps and Google</string>
     <string name="help_news_title">News page</string>
     <string name="help_news">Swipe right from the first Home page for the news. Choose Google News or your own RSS feeds under Gestures &amp; search → Left page; the settings icon on the page picks the edition, sections or sources.</string>
 

@@ -64,6 +64,10 @@ Appearance choices are **Light**, **Dark**, **Follow system**, and **Sunrise / s
 
 **Language** in the customization sheet lists **System language** first, which follows Android and shows the language it currently resolves to. The other choices are English, Čeština, Slovenčina, Polski, and Deutsch, each shown in its own language. On Android 13 and later the same choice also appears in Android Settings under the app's language.
 
+## Search
+
+Swipe up on Home to search. Matching apps appear in up to two rows as you type; tap one to open it. The keyboard's search key or the magnifier in the field opens Google's results for the phrase. Back or a tap outside the panel closes it.
+
 ## Optional shade gestures
 
 On Home, swipe down from the left 70% to open Notifications or from the right 30% to open Quick Settings. The first attempt offers **Turn on shade gestures** because Android requires you to enable iDuo Launcher in Accessibility settings. This is optional and must be enabled by you; **Not now** leaves it off. The service only requests the system panel actions.

@@ -125,6 +125,9 @@
     <string name="help_shade_title">Upozornenia a rýchle nastavenia</string>
     <string name="help_shade">Potiahnite na ploche nadol. Prvýkrát iDuo vysvetlí voliteľné nastavenie Dostupnosti v Androide. Služba iba otvára systémové panely.</string>
     <string name="help_shade_setup">Nastaviť gestá panela</string>
+    <string name="help_search_title">Vyhľadávanie</string>
+    <string name="help_search">Potiahnite na ploche nahor a môžete hľadať. Počas písania sa zobrazia zodpovedajúce aplikácie; kláves hľadania alebo lupa vyhľadá výraz na Googli.</string>
+    <string name="spotlight_hint">Hľadať aplikácie a na Googli</string>
     <string name="help_news_title">Stránka so správami</string>
     <string name="help_news">Potiahnite doprava z prvej strany plochy a zobrazia sa správy. V Gestá a vyhľadávanie → Ľavá stránka zvolíte Google News alebo vlastné RSS; ikona nastavení na stránke vyberá edíciu, rubriky alebo zdroje.</string>
 

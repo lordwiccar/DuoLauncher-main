@@ -125,6 +125,9 @@
     <string name="help_shade_title">Oznámení a rychlé nastavení</string>
     <string name="help_shade">Přejeďte na ploše dolů. Poprvé iDuo vysvětlí volitelné nastavení Usnadnění přístupu v Androidu. Služba pouze otevírá systémové panely.</string>
     <string name="help_shade_setup">Nastavit gesta panelu</string>
+    <string name="help_search_title">Vyhledávání</string>
+    <string name="help_search">Přejeďte na ploše nahoru a můžete hledat. Při psaní se zobrazí odpovídající aplikace; klávesa hledání nebo lupa vyhledá výraz na Googlu.</string>
+    <string name="spotlight_hint">Hledat aplikace a na Googlu</string>
     <string name="help_news_title">Stránka se zprávami</string>
     <string name="help_news">Přejeďte doprava z první stránky plochy a zobrazí se zprávy. V Gesta a vyhledávání → Levá stránka zvolíte Google News nebo vlastní RSS; ikona nastavení na stránce vybírá edici, rubriky nebo zdroje.</string>
 

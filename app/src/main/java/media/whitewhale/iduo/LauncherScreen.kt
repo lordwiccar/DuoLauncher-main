@@ -130,6 +130,7 @@ fun LauncherScreen(
     searchRequests: Int = 0,
     onLaunchFrom: (AppEntry, android.graphics.Rect?) -> Unit = { app, _ -> onLaunch(app) },
     onGoogleSearch: (android.graphics.Rect?) -> Boolean = { false },
+    onWebSearch: (String) -> Unit = {},
     appearance: AppearanceState = AppearanceState(),
     onAppearanceMode: (AppearanceMode) -> Unit = {},
     onAppearanceManual: (String, Double, Double) -> Unit = { _, _, _ -> },
@@ -163,6 +164,7 @@ fun LauncherScreen(
     LaunchedEffect(selectedId) { if (selectedId == null) appMoveMenu = false }
     LaunchedEffect(sheet) { if (sheet.isEmpty()) customizationPage = CustomizationPage.OVERVIEW }
     var openFolderId by rememberSaveable { mutableStateOf<String?>(null) }
+    var spotlight by rememberSaveable { mutableStateOf(false) }
     var createFolderFirstId by rememberSaveable { mutableStateOf<String?>(null) }
     var savedPage by rememberSaveable { mutableIntStateOf(0) }
     var lastHomePage by rememberSaveable { mutableIntStateOf(0) }
@@ -228,7 +230,7 @@ fun LauncherScreen(
             ?: lastHomePage.coerceIn(0, homePages - 1)
         drag.clear(); widgetSession = null; resizeSlot = null; sheet = ""; widgetPackage = null
         widgetExactTarget = false; widgetPlacementMessage = null; selectedId = null; appMoveMenu = false
-        openFolderId = null; createFolderFirstId = null; emptyCellIndex = null
+        openFolderId = null; createFolderFirstId = null; emptyCellIndex = null; spotlight = false
         focus.clearFocus(); keyboard?.hide()
         pager.animateScrollToPage(page)
     } }
@@ -367,12 +369,13 @@ fun LauncherScreen(
 
     // Soften Home behind an open folder so the folder reads as the one surface in focus. No
     // layer is added while closed.
-    val folderBlur by animateDpAsState(if (openFolderId != null) FOLDER_BACKDROP_BLUR else 0.dp, label = "folder blur")
+    val backdropBlurred = openFolderId != null || spotlight
+    val folderBlur by animateDpAsState(if (backdropBlurred) FOLDER_BACKDROP_BLUR else 0.dp, label = "folder blur")
     val behindFolder = if (folderBlur > 0.dp) Modifier.blur(folderBlur) else Modifier
     // Android's wallpaper lies behind this window, so the window blurs it rather than Compose.
     val wallpaperBlur = with(LocalDensity.current) { FOLDER_BACKDROP_BLUR.roundToPx() }
-    DisposableEffect(openFolderId != null) {
-        launcherActivity.window.setWallpaperBlur(if (openFolderId != null) wallpaperBlur else 0)
+    DisposableEffect(backdropBlurred) {
+        launcherActivity.window.setWallpaperBlur(if (backdropBlurred) wallpaperBlur else 0)
         onDispose { launcherActivity.window.setWallpaperBlur(0) }
     }
     // Let a wallpaper wider than the screen scroll with the Home pages.
@@ -386,7 +389,7 @@ fun LauncherScreen(
         }
     }
     Box(Modifier.fillMaxSize().testTag("launcher-root").homeDragInput(drag,
-        enabled = sheet.isEmpty() && !showFirstRun && selectedId == null && resizeSlot == null && pager.currentPage >= 0,
+        enabled = sheet.isEmpty() && !showFirstRun && selectedId == null && resizeSlot == null && !spotlight && pager.currentPage >= 0,
         page = pager.currentPage, eligiblePages = eligibleDragPages, onStart = {
             focus.clearFocus(); keyboard?.hide(); haptic.performHapticFeedback(HapticFeedbackType.LongPress)
             if (drag.source?.folderId != null) openFolderId = null
@@ -456,7 +459,7 @@ fun LauncherScreen(
             var gestureOriginInWindow by remember { mutableStateOf(Offset.Zero) }
             val pagerInputEnabled = pager.currentPage in -firstHome..visibleHomePages && !drag.active &&
                 widgetSession == null && resizeSlot == null && sheet.isEmpty() && !showFirstRun && selectedId == null &&
-                openFolderId == null && emptyCellIndex == null && createFolderFirstId == null &&
+                openFolderId == null && emptyCellIndex == null && createFolderFirstId == null && !spotlight &&
                 launcherActivity.backups.preview == null && !launcherActivity.backups.pickerPending &&
                 !launcherActivity.backgrounds.pickerPending && widgets.setupStatus == null &&
                 widgets.reconfigureWidgetId == null
@@ -467,6 +470,20 @@ fun LauncherScreen(
                 if (pagerInputEnabled && page in 0 until visibleHomePages && !overItem) {
                     emptyCellIndex = firstEmptyHomeCell(state, targetPage)
                 }
+            }
+            // Positive IDs are provider-owned Android views. Leave their vertical stream untouched
+            // so scrollable widgets retain native gesture handling. A dock that can scroll in the
+            // swipe's direction also keeps it.
+            fun homeOwnsVerticalSwipe(point: Offset, upward: Boolean): Boolean {
+                val page = pager.currentPage
+                if (page !in 0 until visibleHomePages) return false
+                val region = drag.hit(point + gestureOriginInRoot, eligibleDragPages)
+                val rootOnScreen = IntArray(2).also(launcherRootView::getLocationOnScreen)
+                val screenPoint = point + gestureOriginInWindow +
+                    Offset(rootOnScreen[0].toFloat(), rootOnScreen[1].toFloat())
+                val dockScrolls = if (upward) dockScroll.canScrollForward else dockScroll.value > 0
+                return !(region?.target is DropTarget.Dock && dockScrolls) &&
+                    !nativeWidgetConsumesVerticalGesture(launcherRootView, screenPoint)
             }
             Box(Modifier.fillMaxSize().then(behindFolder).onGloballyPositioned {
                 gestureOriginInRoot = it.boundsInRoot().topLeft
@@ -479,17 +496,10 @@ fun LauncherScreen(
                 // Positive IDs are provider-owned Android views. Leave their vertical
                 // stream untouched so scrollable widgets retain native gesture handling.
                 // A dock that is already scrolled also gets first use of a downward drag.
-                canStartDownwardSwipe = { point ->
-                    if (pager.currentPage !in 0 until visibleHomePages) false else {
-                        val region = drag.hit(point + gestureOriginInRoot, eligibleDragPages)
-                        val rootOnScreen = IntArray(2).also(launcherRootView::getLocationOnScreen)
-                        val screenPoint = point + gestureOriginInWindow +
-                            Offset(rootOnScreen[0].toFloat(), rootOnScreen[1].toFloat())
-                        !(region?.target is DropTarget.Dock && dockScroll.value > 0) &&
-                            !nativeWidgetConsumesVerticalGesture(launcherRootView, screenPoint)
-                    }
-                },
+                canStartDownwardSwipe = { point -> homeOwnsVerticalSwipe(point, upward = false) },
                 onDownwardSwipe = launcherActivity::openSystemShade,
+                canStartUpwardSwipe = { point -> homeOwnsVerticalSwipe(point, upward = true) },
+                onUpwardSwipe = { spotlight = true },
                 childPagesHorizontally = { point, travel ->
                     drag.childPager?.let { child -> child.bounds().contains(point + gestureOriginInRoot) && child.canPage(travel) } == true
                 },
@@ -1117,6 +1127,9 @@ fun LauncherScreen(
                     }
                 } }, confirmButton = { TextButton(onClick = { createFolderFirstId = null }) { Text(stringResource(R.string.cancel)) } })
         }
+        if (spotlight) SpotlightPanel(state.apps, onDismiss = { spotlight = false; keyboard?.hide() },
+            onLaunch = { app, bounds -> spotlight = false; onLaunchFrom(app, bounds) },
+            onWebSearch = { query -> spotlight = false; onWebSearch(query) })
         openFolderId?.let { id ->
             state.folders.firstOrNull { it.id == id }?.let { folder ->
                 val blocked = state.layout.unavailableCells()

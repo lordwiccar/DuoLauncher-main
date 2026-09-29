@@ -181,6 +181,7 @@ private fun LauncherHelp(
     TextButton(onClick = onShadeSetup, Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("help-shade-setup")) {
         Text(stringResource(R.string.help_shade_setup))
     }
+    HelpSection(Icons.Rounded.SwipeUp, stringResource(R.string.help_search_title), stringResource(R.string.help_search))
     HelpSection(Icons.Rounded.Newspaper, stringResource(R.string.help_news_title), stringResource(R.string.help_news))
 }
 

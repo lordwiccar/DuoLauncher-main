@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add Home search: swipe up on Home, find apps as you type (ignoring accents), and send the phrase to Google with the search key or the magnifier.
 - Replace Google Discover on the left page with Google News. Discover could not work in Play builds, because Google only lets allow-listed launchers embed it. The news page now shows Google News headlines for a chosen edition and sections, or your own RSS feeds.
 - Offer 86 Google News editions from around the world, each checked to serve its own headlines, in a searchable list named in the app's language.
 - Show each article's publisher and drop summaries that only repeat the headline.

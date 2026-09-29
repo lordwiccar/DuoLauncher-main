@@ -91,7 +91,7 @@ class MainActivity : ComponentActivity() {
                     onLaunch = { launchApp(it) }, onMakeDefault = ::makeDefault, onAppInfo = ::appInfo,
                     isDefaultHome = defaultHome.value, deviceStatus = deviceStatus, onStatusMode = ::setStatusMode, onWallpaperSettings = ::openWallpaperSettings,
                     searchRequests = searchRequests.intValue,
-                    onLaunchFrom = ::launchApp, onGoogleSearch = ::openGoogleSearch,
+                    onLaunchFrom = ::launchApp, onGoogleSearch = ::openGoogleSearch, onWebSearch = ::openWebSearch,
                     appearance = appearance.state,
                     onAppearanceMode = { cancelAppearanceLocation(); appearance.setMode(it, systemDark()) },
                     onAppearanceManual = { place, lat, lon -> cancelAppearanceLocation(); appearance.setManual(place, lat, lon, systemDark()) },
@@ -212,6 +212,15 @@ class MainActivity : ComponentActivity() {
         true
     } catch (_: android.content.ActivityNotFoundException) { false }
       catch (_: SecurityException) { false }
+
+    /** Google's results for [query]: in the Google app, else in the browser. */
+    private fun openWebSearch(query: String) {
+        for (intent in webSearchIntents(query)) {
+            try { startActivity(intent); return }
+            catch (_: android.content.ActivityNotFoundException) { }
+            catch (_: SecurityException) { }
+        }
+    }
 
 
     private fun makeDefault() {

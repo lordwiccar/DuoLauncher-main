@@ -125,6 +125,9 @@
     <string name="help_shade_title">Benachrichtigungen und Schnelleinstellungen</string>
     <string name="help_shade">Wische auf dem Startbildschirm nach unten. Beim ersten Mal erklärt iDuo die optionale Bedienungshilfen-Einstellung von Android. Der Dienst öffnet nur die Systemleisten.</string>
     <string name="help_shade_setup">Leistengesten einrichten</string>
+    <string name="help_search_title">Suche</string>
+    <string name="help_search">Wische auf dem Startbildschirm nach oben, um zu suchen. Beim Tippen erscheinen passende Apps; die Suchtaste oder die Lupe sucht den Begriff bei Google.</string>
+    <string name="spotlight_hint">Apps und Google durchsuchen</string>
     <string name="help_news_title">Nachrichtenseite</string>
     <string name="help_news">Wische auf der ersten Startbildschirmseite nach rechts, um Nachrichten zu sehen. Unter Gesten und Suche → Linke Seite wählst du Google News oder eigene RSS-Feeds; das Einstellungssymbol auf der Seite wählt Ausgabe, Rubriken oder Quellen.</string>
 

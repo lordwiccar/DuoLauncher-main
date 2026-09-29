@@ -125,6 +125,9 @@
     <string name="help_shade_title">Powiadomienia i szybkie ustawienia</string>
     <string name="help_shade">Przesuń w dół na ekranie głównym. Za pierwszym razem iDuo wyjaśni opcjonalne ustawienie Ułatwień dostępu w Androidzie. Usługa jedynie otwiera panele systemowe.</string>
     <string name="help_shade_setup">Skonfiguruj gesty panelu</string>
+    <string name="help_search_title">Wyszukiwanie</string>
+    <string name="help_search">Przesuń palcem w górę na ekranie głównym, aby wyszukiwać. Podczas pisania pojawiają się pasujące aplikacje; klawisz wyszukiwania lub lupa wyszukuje frazę w Google.</string>
+    <string name="spotlight_hint">Szukaj aplikacji i w Google</string>
     <string name="help_news_title">Strona z wiadomościami</string>
     <string name="help_news">Przesuń w prawo z pierwszej strony ekranu głównego, aby zobaczyć wiadomości. W Gesty i wyszukiwanie → Lewa strona wybierzesz Google News lub własne RSS; ikona ustawień na stronie wybiera wydanie, działy lub źródła.</string>
 

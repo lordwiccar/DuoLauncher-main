@@ -48,6 +48,7 @@ Updates install over the existing app when they are signed with the same key. Un
 | Add to the dock | Drag into a vacancy; move an app out first when the dock is full |
 | Scroll a widget | Swipe vertically inside its content; hold still to pick it up |
 | Customize | Long press any empty Home space or bare wallpaper |
+| Search | Swipe up on Home, type to find apps; the search key or the magnifier searches Google |
 | Notifications / Quick Settings | Swipe down from Home's left 70% / right 30%, after enabling optional shade gestures |
 
 The surrounding status ring shows battery, the inner arcs show Wi-Fi strength, and the lower dots show cellular strength. Unknown readings are not displayed as full signal. This rail applies to Home only.
