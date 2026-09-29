@@ -92,4 +92,4 @@ The [contributor code map](docs/architecture.md) explains the main components, d
 
 Use issue templates with version, phone model, Android version, folded/unfolded state, and reproduction steps. Review screenshots and logs for personal/work information. See [contributing](CONTRIBUTING.md) and [changes](CHANGELOG.md).
 
-Source is under the [MIT license](LICENSE); dependency notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). This independent project is unaffiliated with Apple, Google, or Samsung. The bundled dunes wallpaper ships with the app; app icons come from installed apps. Apple research media and Google application code are excluded from the public source and APK.
+iDuo Launcher builds on [Duo Launcher](https://github.com/jakesgoodapps/DuoLauncher) by Jake's Good Apps. Source is under the [MIT license](LICENSE); dependency notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). This independent project is unaffiliated with Apple, Google, or Samsung. The bundled dunes wallpaper ships with the app; app icons come from installed apps. Apple research media and Google application code are excluded from the public source and APK.

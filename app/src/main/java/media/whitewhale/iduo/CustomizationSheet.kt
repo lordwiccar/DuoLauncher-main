@@ -27,7 +27,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
-internal enum class CustomizationPage { OVERVIEW, WALLPAPER, HOME, GESTURES, LANGUAGE, BACKUP, HELP }
+internal enum class CustomizationPage { OVERVIEW, WALLPAPER, HOME, GESTURES, LANGUAGE, BACKUP, HELP, ABOUT, CHANGELOG }
 
 @Composable
 internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, model: LauncherModel,
@@ -49,6 +49,8 @@ internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, mo
         CustomizationPage.LANGUAGE -> R.string.customize_language
         CustomizationPage.BACKUP -> R.string.customize_backup
         CustomizationPage.HELP -> R.string.customize_help
+        CustomizationPage.ABOUT -> R.string.customize_about
+        CustomizationPage.CHANGELOG -> R.string.customize_changelog
     })
     val bodyScroll = rememberScrollState()
     LaunchedEffect(page) { bodyScroll.scrollTo(0) }
@@ -85,6 +87,10 @@ internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, mo
                         stringResource(R.string.customize_help_detail), "customization-help") {
                         onPage(CustomizationPage.HELP)
                     }
+                    CustomizationDestination(Icons.Rounded.Info, stringResource(R.string.customize_about),
+                        stringResource(R.string.customize_about_detail), "customization-about") { onPage(CustomizationPage.ABOUT) }
+                    CustomizationDestination(Icons.Rounded.History, stringResource(R.string.customize_changelog),
+                        stringResource(R.string.customize_changelog_detail), "customization-changelog") { onPage(CustomizationPage.CHANGELOG) }
                     if (isDefaultHome) TextButton(onClick = onMakeDefault, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
                         .testTag("default-home-settings")) { Text(stringResource(R.string.change_home_app)) }
                 }
@@ -154,6 +160,8 @@ internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, mo
                     onAddWidget = { onAddWidget(homePage) },
                     onShadeSetup = onShadeSetup,
                 )
+                CustomizationPage.ABOUT -> AboutPage()
+                CustomizationPage.CHANGELOG -> ChangelogPage()
             }
         }
     }

@@ -27,6 +27,7 @@ Long press an empty Home cell or any bare wallpaper on Home, such as the space b
 - **Gestures & search** for app names, the upper-right status display, and Google search behavior.
 - **Backup** to save or restore the layout.
 - **Help & setup** for Home selection, widgets, Home gestures, search, and the news page.
+- **About** for the version, the developer, the original Duo Launcher project and the licences, and **Changelog** for what changed in each version.
 
 After a layout edit, **Undo last layout change** appears in customization. It covers the latest supported layout change, so use it before making another edit.
 

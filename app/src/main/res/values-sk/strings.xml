@@ -415,4 +415,19 @@
     <string name="status_airplane_short">Lietadlo</string>
     <string name="status_cellular">Mobilný signál %1$d zo 4</string>
     <string name="status_cellular_unavailable">Mobilný signál nie je dostupný</string>
+    <string name="customize_about">O aplikácii</string>
+    <string name="customize_about_detail">Verzia, vývojár a licencie</string>
+    <string name="customize_changelog">Changelog</string>
+    <string name="customize_changelog_detail">Čo sa zmenilo v jednotlivých verziách</string>
+    <string name="about_version">Verzia %1$s (%2$d)</string>
+    <string name="about_developer_title">Vývojár</string>
+    <string name="about_developer">iDuo Launcher vyvíja Danny, whitewhale.media, ktorý navrhuje a tvorí jeho funkcie nad rámec pôvodného projektu.</string>
+    <string name="about_source">Zdrojový kód</string>
+    <string name="about_privacy">Zásady ochrany súkromia</string>
+    <string name="about_upstream_title">Pôvodný projekt</string>
+    <string name="about_upstream">iDuo Launcher vychádza z open-source projektu Duo Launcher od Jake’s Good Apps (jakesgoodapps), vydaného pod licenciou MIT uvedenou nižšie.</string>
+    <string name="about_license">Licencia MIT</string>
+    <string name="about_third_party">Licencie tretích strán</string>
+    <string name="changelog_unreleased">Ďalšia verzia</string>
+    <string name="changelog_note">Changelog je vedený v angličtine.</string>
 </resources>

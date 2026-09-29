@@ -399,4 +399,19 @@
     <string name="status_airplane_short">Flugmodus</string>
     <string name="status_cellular">Mobilfunksignal %1$d von 4</string>
     <string name="status_cellular_unavailable">Mobilfunksignal nicht verfügbar</string>
+    <string name="customize_about">Über die App</string>
+    <string name="customize_about_detail">Version, Entwickler und Lizenzen</string>
+    <string name="customize_changelog">Änderungsprotokoll</string>
+    <string name="customize_changelog_detail">Was sich in jeder Version geändert hat</string>
+    <string name="about_version">Version %1$s (%2$d)</string>
+    <string name="about_developer_title">Entwickler</string>
+    <string name="about_developer">iDuo Launcher wird von Danny, whitewhale.media, entwickelt, der seine Funktionen über das ursprüngliche Projekt hinaus gestaltet und umsetzt.</string>
+    <string name="about_source">Quellcode</string>
+    <string name="about_privacy">Datenschutzerklärung</string>
+    <string name="about_upstream_title">Ursprüngliches Projekt</string>
+    <string name="about_upstream">iDuo Launcher baut auf dem Open-Source-Projekt Duo Launcher von Jake’s Good Apps (jakesgoodapps) auf, veröffentlicht unter der unten stehenden MIT-Lizenz.</string>
+    <string name="about_license">MIT-Lizenz</string>
+    <string name="about_third_party">Hinweise zu Drittanbietern</string>
+    <string name="changelog_unreleased">Nächste Version</string>
+    <string name="changelog_note">Das Änderungsprotokoll wird auf Englisch geführt.</string>
 </resources>
