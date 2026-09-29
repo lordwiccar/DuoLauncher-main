@@ -112,7 +112,7 @@
     <string name="help_search">Wische auf dem Startbildschirm nach oben, um zu suchen. Beim Tippen erscheinen passende Apps; die Suchtaste oder die Lupe sucht den Begriff bei Google.</string>
     <string name="spotlight_hint">Apps und Google durchsuchen</string>
     <string name="help_news_title">Nachrichtenseite</string>
-    <string name="help_news">Wische auf der ersten Startbildschirmseite nach rechts, um Nachrichten zu sehen. Unter Gesten und Suche → Linke Seite wählst du Google News oder eigene RSS-Feeds; das Einstellungssymbol auf der Seite wählt Ausgabe, Rubriken oder Quellen.</string>
+    <string name="help_news">Wische auf der ersten Startbildschirmseite nach rechts, um Nachrichten zu sehen. Unter Einstellungen → Nachrichtenseite wählst du Google News oder eigene RSS-Feeds sowie Ausgabe, Rubriken oder Quellen; das Einstellungssymbol auf der Seite kann dasselbe.</string>
 
     <!-- Apps and profiles -->
     <string name="all_apps">Alle Apps</string>
@@ -456,4 +456,14 @@
     <string name="settings_reset_cover">Layout des Außendisplays zurücksetzen</string>
     <string name="settings_reset_inner">Layout des Innendisplays zurücksetzen</string>
     <string name="settings_news_detail">Wische auf der ersten Startbildschirmseite nach rechts, um sie zu sehen.</string>
+    <string name="settings_icon_pack">Symbolpaket</string>
+    <string name="settings_icon_pack_system">App-Symbole</string>
+    <string name="settings_icon_pack_missing">Paket nicht installiert · App-Symbole</string>
+    <string name="settings_icon_pack_detail">Symbole aus einem Paket, das du aus Google Play installierst. Apps, die das Paket nicht enthält, behalten ihr eigenes Symbol, gegebenenfalls auf dem Hintergrund des Pakets.</string>
+    <string name="settings_icon_pack_none">Noch kein Symbolpaket installiert.</string>
+    <string name="settings_icon_pack_get">Symbolpakete in Google Play finden</string>
+    <string name="settings_section_screen">Bildschirm</string>
+    <string name="settings_cover_rotation">Außendisplay drehen</string>
+    <string name="settings_cover_rotation_detail">Der Startbildschirm auf dem Außendisplay dreht sich mit dem Telefon. Das Querformat funktioniert eventuell noch nicht wie erwartet.</string>
+    <string name="settings_experimental">Experimentell</string>
 </resources>

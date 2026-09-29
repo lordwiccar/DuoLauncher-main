@@ -2,6 +2,7 @@ package media.whitewhale.iduo
 
 import android.app.Application
 import android.content.ComponentName
+import android.content.Context
 import android.content.pm.LauncherApps
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -71,6 +72,10 @@ data class LauncherState(
     val swipeDownShade: Boolean = true,
     /** An upward swipe on Home opens search. */
     val swipeUpSearch: Boolean = true,
+    /** Whether the cover screen follows the device's rotation; it stays upright by default. */
+    val coverRotation: Boolean = false,
+    /** Package of the chosen third-party icon pack, or null for the apps' own icons. */
+    val iconPack: String? = null,
     val loading: Boolean = true,
     val error: String? = null,
 ) {
@@ -141,11 +146,15 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         invalidatedPackages.clear()
         removedPackages.clear()
         val resources = getApplication<Application>().resources
+        val iconPackName = mutable.value.iconPack
         val configuration = resources.configuration.let { "${it.densityDpi}|${it.locales.toLanguageTags()}|${it.uiMode}" }
         viewModelScope.launch {
             try {
                 val apps = withContext(Dispatchers.IO) {
-                    if (configuration != iconConfiguration) { iconCache.clear(); iconConfiguration = configuration }
+                    // A chosen pack that was updated or removed redraws every icon, like a changed configuration.
+                    val iconPack = iconPackName?.let { IconPacks.load(getApplication(), it) }
+                    val iconKey = configuration + "|" + (iconPack?.stamp ?: "")
+                    if (iconKey != iconConfiguration) { iconCache.clear(); iconConfiguration = iconKey }
                     iconCache.keys.removeAll { key -> parseProfileAppId(key)?.let { identity ->
                         val serial = identity.userSerial ?: userManager.getSerialNumberForUser(Process.myUserHandle())
                         serial to (ComponentName.unflattenFromString(identity.component)?.packageName ?: "") in invalidated
@@ -185,8 +194,9 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
                             val id = profileAppId(component.flattenToString(), serial, personalSerial)
                             val label = info.label.toString()
                             iconCache[id]?.takeIf { it.label == label && it.available } ?: run {
-                                val icon = runCatching { info.getBadgedIcon(0) }.getOrElse { application.packageManager.defaultActivityIcon }
-                                AppEntry(id, label, launcherIcon(icon), component, profile, serial, descriptor.label,
+                                val icon = iconPack?.let { pack -> runCatching { packIcon(application, pack, info, profile) }.getOrNull() }
+                                    ?: launcherIcon(runCatching { info.getBadgedIcon(0) }.getOrElse { application.packageManager.defaultActivityIcon })
+                                AppEntry(id, label, icon, component, profile, serial, descriptor.label,
                                     descriptor.isWork, available = true).also { iconCache[id] = it }
                             }
                         }
@@ -476,6 +486,15 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         if (statePayloadInvalid) return
         mutable.update { it.copy(swipeUpSearch = value) }; persist()
     }
+    fun setCoverRotation(value: Boolean) {
+        if (statePayloadInvalid) return
+        mutable.update { it.copy(coverRotation = value) }; persist()
+    }
+    /** Switches the icon pack and redraws every app icon with it. */
+    fun setIconPack(packageName: String?) {
+        if (statePayloadInvalid || packageName == mutable.value.iconPack) return
+        mutable.update { it.copy(iconPack = packageName) }; persist(); refresh()
+    }
     fun setGoogleSearch(value: Boolean) { if (statePayloadInvalid) return; undoLayout = null; undoImportSettings = null; mutable.update { it.copy(googleSearch = value, canUndoEdit = false) }; persist() }
     fun setPreset(expanded: Boolean, value: LayoutPreset) {
         if (statePayloadInvalid) return
@@ -544,6 +563,8 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .put("doubleTapLock", s.doubleTapLock)
             .put("swipeDownShade", s.swipeDownShade)
             .put("swipeUpSearch", s.swipeUpSearch)
+            .put("coverRotation", s.coverRotation)
+            .put("iconPack", s.iconPack ?: "")
             .put("compact", preset(s.compact)).put("expanded", preset(s.expanded))
         val editor = prefs.edit()
         if (legacyRaw != null && sourceSchema == 2 && !prefs.contains("state_v2_backup"))
@@ -701,7 +722,9 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             leftPage = LeftPage.entries.firstOrNull { it.name == j.optString("leftPage") } ?: LeftPage.GOOGLE_NEWS,
             doubleTapLock = j.optBoolean("doubleTapLock", true),
             swipeDownShade = j.optBoolean("swipeDownShade", true),
-            swipeUpSearch = j.optBoolean("swipeUpSearch", true))
+            swipeUpSearch = j.optBoolean("swipeUpSearch", true),
+            coverRotation = j.optBoolean("coverRotation", false),
+            iconPack = j.optString("iconPack").takeIf { it.isNotEmpty() })
             .let { it.copy(homeRows = maxOf(it.homeRows, it.layout.requiredRows())) }
     }.getOrElse {
         statePayloadInvalid = legacyRaw != null
@@ -711,8 +734,21 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
     override fun onCleared() { launcherApps.unregisterCallback(callback) }
 }
 
+/**
+ * An app's icon from [pack]: its own drawing, else the app's icon on the pack's backdrop when the
+ * pack provides one, else null for the app's own icon. Work apps keep Android's badge.
+ */
+private fun packIcon(context: Context, pack: IconPack, info: android.content.pm.LauncherActivityInfo, user: UserHandle): Bitmap? {
+    val themed = pack.iconFor(info.componentName)?.let { launcherIcon(it) }
+        ?: pack.compose(launcherIcon(info.getIcon(0)), info.componentName.flattenToString())
+        ?: return null
+    if (user == Process.myUserHandle()) return themed
+    val badged = context.packageManager.getUserBadgedIcon(android.graphics.drawable.BitmapDrawable(context.resources, themed), user)
+    return badged.toBitmap(ICON_SIZE, ICON_SIZE)
+}
+
 /** Render adaptive layers through our rounded-square mask, preserving original app artwork. */
-private fun launcherIcon(drawable: Drawable): Bitmap {
+internal fun launcherIcon(drawable: Drawable): Bitmap {
     if (drawable !is AdaptiveIconDrawable) return drawable.toBitmap(144, 144)
     val bitmap = Bitmap.createBitmap(144, 144, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)

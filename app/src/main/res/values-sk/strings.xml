@@ -112,7 +112,7 @@
     <string name="help_search">Potiahnite na ploche nahor a môžete hľadať. Počas písania sa zobrazia zodpovedajúce aplikácie; kláves hľadania alebo lupa vyhľadá výraz na Googli.</string>
     <string name="spotlight_hint">Hľadať aplikácie a na Googli</string>
     <string name="help_news_title">Stránka so správami</string>
-    <string name="help_news">Potiahnite doprava z prvej strany plochy a zobrazia sa správy. V Gestá a vyhľadávanie → Ľavá stránka zvolíte Google News alebo vlastné RSS; ikona nastavení na stránke vyberá edíciu, rubriky alebo zdroje.</string>
+    <string name="help_news">Potiahnite doprava z prvej strany plochy a zobrazia sa správy. V Nastaveniach → Stránka so správami zvolíte Google News alebo vlastné RSS a vyberiete edíciu, rubriky alebo zdroje; to isté vie ikona nastavení na stránke.</string>
 
     <!-- Apps and profiles -->
     <string name="all_apps">Všetky aplikácie</string>
@@ -472,4 +472,14 @@
     <string name="settings_reset_cover">Obnoviť predvolené rozloženie vonkajšieho displeja</string>
     <string name="settings_reset_inner">Obnoviť predvolené rozloženie vnútorného displeja</string>
     <string name="settings_news_detail">Zobrazí sa potiahnutím doprava z prvej strany plochy.</string>
+    <string name="settings_icon_pack">Balík ikon</string>
+    <string name="settings_icon_pack_system">Ikony aplikácií</string>
+    <string name="settings_icon_pack_missing">Balík nie je nainštalovaný · ikony aplikácií</string>
+    <string name="settings_icon_pack_detail">Ikony z balíka, ktorý si nainštalujete z Google Play. Aplikácie, ktoré balík neobsahuje, si ponechajú vlastnú ikonu, prípadne na podklade balíka.</string>
+    <string name="settings_icon_pack_none">Zatiaľ nie je nainštalovaný žiadny balík ikon.</string>
+    <string name="settings_icon_pack_get">Nájsť balíky ikon na Google Play</string>
+    <string name="settings_section_screen">Obrazovka</string>
+    <string name="settings_cover_rotation">Otáčať vonkajší displej</string>
+    <string name="settings_cover_rotation_detail">Plocha na vonkajšom displeji sa otáča s telefónom. Zobrazenie na šírku zatiaľ nemusí fungovať podľa očakávania.</string>
+    <string name="settings_experimental">Experimentálne</string>
 </resources>

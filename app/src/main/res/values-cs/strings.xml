@@ -112,7 +112,7 @@
     <string name="help_search">Přejeďte na ploše nahoru a můžete hledat. Při psaní se zobrazí odpovídající aplikace; klávesa hledání nebo lupa vyhledá výraz na Googlu.</string>
     <string name="spotlight_hint">Hledat aplikace a na Googlu</string>
     <string name="help_news_title">Stránka se zprávami</string>
-    <string name="help_news">Přejeďte doprava z první stránky plochy a zobrazí se zprávy. V Gesta a vyhledávání → Levá stránka zvolíte Google News nebo vlastní RSS; ikona nastavení na stránce vybírá edici, rubriky nebo zdroje.</string>
+    <string name="help_news">Přejeďte doprava z první stránky plochy a zobrazí se zprávy. V Nastavení → Stránka se zprávami zvolíte Google News nebo vlastní RSS a vyberete edici, rubriky nebo zdroje; totéž umí ikona nastavení na stránce.</string>
 
     <!-- Apps and profiles -->
     <string name="all_apps">Všechny aplikace</string>
@@ -472,4 +472,14 @@
     <string name="settings_reset_cover">Obnovit výchozí rozvržení vnějšího displeje</string>
     <string name="settings_reset_inner">Obnovit výchozí rozvržení vnitřního displeje</string>
     <string name="settings_news_detail">Zobrazí se přejetím doprava z první stránky plochy.</string>
+    <string name="settings_icon_pack">Balíček ikon</string>
+    <string name="settings_icon_pack_system">Ikony aplikací</string>
+    <string name="settings_icon_pack_missing">Balíček není nainstalován · ikony aplikací</string>
+    <string name="settings_icon_pack_detail">Ikony z balíčku, který si nainstalujete z Google Play. Aplikace, které balíček neobsahuje, si ponechají vlastní ikonu, případně na podkladu balíčku.</string>
+    <string name="settings_icon_pack_none">Zatím není nainstalován žádný balíček ikon.</string>
+    <string name="settings_icon_pack_get">Najít balíčky ikon na Google Play</string>
+    <string name="settings_section_screen">Obrazovka</string>
+    <string name="settings_cover_rotation">Otáčet vnější displej</string>
+    <string name="settings_cover_rotation_detail">Plocha na vnějším displeji se otáčí s telefonem. Zobrazení na šířku zatím nemusí fungovat podle očekávání.</string>
+    <string name="settings_experimental">Experimentální</string>
 </resources>

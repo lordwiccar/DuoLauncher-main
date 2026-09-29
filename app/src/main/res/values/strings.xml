@@ -112,7 +112,7 @@
     <string name="help_search">Swipe up on Home to search. Matching apps appear as you type; the search key or the magnifier searches Google.</string>
     <string name="spotlight_hint">Search apps and Google</string>
     <string name="help_news_title">News page</string>
-    <string name="help_news">Swipe right from the first Home page for the news. Choose Google News or your own RSS feeds under Gestures &amp; search → Left page; the settings icon on the page picks the edition, sections or sources.</string>
+    <string name="help_news">Swipe right from the first Home page for the news. Under Settings → News page, choose Google News or your own RSS feeds and pick the edition, sections or sources; the settings icon on the page does the same.</string>
 
     <!-- Apps and profiles -->
     <string name="all_apps">All apps</string>
@@ -457,4 +457,14 @@
     <string name="settings_reset_cover">Reset the cover screen layout</string>
     <string name="settings_reset_inner">Reset the inner screen layout</string>
     <string name="settings_news_detail">Swipe right from the first Home page to see it.</string>
+    <string name="settings_icon_pack">Icon pack</string>
+    <string name="settings_icon_pack_system">App icons</string>
+    <string name="settings_icon_pack_missing">Pack not installed · app icons</string>
+    <string name="settings_icon_pack_detail">Icons from a pack you installed from Google Play. Apps the pack does not include keep their own icon, set on the pack’s backdrop when it has one.</string>
+    <string name="settings_icon_pack_none">No icon pack is installed yet.</string>
+    <string name="settings_icon_pack_get">Get icon packs on Google Play</string>
+    <string name="settings_section_screen">Screen</string>
+    <string name="settings_cover_rotation">Rotate the cover screen</string>
+    <string name="settings_cover_rotation_detail">Home on the cover screen turns with the phone. Landscape may not work as expected yet.</string>
+    <string name="settings_experimental">Experimental</string>
 </resources>

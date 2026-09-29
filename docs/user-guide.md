@@ -23,8 +23,8 @@ To make iDuo the launcher, choose **Set as home app** at the top of **Settings**
 Long press an empty Home cell or any bare wallpaper on Home, such as the space below or beside the grid, to open **Add to Home**, then choose **Widgets**, **Wallpaper**, or **Customize launcher**. **Settings** opens over the whole screen. On the cover screen it lists its sections and opens one at a time; on the inner screen the list stays on the left beside the open section. Each row in the list shows its current setting, **Search settings** finds any setting by name, and cards at the top point out when iDuo is not the Home app or when Home gestures are off.
 
 - **Customization**
-  - **Wallpaper & appearance**: the wallpaper (**iDuo dunes**, **Your photo** or **Android wallpapers**), the **Color mode** and folder transparency.
-  - **Home**: **Grid layout** (4 × 4, 4 × 5 or 4 × 6 apps below the widget band, chosen on a scrolling wheel; the unfolded screen shows two pages side by side), icon size, row spacing, app names, the Home apps, the widgets on the current page, the status display and the **All apps view**. A small Home preview stays at the top with the choice of **Cover screen** or **Inner screen**, which the size and spacing settings apply to.
+  - **Wallpaper & appearance**: the wallpaper (**iDuo dunes**, **Your photo** or **Android wallpapers**), the **Color mode**, an **Icon pack** and folder transparency.
+  - **Home**: **Grid layout** (4 × 4, 4 × 5 or 4 × 6 apps below the widget band, chosen on a scrolling wheel; the unfolded screen shows two pages side by side), icon size, row spacing, app names, the Home apps, the widgets on the current page, the status display, **Rotate the cover screen** and the **All apps view**. A small Home preview stays at the top with the choice of **Cover screen** or **Inner screen**, which the size and spacing settings apply to.
   - **Dock**: the number of dock apps (4–8), its width and its position.
 - **Controls**
   - **Gestures & search**: the Home gestures service, a switch for each gesture, and what the search button opens.
@@ -64,6 +64,14 @@ iDuo shows your Android wallpaper, including live wallpapers, and follows any ch
 **iDuo dunes** sets the bundled dunes landscape as the Android wallpaper, asking for the same screens. **Android wallpapers** opens Android's own wallpaper picker. While a folder is open, the wallpaper is dimmed and softly blurred.
 
 **Color mode** offers **Light**, **Dark**, **System**, and **Sun**, which follows sunrise and sunset. **Sun** accepts coordinates through **Use this place**, or requests approximate location only when you choose **Use device location**. If location is unavailable, iDuo visibly falls back to the system theme. **Clear location** removes saved coordinates; iDuo does not request location in the background.
+
+## Icon packs
+
+Install an icon pack from Google Play (search for "icon pack"; iDuo reads packs made for launchers such as Nova), then choose it under **Settings → Wallpaper & appearance → Icon pack**, which also links to the store. Apps the pack does not draw keep their own icon, placed on the pack's backdrop when it has one. Choose **App icons** to return to the apps' own icons.
+
+## Screen rotation
+
+The cover screen stays upright. **Rotate the cover screen** under **Settings → Home → Screen** lets it turn with the phone; this is experimental and landscape may not look right yet. The inner screen always follows the phone.
 
 ## Language
 

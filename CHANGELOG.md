@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Keep the cover screen upright by default. Rotating it is an experimental choice under Settings → Home → Screen; the inner screen always follows the phone.
+- Apply third-party icon packs from Google Play (the ADW and Nova format) under Settings → Wallpaper & appearance → Icon pack. Apps a pack does not draw keep their own icon, set on the pack's backdrop when it has one.
+- Fix text in dark mode: headings and other text in Settings were black on the dark background.
+- Update the news page help to point to Settings → News page.
+
 ## 1.1.0
 
 Second release on Google Play (version code 3).

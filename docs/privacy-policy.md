@@ -24,6 +24,7 @@ The following information is used only on your device and is never sent to the d
 - **Approximate location (optional).** Only if you tap "Use device location" for the sunrise/sunset appearance, the app requests approximate location once to calculate sunrise and sunset times on the device. Coordinates you enter or obtain are stored on the device until you clear them. There is no background location access.
 - **News settings and articles.** Your Google News edition and sections, the RSS addresses you add, and the most recently downloaded headlines are stored on the device.
 - **Searches.** What you type in Home search or in Settings search is matched against your apps and settings on the device and is not stored.
+- **Icon packs.** To offer icon packs, the app looks for installed apps that declare themselves as launcher icon packs, and reads the icons of the pack you choose on the device.
 
 ## Internet use (news page)
 
@@ -99,6 +100,7 @@ Následující informace se používají jen ve vašem zařízení a nikdy se ne
 - **Přibližná poloha (volitelná).** Jen pokud klepnete na „Použít polohu zařízení“ u vzhledu podle východu a západu slunce, aplikace jednorázově požádá o přibližnou polohu a časy vypočítá v zařízení. Souřadnice zůstanou v zařízení, dokud je nesmažete. Poloha na pozadí se nepoužívá.
 - **Nastavení zpráv a články.** Zvolená edice a rubriky Google News, přidané adresy RSS a naposledy stažené titulky jsou uložené v zařízení.
 - **Hledání.** Co napíšete do hledání na ploše nebo v Nastavení, se porovnává s aplikacemi a nastaveními v zařízení a neukládá se.
+- **Balíčky ikon.** Aby mohla nabídnout balíčky ikon, aplikace vyhledá nainstalované aplikace, které se hlásí jako balíčky ikon pro spouštěče, a ikony zvoleného balíčku čte v zařízení.
 
 ## Použití internetu (stránka se zprávami)
 

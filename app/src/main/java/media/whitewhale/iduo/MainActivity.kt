@@ -88,8 +88,13 @@ class MainActivity : ComponentActivity() {
         updateDefaultHome()
         if (savedInstanceState == null && intent.getStringExtra("duo_destination") == "search") searchRequests.intValue++
         intent.removeExtra("duo_destination")
+        applyCoverRotation(model.state.value.coverRotation, resources.configuration.smallestScreenWidthDp)
         setContent {
             val state = model.state.collectAsStateWithLifecycle().value
+            val smallestWidth = androidx.compose.ui.platform.LocalConfiguration.current.smallestScreenWidthDp
+            androidx.compose.runtime.LaunchedEffect(state.coverRotation, smallestWidth) {
+                applyCoverRotation(state.coverRotation, smallestWidth)
+            }
             val deviceStatus = status.state.collectAsStateWithLifecycle().value
             DuoTheme(appearance.state.dark) {
                 LauncherScreen(state, model, widgets, homeRequests.intValue,
@@ -137,6 +142,16 @@ class MainActivity : ComponentActivity() {
         returningFromShadeSettings = false
         model.refresh(); appearance.refresh(systemDark()); updateDefaultHome()
         homeGesturesEnabled = SystemShadeAccessibilityService.isEnabled(this)
+    }
+
+    /**
+     * The cover screen stays upright unless the user allows rotation; the inner screen, 600dp and
+     * wider in every orientation, always follows the device.
+     */
+    private fun applyCoverRotation(allowed: Boolean, smallestWidthDp: Int) {
+        val wanted = if (smallestWidthDp < 600 && !allowed) android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            else android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        if (requestedOrientation != wanted) requestedOrientation = wanted
     }
 
     internal fun openSystemShade(panel: ShadePanel) =

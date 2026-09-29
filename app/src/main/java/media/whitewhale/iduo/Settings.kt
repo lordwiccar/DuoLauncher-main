@@ -129,7 +129,8 @@ internal fun SettingsScreen(state: LauncherState, initiallyWide: Boolean, model:
                 }
             }
         }
-        CompositionLocalProvider(LocalSettingsColors provides if (dark) DarkSettings else LightSettings) {
+        CompositionLocalProvider(LocalSettingsColors provides if (dark) DarkSettings else LightSettings,
+            LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
             val colors = LocalSettingsColors.current
             val scope = rememberCoroutineScope()
             var wide by rememberSaveable { mutableStateOf(initiallyWide) }
@@ -381,9 +382,10 @@ private fun settingsEntries(): List<SettingsEntry> {
     fun entries(page: SettingsPage, vararg titles: Int) = titles.map { page to it }
     val all = entries(SettingsPage.APPEARANCE, R.string.wallpaper, R.string.use_iduo_dunes, R.string.choose_photo,
             R.string.android_wallpaper, R.string.settings_color_mode, R.string.appearance_dark, R.string.appearance_sun,
-            R.string.folder_transparency) +
+            R.string.folder_transparency, R.string.settings_icon_pack) +
         entries(SettingsPage.HOME, R.string.grid_layout, R.string.icon_size, R.string.row_spacing, R.string.show_app_names,
-            R.string.choose_home_apps, R.string.widgets, R.string.show_status, R.string.all_apps_view, R.string.reset_layout) +
+            R.string.choose_home_apps, R.string.widgets, R.string.show_status, R.string.all_apps_view, R.string.reset_layout,
+            R.string.settings_cover_rotation) +
         entries(SettingsPage.DOCK, R.string.settings_dock_count, R.string.dock_width, R.string.dock_align, R.string.dock_height) +
         entries(SettingsPage.GESTURES, R.string.gesture_down, R.string.gesture_double, R.string.gesture_up,
             R.string.gesture_side, R.string.settings_search_button, R.string.settings_service_title) +
@@ -417,7 +419,8 @@ private fun SettingsDetail(page: SettingsPage, twoPane: Boolean, onBack: () -> U
 
 @Composable
 private fun SettingsGroup(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
-    Surface(modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp), color = LocalSettingsColors.current.card) {
+    Surface(modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp), color = LocalSettingsColors.current.card,
+        contentColor = MaterialTheme.colorScheme.onSurface) {
         Column(content = content)
     }
 }
@@ -452,7 +455,8 @@ private fun CategoryRow(category: Category, summary: String?, selected: Boolean,
 @Composable
 private fun AlertCard(title: String, detail: String, action: String, tag: String, onAction: () -> Unit) {
     val colors = LocalSettingsColors.current
-    Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp), color = colors.alert) {
+    Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp), color = colors.alert,
+        contentColor = MaterialTheme.colorScheme.onSurface) {
         Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             Icon(Icons.Rounded.ErrorOutline, null, tint = colors.onAlert)
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -586,6 +590,7 @@ private fun AppearancePage(model: LauncherModel, state: LauncherState, appearanc
             if (appearance.mode == AppearanceMode.SUNRISE_SUNSET) SunLocationSettings(appearance, onManual, onDeviceLocation, onClear)
         }
     }
+    IconPackSettings(state.iconPack, model::setIconPack)
     SettingsGroup {
         SliderRow(stringResource(R.string.folder_transparency),
             stringResource(R.string.value_percent, Math.round(state.folderTransparency * 100)),
@@ -602,6 +607,61 @@ private fun WallpaperTile(label: String, tag: String, enabled: Boolean, onClick:
         Box(Modifier.fillMaxWidth().height(96.dp).clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.secondaryContainer), contentAlignment = Alignment.Center, content = thumb)
         Text(label, style = MaterialTheme.typography.labelLarge, maxLines = 2, minLines = 2)
+    }
+}
+
+/** The chosen icon pack, a list of installed ones, and a way to find more on Google Play. */
+@Composable
+private fun IconPackSettings(current: String?, onChoose: (String?) -> Unit) {
+    val context = LocalContext.current
+    var choosing by rememberSaveable { mutableStateOf(false) }
+    // Packs can be installed while Settings is open, so the list is read again when it opens.
+    val packs by produceState(emptyList<IconPackInfo>(), choosing) {
+        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { IconPacks.installed(context) }
+    }
+    val chosen = packs.firstOrNull { it.packageName == current }
+    SettingsGroup {
+        ValueRow(stringResource(R.string.settings_icon_pack),
+            chosen?.label ?: stringResource(if (current == null) R.string.settings_icon_pack_system else R.string.settings_icon_pack_missing),
+            tag = "icon-pack") { choosing = true }
+    }
+    if (choosing) AlertDialog(onDismissRequest = { choosing = false },
+        title = { Text(stringResource(R.string.settings_icon_pack)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                Detail(stringResource(R.string.settings_icon_pack_detail))
+                Spacer(Modifier.height(8.dp))
+                IconPackOption(null, stringResource(R.string.settings_icon_pack_system), current == null) { onChoose(null); choosing = false }
+                packs.forEach { pack ->
+                    IconPackOption(pack.icon, pack.label, pack.packageName == current, pack.packageName) {
+                        onChoose(pack.packageName); choosing = false }
+                }
+                if (packs.isEmpty()) Detail(stringResource(R.string.settings_icon_pack_none))
+                TextButton(onClick = {
+                    val search = "icon pack"
+                    val market = android.content.Intent(android.content.Intent.ACTION_VIEW,
+                        android.net.Uri.parse("market://search?q=" + android.net.Uri.encode(search) + "&c=apps"))
+                        .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                    if (runCatching { context.startActivity(market) }.isFailure)
+                        context.openLink("https://play.google.com/store/search?q=" + android.net.Uri.encode(search) + "&c=apps")
+                }, Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("icon-pack-store")) {
+                    Text(stringResource(R.string.settings_icon_pack_get))
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = { choosing = false }) { Text(stringResource(R.string.cancel)) } })
+}
+
+@Composable
+private fun IconPackOption(icon: android.graphics.drawable.Drawable?, label: String, selected: Boolean, tag: String? = null, onClick: () -> Unit) {
+    val bitmap = remember(icon) { icon?.let { launcherIcon(it).asImageBitmap() } }
+    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).clip(RoundedCornerShape(12.dp))
+        .selectable(selected, role = Role.RadioButton, onClick = onClick).testTag("icon-pack-${tag ?: "system"}"),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        RadioButton(selected, null)
+        if (bitmap != null) Image(bitmap, null, Modifier.size(36.dp).clip(RoundedCornerShape(9.dp)))
+        Text(label, Modifier.weight(1f))
     }
 }
 
@@ -678,6 +738,11 @@ private fun HomePage(state: LauncherState, wide: Boolean, model: LauncherModel, 
         SwitchRow(stringResource(R.string.show_status), stringResource(R.string.settings_status_detail), state.verticalStatus,
             model::setVerticalStatus, "status-switch")
     }
+    SectionCaption(stringResource(R.string.settings_section_screen))
+    SettingsGroup {
+        SwitchRow(stringResource(R.string.settings_cover_rotation), stringResource(R.string.settings_cover_rotation_detail),
+            state.coverRotation, model::setCoverRotation, "cover-rotation-switch", badge = stringResource(R.string.settings_experimental))
+    }
     SectionCaption(stringResource(R.string.all_apps))
     SettingsGroup {
         GroupBody {
@@ -719,6 +784,7 @@ private fun DockPage(state: LauncherState, wide: Boolean, model: LauncherModel) 
 private fun GesturesPage(state: LauncherState, model: LauncherModel, serviceOn: Boolean, onShadeSetup: () -> Unit) {
     val colors = LocalSettingsColors.current
     Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp), color = colors.card,
+        contentColor = MaterialTheme.colorScheme.onSurface,
         border = if (serviceOn) null else BorderStroke(2.dp, colors.onAlert.copy(alpha = .4f))) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Column(Modifier.weight(1f)) {
