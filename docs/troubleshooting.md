@@ -4,9 +4,9 @@ iDuo Launcher is an experimental Fold beta. Device vendors, Android releases, th
 
 ## iDuo is not the Home app
 
-Long press empty Home space, choose **Customize launcher**, then **Set as home app**. You can also use **Help & setup → Set iDuo as Home**. Complete the choice in Android's Home app settings.
+Long press empty Home space, choose **Customize launcher**, then **Set as home app** at the top of Settings. You can also use **Language, backup & Home app**. Complete the choice in Android's Home app settings.
 
-To switch back, choose **Change home app** in customization or use Android **Settings → Apps → Default apps → Home app**. Installing iDuo never changes the Home app automatically.
+To switch back, choose **Change home app** under **Settings → Language, backup & Home app** or use Android **Settings → Apps → Default apps → Home app**. Installing iDuo never changes the Home app automatically.
 
 ## An update will not install
 
@@ -25,7 +25,7 @@ The news page needs an internet connection. Pull down on the list or use the ref
 
 ## The search button does not open Google
 
-In **Customize launcher → Gestures & search**, check **Search button opens Google**. iDuo asks the Google app to open Android's global search screen. If that activity is missing or blocked, iDuo falls back to **All apps** with its local **Search apps** field. You can turn the setting off to use local app search every time.
+In **Settings → Gestures & search**, check that **Search button** is set to **Google**. iDuo asks the Google app to open Android's global search screen. If that activity is missing or blocked, iDuo falls back to **All apps** with its local **Search apps** field. You can turn the setting off to use local app search every time.
 
 ## A widget will not add or finish setup
 
@@ -57,7 +57,7 @@ Long press and release to open **Widget options**. Use **Resize on Home** or the
 - Home gestures work only on Home: a swipe down on the left 70% opens Notifications, on the right 30% Quick Settings. A double tap locks the screen only on empty space; icons, folders, widgets and the dock keep their own taps. A dock that is already vertically scrolled keeps its downward gesture.
 - To drag an item between pages, keep holding at the full left or right window edge until the page turns. Ordinary swipes and held edge paging use different timing.
 
-If Home gestures are off, choose **Help & setup → Set up Home gestures**, then **Open settings** and enable iDuo Launcher yourself. If the service has just started, follow the on-screen request to swipe again. iDuo does not enable Accessibility access automatically.
+If Home gestures are off, choose **Turn on** in **Settings → Gestures & search**, then **Open settings** and enable iDuo Launcher yourself. If the service has just started, follow the on-screen request to swipe again. iDuo does not enable Accessibility access automatically.
 
 ## An app or work profile is unavailable
 

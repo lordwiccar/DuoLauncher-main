@@ -245,7 +245,7 @@ private fun GoogleNewsEditor(modifier: Modifier) {
 
 /** Every edition, sorted by its name in [locale], with a filter for the long list. */
 @Composable
-private fun NewsEditionDialog(locale: java.util.Locale, onDismiss: () -> Unit, onChoose: (NewsEdition) -> Unit) {
+internal fun NewsEditionDialog(locale: java.util.Locale, onDismiss: () -> Unit, onChoose: (NewsEdition) -> Unit) {
     var query by rememberSaveable { mutableStateOf("") }
     val sorted = remember(locale) {
         val collator = java.text.Collator.getInstance(locale)

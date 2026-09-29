@@ -30,7 +30,7 @@ Android still controls the lock screen, notification panels, recents, and system
 1. Install iDuo Launcher from Google Play, or download the signed APK from this repository's Releases section.
 2. Open the APK, allow installation from that source if Android asks, and open **iDuo Launcher**.
 3. Try the layout before choosing **Set as home app**. Select iDuo Launcher in Android's Home app settings when ready.
-4. Long press any empty Home space, including the wallpaper around and below the grid, to add widgets or **Customize launcher**. Help is available from customization.
+4. Long press any empty Home space, including the wallpaper around and below the grid, to add widgets or **Customize launcher** for Settings. Help is under **Help & information**.
 
 To switch back, open Android **Settings → Apps → Default apps → Home app** and select your previous launcher. Vendor labels may differ. Installing iDuo does not automatically select it as Home.
 

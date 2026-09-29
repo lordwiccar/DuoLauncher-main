@@ -67,6 +67,10 @@ data class LauncherState(
     val leftPage: LeftPage = LeftPage.GOOGLE_NEWS,
     /** A double tap on empty Home space locks the screen. */
     val doubleTapLock: Boolean = true,
+    /** A downward swipe on Home opens notifications or Quick Settings. */
+    val swipeDownShade: Boolean = true,
+    /** An upward swipe on Home opens search. */
+    val swipeUpSearch: Boolean = true,
     val loading: Boolean = true,
     val error: String? = null,
 ) {
@@ -464,6 +468,14 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         if (statePayloadInvalid) return
         mutable.update { it.copy(doubleTapLock = value) }; persist()
     }
+    fun setSwipeDownShade(value: Boolean) {
+        if (statePayloadInvalid) return
+        mutable.update { it.copy(swipeDownShade = value) }; persist()
+    }
+    fun setSwipeUpSearch(value: Boolean) {
+        if (statePayloadInvalid) return
+        mutable.update { it.copy(swipeUpSearch = value) }; persist()
+    }
     fun setGoogleSearch(value: Boolean) { if (statePayloadInvalid) return; undoLayout = null; undoImportSettings = null; mutable.update { it.copy(googleSearch = value, canUndoEdit = false) }; persist() }
     fun setPreset(expanded: Boolean, value: LayoutPreset) {
         if (statePayloadInvalid) return
@@ -530,6 +542,8 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .put("libraryGrid", s.libraryGrid)
             .put("leftPage", s.leftPage.name)
             .put("doubleTapLock", s.doubleTapLock)
+            .put("swipeDownShade", s.swipeDownShade)
+            .put("swipeUpSearch", s.swipeUpSearch)
             .put("compact", preset(s.compact)).put("expanded", preset(s.expanded))
         val editor = prefs.edit()
         if (legacyRaw != null && sourceSchema == 2 && !prefs.contains("state_v2_backup"))
@@ -685,7 +699,9 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             libraryGrid = j.optBoolean("libraryGrid", false),
             // Layouts from before Google News chose "DISCOVER", which now falls back to Google News.
             leftPage = LeftPage.entries.firstOrNull { it.name == j.optString("leftPage") } ?: LeftPage.GOOGLE_NEWS,
-            doubleTapLock = j.optBoolean("doubleTapLock", true))
+            doubleTapLock = j.optBoolean("doubleTapLock", true),
+            swipeDownShade = j.optBoolean("swipeDownShade", true),
+            swipeUpSearch = j.optBoolean("swipeUpSearch", true))
             .let { it.copy(homeRows = maxOf(it.homeRows, it.layout.requiredRows())) }
     }.getOrElse {
         statePayloadInvalid = legacyRaw != null

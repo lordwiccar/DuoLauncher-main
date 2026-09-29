@@ -52,7 +52,7 @@ class SystemShadeAccessibilityService : AccessibilityService() {
             else ShadeOpenResult.SERVICE_DISABLED
         }
 
-        private fun isEnabled(context: Context): Boolean {
+        internal fun isEnabled(context: Context): Boolean {
             val component = ComponentName(context, SystemShadeAccessibilityService::class.java)
             val manager = context.getSystemService(AccessibilityManager::class.java)
             return manager.getEnabledAccessibilityServiceList(

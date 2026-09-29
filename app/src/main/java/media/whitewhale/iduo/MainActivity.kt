@@ -12,6 +12,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.SystemBarStyle
 import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.view.WindowCompat
@@ -43,6 +45,9 @@ class MainActivity : ComponentActivity() {
         private set
     private val homeRequests = mutableIntStateOf(0)
     private val searchRequests = mutableIntStateOf(0)
+    /** Whether the optional Home gestures accessibility service is on, checked on each resume. */
+    internal var homeGesturesEnabled by androidx.compose.runtime.mutableStateOf(false)
+        private set
     private val defaultHome = mutableStateOf(false)
     private val showFirstRun = mutableStateOf(false)
     private lateinit var setupExperience: SetupExperience
@@ -131,6 +136,7 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         returningFromShadeSettings = false
         model.refresh(); appearance.refresh(systemDark()); updateDefaultHome()
+        homeGesturesEnabled = SystemShadeAccessibilityService.isEnabled(this)
     }
 
     internal fun openSystemShade(panel: ShadePanel) =

@@ -24,20 +24,13 @@
     <string name="value_percent">%1$d %%</string>
 
     <!-- Customization -->
-    <string name="customize_title">Ganz nach deinem Geschmack</string>
     <string name="customize_close">Anpassung schließen</string>
     <string name="customize_launcher">Launcher anpassen</string>
     <string name="customize_wallpaper">Hintergrund &amp; Darstellung</string>
-    <string name="customize_wallpaper_detail">Hintergrund, Farben und Helligkeit</string>
-    <string name="customize_wallpaper_pending">Foto bereit zur Prüfung</string>
-    <string name="customize_home">Startbildschirm-Layout</string>
-    <string name="customize_home_detail">Symbole, Abstände, Dock und Widgets</string>
+    <string name="customize_home">Startbildschirm</string>
     <string name="customize_gestures">Gesten &amp; Suche</string>
-    <string name="customize_gestures_detail">Beschriftungen, Status und Suchverhalten</string>
     <string name="customize_language">Sprache</string>
     <string name="language_system">Systemsprache</string>
-    <string name="customize_backup">Sicherung</string>
-    <string name="customize_backup_detail">Dieses Layout speichern oder wiederherstellen</string>
     <string name="customize_help">Hilfe &amp; Einrichtung</string>
     <string name="customize_help_detail">Start-App, Widgets, Gesten und Nachrichten</string>
     <string name="set_as_home_app">Als Start-App festlegen</string>
@@ -46,11 +39,9 @@
     <string name="undo_layout_change">Letzte Layoutänderung rückgängig machen</string>
 
     <string name="choose_photo">Foto auswählen</string>
-    <string name="choose_different_photo">Anderes Foto auswählen</string>
     <string name="android_wallpaper">Android-Hintergrund</string>
     <string name="wallpaper_detail">iDuo zeigt deinen Android-Hintergrund. Ein hier gewähltes Foto oder die iDuo-Dünen werden als Android-Hintergrund festgelegt.</string>
     <string name="use_iduo_dunes">iDuo-Dünen verwenden</string>
-    <string name="android_wallpaper_detail">Wähle in den Android-Einstellungen einen beliebigen Hintergrund, auch Live-Hintergründe. iDuo zeigt ihn sofort an.</string>
     <string name="open_wallpaper_settings">Hintergrundeinstellungen öffnen</string>
     <string name="wallpaper_settings_unavailable">Die Hintergrundeinstellungen von Android sind nicht verfügbar.</string>
     <string name="wallpaper_target_title">Hintergrund festlegen für</string>
@@ -61,10 +52,8 @@
     <string name="wallpaper_updated">Hintergrund aktualisiert.</string>
     <string name="restore_photo_note">Dein Hintergrund ist nicht Teil der Layout-Sicherung.</string>
 
-    <string name="appearance">Darstellung</string>
     <string name="appearance_light">Hell</string>
     <string name="appearance_dark">Dunkel</string>
-    <string name="appearance_system">Wie System</string>
     <string name="appearance_sun">Sonnenaufgang / -untergang</string>
     <string name="place_name">Ortsname</string>
     <string name="latitude_label">Breitengrad (−90 bis 90)</string>
@@ -85,11 +74,8 @@
     <string name="location_timeout">Zeitüberschreitung bei der Standortbestimmung. Das Systemdesign wird verwendet, bis du es erneut versuchst oder einen Ort eingibst.</string>
     <string name="location_unavailable">Standort nicht verfügbar. Das Systemdesign wird verwendet.</string>
 
-    <string name="display_cover">Außendisplay</string>
-    <string name="display_inner">Innendisplay</string>
     <string name="choose_home_apps">Apps für den Startbildschirm auswählen</string>
     <string name="pin_home_apps_title">Apps auf dem Startbildschirm</string>
-    <string name="dock_apps_setting">Apps im Dock · Außen- und Innendisplay</string>
     <string name="home_rows_setting">Startbildschirm-Zeilen · Außen- und Innendisplay</string>
     <string name="grid_layout">Rasterlayout</string>
     <string name="home_rows_option">%1$d × %2$d Apps</string>
@@ -109,9 +95,6 @@
 
     <string name="show_app_names">App-Namen anzeigen</string>
     <string name="show_status">Status oben rechts anzeigen</string>
-    <string name="search_opens_google">Suchtaste öffnet Google</string>
-    <string name="search_local_note">Die App-Übersicht behält immer ihre eigene App-Suche.</string>
-    <string name="gestures_note">Wische irgendwo auf dem Startbildschirm seitwärts, um die Seite zu wechseln. Wische nach unten für Benachrichtigungen oder Schnelleinstellungen, nach oben für die Suche.</string>
 
     <string name="backup_detail">Speichert das aktuelle Startbildschirm-Layout, Ordner, Widgets und Layouteinstellungen.</string>
     <string name="backup_restore_note">Vor einer Änderung des Startbildschirms zeigt die Wiederherstellung eine Übersicht.</string>
@@ -368,7 +351,6 @@
     <string name="shade_setup_title">Startbildschirmgesten aktivieren</string>
     <string name="shade_setup_message">Android verlangt, dass du die Startbildschirmgesten von iDuo Launcher in den Bedienungshilfen aktivierst. Dieser Dienst öffnet nur Benachrichtigungen oder Schnelleinstellungen und sperrt den Bildschirm; er liest keine Bildschirminhalte und beobachtet keine anderen Apps.</string>
     <string name="shade_starting">Startbildschirmgesten werden gestartet. Versuche es erneut.</string>
-    <string name="double_tap_lock">Doppeltippen sperrt den Bildschirm</string>
     <string name="lock_rejected">Android konnte den Bildschirm nicht sperren.</string>
     <string name="shade_rejected">Android konnte die Systemleiste nicht öffnen.</string>
     <string name="accessibility_unavailable">Die Bedienungshilfen-Einstellungen sind nicht verfügbar.</string>
@@ -414,8 +396,64 @@
     <string name="about_third_party">Hinweise zu Drittanbietern</string>
     <string name="changelog_unreleased">Nächste Version</string>
     <string name="changelog_note">Das Änderungsprotokoll wird auf Englisch geführt.</string>
-    <string name="customize_info">Info und Feedback</string>
-    <string name="customize_info_detail">Über die App, Änderungsprotokoll und Feedback</string>
     <string name="customize_feedback">Feedback senden</string>
     <string name="customize_feedback_detail">Melde ein Problem oder schlage eine Idee in einem kurzen Formular vor</string>
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_search">Einstellungen durchsuchen</string>
+    <string name="settings_no_results">Nichts gefunden</string>
+    <string name="settings_group_customize">Personalisierung</string>
+    <string name="settings_group_control">Bedienung</string>
+    <string name="settings_group_system">System und Hilfe</string>
+    <string name="customize_dock">Dock</string>
+    <string name="customize_system">Sprache, Sicherung und Start-App</string>
+    <string name="customize_support">Hilfe und Infos</string>
+    <string name="settings_not_default_title">iDuo ist nicht deine Start-App</string>
+    <string name="settings_gestures_off_title">Startbildschirmgesten sind aus</string>
+    <string name="settings_gestures_off_detail">Ohne sie funktionieren Wischen nach unten und Sperren per Doppeltippen nicht.</string>
+    <string name="settings_turn_on">Aktivieren</string>
+    <string name="settings_color_mode_value">Farbmodus: %1$s</string>
+    <string name="settings_home_summary">Raster %1$d × %2$d · Symbole %3$d dp · Widgets: %4$d</string>
+    <string name="settings_dock_summary">Apps im Dock: %1$d</string>
+    <string name="settings_gestures_none">Keine Startbildschirmgesten</string>
+    <string name="settings_rss_summary">Eigene RSS-Feeds · Quellen: %1$d</string>
+    <string name="settings_support_summary">Anleitung, Info, Änderungen, Feedback</string>
+    <string name="appearance_system_short">System</string>
+    <string name="appearance_sun_short">Sonne</string>
+    <string name="settings_color_mode">Farbmodus</string>
+    <string name="settings_dock_count">Apps im Dock</string>
+    <string name="settings_dock_count_detail">Gleich auf dem Außen- und Innendisplay.</string>
+    <string name="gesture_down">Nach unten wischen</string>
+    <string name="gesture_down_detail">Links Benachrichtigungen, rechts Schnelleinstellungen</string>
+    <string name="gesture_double">Doppeltippen</string>
+    <string name="gesture_double_detail">Sperrt den Bildschirm, Fingerabdruck funktioniert weiter</string>
+    <string name="gesture_up">Nach oben wischen</string>
+    <string name="gesture_up_detail">Öffnet die Suche nach Apps und bei Google</string>
+    <string name="gesture_side">Seitlich wischen</string>
+    <string name="gesture_side_detail">Wechselt die Startbildschirmseiten · immer an</string>
+    <string name="settings_search_button">Suchtaste</string>
+    <string name="settings_search_button_detail">Was die Lupe unten rechts öffnet</string>
+    <string name="settings_search_google">Google</string>
+    <string name="settings_search_apps">App-Suche</string>
+    <string name="settings_service_title">Dienst für Startbildschirmgesten</string>
+    <string name="settings_service_on">An</string>
+    <string name="settings_service_off">Aus · nötig für die unten markierten Gesten</string>
+    <string name="settings_needs_service">Braucht den Dienst</string>
+    <string name="settings_section_gestures">Gesten auf dem Startbildschirm</string>
+    <string name="settings_tile_dunes">iDuo-Dünen</string>
+    <string name="settings_tile_photo">Eigenes Foto</string>
+    <string name="settings_tile_android">Android-Hintergründe</string>
+    <string name="settings_sun_detail">„Sonne“ wechselt bei Sonnenauf- und -untergang an deinem Ort.</string>
+    <string name="settings_applies_to">Änderungen gelten für</string>
+    <string name="settings_display_cover">Außendisplay</string>
+    <string name="settings_display_inner">Innendisplay</string>
+    <string name="settings_section_grid">Raster und Symbole</string>
+    <string name="settings_grid_detail">Anzahl der App-Reihen</string>
+    <string name="settings_grid_value">%1$d × %2$d</string>
+    <string name="settings_names_detail">Unter den Symbolen auf dem Startbildschirm und im Dock</string>
+    <string name="settings_section_content">Inhalt des Startbildschirms</string>
+    <string name="settings_pinned_count">Angeheftete Apps: %1$d</string>
+    <string name="settings_status_detail">Uhrzeit, Datum, Akku und Signal</string>
+    <string name="settings_reset_cover">Layout des Außendisplays zurücksetzen</string>
+    <string name="settings_reset_inner">Layout des Innendisplays zurücksetzen</string>
+    <string name="settings_news_detail">Wische auf der ersten Startbildschirmseite nach rechts, um sie zu sehen.</string>
 </resources>

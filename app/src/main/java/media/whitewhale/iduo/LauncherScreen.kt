@@ -160,9 +160,9 @@ fun LauncherScreen(
     var resizeAppPitch by remember { mutableFloatStateOf(1f) }
     var selectedId by rememberSaveable { mutableStateOf<String?>(null) }
     var appMoveMenu by rememberSaveable { mutableStateOf(false) }
-    var customizationPage by rememberSaveable { mutableStateOf(CustomizationPage.OVERVIEW) }
+    var customizationPage by rememberSaveable { mutableStateOf(SettingsPage.OVERVIEW) }
     LaunchedEffect(selectedId) { if (selectedId == null) appMoveMenu = false }
-    LaunchedEffect(sheet) { if (sheet.isEmpty()) customizationPage = CustomizationPage.OVERVIEW }
+    LaunchedEffect(sheet) { if (sheet.isEmpty()) customizationPage = SettingsPage.OVERVIEW }
     var openFolderId by rememberSaveable { mutableStateOf<String?>(null) }
     var spotlight by rememberSaveable { mutableStateOf(false) }
     var createFolderFirstId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -235,7 +235,7 @@ fun LauncherScreen(
         pager.animateScrollToPage(page)
     } }
     LaunchedEffect(searchRequests) { if (searchRequests > 0) { drag.clear(); widgetSession = null; resizeSlot = null; sheet = ""; widgetPackage = null; widgetExactTarget = false; selectedId = null
-        if (!state.googleSearch || !onGoogleSearch(null)) pager.animateScrollToPage(homePages)
+        if (!state.googleSearch || !onGoogleSearch(null)) spotlight = true
     } }
     val widgetPickerBack = {
         if (widgetSession != null) {
@@ -504,9 +504,9 @@ fun LauncherScreen(
                 // stream untouched so scrollable widgets retain native gesture handling.
                 // A dock that is already scrolled also gets first use of a downward drag.
                 canStartDownwardSwipe = { point -> homeOwnsVerticalSwipe(point, upward = false) },
-                onDownwardSwipe = launcherActivity::openSystemShade,
+                onDownwardSwipe = if (state.swipeDownShade) launcherActivity::openSystemShade else null,
                 canStartUpwardSwipe = { point -> homeOwnsVerticalSwipe(point, upward = true) },
-                onUpwardSwipe = { spotlight = true },
+                onUpwardSwipe = if (state.swipeUpSearch) ({ spotlight = true }) else null,
                 childPagesHorizontally = { point, travel ->
                     drag.childPager?.let { child -> child.bounds().contains(point + gestureOriginInRoot) && child.canPage(travel) } == true
                 },
@@ -622,28 +622,34 @@ fun LauncherScreen(
                 val searchBounds = remember { android.graphics.Rect() }
                 Box(Modifier.onGloballyPositioned { searchBounds.set(it.boundsInWindow().toAndroidBounds()) }) {
                     CircleControl(Icons.Rounded.Search, stringResource(if (state.googleSearch) R.string.search_google else R.string.search_apps), "search", controlSize) {
-                        if (!state.googleSearch || !onGoogleSearch(searchBounds)) openLibrary()
+                        if (!state.googleSearch || !onGoogleSearch(searchBounds)) spotlight = true
                     }
                 }
             }
-            if (sheet.isNotEmpty() && sheet != "widgets") {
-                val activeCustomizationPage = if (sheet == "settings:wallpaper") CustomizationPage.WALLPAPER else customizationPage
+            if (sheet == "settings" || sheet == "settings:wallpaper") SettingsScreen(state, wide, model, isDefaultHome, maxRowsFit,
+                page = if (sheet == "settings:wallpaper") SettingsPage.APPEARANCE else customizationPage,
+                onPage = { customizationPage = it; sheet = "settings" },
+                onMakeDefault = { sheet = ""; onMakeDefault() },
+                onClose = { customizationPage = SettingsPage.OVERVIEW; sheet = "" }, onEditPins = { sheet = "pins" },
+                onWidget = { widgetSlot = it; widgetPackage = null; widgetProfileSerial = null; widgetExactTarget = false; sheet = "widgets" },
+                onAddWidget = { page -> widgetSlot = model.nextWidgetSlot(); widgetTargetIndex = page * HOME_CELLS; widgetPackage = null; widgetProfileSerial = null; widgetExactTarget = false; sheet = "widgets" },
+                onRemoveWidget = widgets::remove,
+                onExportLayout = { sheet = ""; launcherActivity.backups.startExport() },
+                onImportLayout = { sheet = ""; launcherActivity.backups.startImport() },
+                appearance = appearance, onAppearanceMode = onAppearanceMode,
+                onAppearanceManual = onAppearanceManual, onAppearanceDeviceLocation = onAppearanceDeviceLocation,
+                onAppearanceClear = onAppearanceClear,
+                onShadeSetup = { sheet = ""; onShadeSetup() },
+                homeGesturesOn = launcherActivity.homeGesturesEnabled,
+                backgrounds = launcherActivity.backgrounds,
+                onWallpaperSettings = { sheet = ""; onWallpaperSettings() }, homePage = pager.currentPage.coerceIn(0, homePages - 1))
+            if (sheet.isNotEmpty() && sheet != "widgets" && !sheet.startsWith("settings")) {
                 ModalBottomSheet(onDismissRequest = {
-                    customizationPage = CustomizationPage.OVERVIEW
                     sheet = ""; widgetPackage = null; widgetExactTarget = false
                 }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
                     properties = ModalBottomSheetProperties(shouldDismissOnBackPress = false),
                     containerColor = MaterialTheme.colorScheme.surface) {
-                    ModalDialogBackHandler {
-                        if ((sheet == "settings" || sheet == "settings:wallpaper") &&
-                            activeCustomizationPage != CustomizationPage.OVERVIEW) {
-                            customizationPage = activeCustomizationPage.parent
-                            sheet = "settings"
-                        } else {
-                            customizationPage = CustomizationPage.OVERVIEW
-                            sheet = ""; widgetPackage = null; widgetExactTarget = false
-                        }
-                    }
+                    ModalDialogBackHandler { sheet = ""; widgetPackage = null; widgetExactTarget = false }
                     when (sheet) {
                         "dock" -> AppPicker(state.apps, dockSlot,
                             onSelect = {
@@ -663,21 +669,6 @@ fun LauncherScreen(
                                 onActions = { selectedId = it.id; sheet = "" }, editing = true, modifier = Modifier.weight(1f).fillMaxWidth(),
                                 onTurnOnWork = { model.turnOnWork(it) })
                         }
-                        "settings", "settings:wallpaper" -> CustomizationSheet(state, wide, model, isDefaultHome, maxRowsFit,
-                            page = activeCustomizationPage, onPage = { customizationPage = it; sheet = "settings" },
-                            onMakeDefault = { sheet = ""; onMakeDefault() },
-                            onClose = { customizationPage = CustomizationPage.OVERVIEW; sheet = "" }, onEditPins = { sheet = "pins" },
-                            onWidget = { widgetSlot = it; widgetPackage = null; widgetProfileSerial = null; widgetExactTarget = false; sheet = "widgets" },
-                            onAddWidget = { page -> widgetSlot = model.nextWidgetSlot(); widgetTargetIndex = page * HOME_CELLS; widgetPackage = null; widgetProfileSerial = null; widgetExactTarget = false; sheet = "widgets" },
-                            onRemoveWidget = widgets::remove,
-                            onExportLayout = { sheet = ""; launcherActivity.backups.startExport() },
-                            onImportLayout = { sheet = ""; launcherActivity.backups.startImport() },
-                            appearance = appearance, onAppearanceMode = onAppearanceMode,
-                            onAppearanceManual = onAppearanceManual, onAppearanceDeviceLocation = onAppearanceDeviceLocation,
-                            onAppearanceClear = onAppearanceClear,
-                            onShadeSetup = { sheet = ""; onShadeSetup() },
-                            backgrounds = launcherActivity.backgrounds,
-                            onWallpaperSettings = { sheet = ""; onWallpaperSettings() }, homePage = pager.currentPage.coerceIn(0, homePages - 1))
                         "widgetActions" -> model.placement(widgetSlot)?.let { placement ->
                             val topPitch = (geometry.widgetHeight + 18f) / 2f
                             val gridSizing = WidgetGridSizing(GRID_COLUMNS, state.homeRows, geometry.gridWidth / GRID_COLUMNS,

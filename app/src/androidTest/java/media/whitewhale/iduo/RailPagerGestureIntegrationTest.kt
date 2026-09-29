@@ -99,7 +99,7 @@ class RailPagerGestureIntegrationTest {
         compose.openHomeCustomization()
         compose.onNodeWithTag("customization-gestures").performClick()
         compose.onNodeWithTag("google-search-switch").assertExists()
-        compose.onNodeWithContentDescription("Close customization").performClick()
+        compose.closeSettingsPage()
         compose.waitForIdle()
         compose.onNodeWithTag("google-search-switch").assertDoesNotExist()
 

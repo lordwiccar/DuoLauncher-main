@@ -24,20 +24,13 @@
     <string name="value_percent">%1$d%%</string>
 
     <!-- Customization -->
-    <string name="customize_title">Dostosuj po swojemu</string>
     <string name="customize_close">Zamknij dostosowywanie</string>
     <string name="customize_launcher">Dostosuj launcher</string>
     <string name="customize_wallpaper">Tapeta i wygląd</string>
-    <string name="customize_wallpaper_detail">Tło, kolory i jasność</string>
-    <string name="customize_wallpaper_pending">Zdjęcie czeka na sprawdzenie</string>
-    <string name="customize_home">Układ ekranu głównego</string>
-    <string name="customize_home_detail">Ikony, odstępy, dok i widżety</string>
+    <string name="customize_home">Ekran główny</string>
     <string name="customize_gestures">Gesty i wyszukiwanie</string>
-    <string name="customize_gestures_detail">Etykiety, stan i działanie wyszukiwania</string>
     <string name="customize_language">Język</string>
     <string name="language_system">Język systemu</string>
-    <string name="customize_backup">Kopia zapasowa</string>
-    <string name="customize_backup_detail">Zapisz lub przywróć ten układ</string>
     <string name="customize_help">Pomoc i konfiguracja</string>
     <string name="customize_help_detail">Aplikacja ekranu głównego, widżety, gesty i wiadomości</string>
     <string name="set_as_home_app">Ustaw jako aplikację ekranu głównego</string>
@@ -46,11 +39,9 @@
     <string name="undo_layout_change">Cofnij ostatnią zmianę układu</string>
 
     <string name="choose_photo">Wybierz zdjęcie</string>
-    <string name="choose_different_photo">Wybierz inne zdjęcie</string>
     <string name="android_wallpaper">Tapeta Androida</string>
     <string name="wallpaper_detail">iDuo wyświetla tapetę Androida. Zdjęcie lub wydmy iDuo wybrane tutaj zostaną ustawione jako tapeta Androida.</string>
     <string name="use_iduo_dunes">Użyj wydm iDuo</string>
-    <string name="android_wallpaper_detail">W ustawieniach Androida możesz wybrać dowolną tapetę, także animowaną. iDuo od razu ją wyświetli.</string>
     <string name="open_wallpaper_settings">Otwórz ustawienia tapety</string>
     <string name="wallpaper_settings_unavailable">Ustawienia tapety Androida są niedostępne.</string>
     <string name="wallpaper_target_title">Ustaw tapetę na</string>
@@ -61,10 +52,8 @@
     <string name="wallpaper_updated">Tapeta została zmieniona.</string>
     <string name="restore_photo_note">Tapeta nie jest częścią kopii zapasowej układu.</string>
 
-    <string name="appearance">Wygląd</string>
     <string name="appearance_light">Jasny</string>
     <string name="appearance_dark">Ciemny</string>
-    <string name="appearance_system">Zgodnie z systemem</string>
     <string name="appearance_sun">Wschód / zachód słońca</string>
     <string name="place_name">Nazwa miejsca</string>
     <string name="latitude_label">Szerokość geograficzna (−90 do 90)</string>
@@ -85,11 +74,8 @@
     <string name="location_timeout">Upłynął limit czasu lokalizacji. Motyw systemowy będzie używany, dopóki nie spróbujesz ponownie lub nie wpiszesz miejsca.</string>
     <string name="location_unavailable">Lokalizacja jest niedostępna. Używany jest motyw systemowy.</string>
 
-    <string name="display_cover">Ekran zewnętrzny</string>
-    <string name="display_inner">Ekran wewnętrzny</string>
     <string name="choose_home_apps">Wybierz aplikacje na ekran główny</string>
     <string name="pin_home_apps_title">Aplikacje na ekranie głównym</string>
-    <string name="dock_apps_setting">Aplikacje w doku · ekran zewnętrzny i wewnętrzny</string>
     <string name="home_rows_setting">Wiersze ekranu głównego · ekran zewnętrzny i wewnętrzny</string>
     <string name="grid_layout">Układ siatki</string>
     <string name="home_rows_option">%1$d × %2$d aplikacji</string>
@@ -109,9 +95,6 @@
 
     <string name="show_app_names">Pokaż nazwy aplikacji</string>
     <string name="show_status">Pokaż stan w prawym górnym rogu</string>
-    <string name="search_opens_google">Przycisk wyszukiwania otwiera Google</string>
-    <string name="search_local_note">Lista wszystkich aplikacji zawsze ma własne wyszukiwanie.</string>
-    <string name="gestures_note">Przesuń w bok w dowolnym miejscu ekranu głównego, aby zmienić stronę. Przesuń w dół, aby otworzyć powiadomienia lub szybkie ustawienia, w górę, aby wyszukiwać.</string>
 
     <string name="backup_detail">Zapisz bieżący układ ekranu głównego, foldery, widżety i ustawienia układu.</string>
     <string name="backup_restore_note">Przed zmianą ekranu głównego przywracanie zawsze pokazuje podsumowanie.</string>
@@ -384,7 +367,6 @@
     <string name="shade_setup_title">Włącz gesty ekranu głównego</string>
     <string name="shade_setup_message">Android wymaga włączenia gestów ekranu głównego iDuo Launcher w ustawieniach Ułatwień dostępu. Usługa jedynie otwiera powiadomienia lub szybkie ustawienia i blokuje ekran; nie odczytuje zawartości ekranu ani nie obserwuje innych aplikacji.</string>
     <string name="shade_starting">Gesty ekranu głównego uruchamiają się. Spróbuj ponownie.</string>
-    <string name="double_tap_lock">Dotknij dwukrotnie, aby zablokować ekran</string>
     <string name="lock_rejected">Android nie mógł zablokować ekranu.</string>
     <string name="shade_rejected">Android nie mógł otworzyć panelu systemowego.</string>
     <string name="accessibility_unavailable">Ustawienia Ułatwień dostępu są niedostępne.</string>
@@ -430,8 +412,64 @@
     <string name="about_third_party">Licencje stron trzecich</string>
     <string name="changelog_unreleased">Następna wersja</string>
     <string name="changelog_note">Lista zmian jest prowadzona po angielsku.</string>
-    <string name="customize_info">O aplikacji i opinie</string>
-    <string name="customize_info_detail">O aplikacji, lista zmian i opinie</string>
     <string name="customize_feedback">Wyślij opinię</string>
     <string name="customize_feedback_detail">Zgłoś problem lub zaproponuj pomysł w krótkim formularzu</string>
+    <string name="settings_title">Ustawienia</string>
+    <string name="settings_search">Szukaj w ustawieniach</string>
+    <string name="settings_no_results">Nic nie znaleziono</string>
+    <string name="settings_group_customize">Personalizacja</string>
+    <string name="settings_group_control">Sterowanie</string>
+    <string name="settings_group_system">System i pomoc</string>
+    <string name="customize_dock">Dok</string>
+    <string name="customize_system">Język, kopia zapasowa i ekran główny</string>
+    <string name="customize_support">Pomoc i informacje</string>
+    <string name="settings_not_default_title">iDuo nie jest aplikacją ekranu głównego</string>
+    <string name="settings_gestures_off_title">Gesty ekranu głównego są wyłączone</string>
+    <string name="settings_gestures_off_detail">Bez nich nie działa przesunięcie w dół ani blokada dwukrotnym dotknięciem.</string>
+    <string name="settings_turn_on">Włącz</string>
+    <string name="settings_color_mode_value">Tryb kolorów: %1$s</string>
+    <string name="settings_home_summary">Siatka %1$d × %2$d · ikony %3$d dp · widżety: %4$d</string>
+    <string name="settings_dock_summary">Aplikacje w doku: %1$d</string>
+    <string name="settings_gestures_none">Brak gestów ekranu głównego</string>
+    <string name="settings_rss_summary">Moje kanały RSS · źródła: %1$d</string>
+    <string name="settings_support_summary">Przewodnik, o aplikacji, lista zmian, opinie</string>
+    <string name="appearance_system_short">System</string>
+    <string name="appearance_sun_short">Słońce</string>
+    <string name="settings_color_mode">Tryb kolorów</string>
+    <string name="settings_dock_count">Aplikacje w doku</string>
+    <string name="settings_dock_count_detail">Tak samo na ekranie zewnętrznym i wewnętrznym.</string>
+    <string name="gesture_down">Przesunięcie w dół</string>
+    <string name="gesture_down_detail">Po lewej powiadomienia, po prawej szybkie ustawienia</string>
+    <string name="gesture_double">Dwukrotne dotknięcie</string>
+    <string name="gesture_double_detail">Blokuje ekran, odcisk palca nadal działa</string>
+    <string name="gesture_up">Przesunięcie w górę</string>
+    <string name="gesture_up_detail">Otwiera wyszukiwanie aplikacji i Google</string>
+    <string name="gesture_side">Przesunięcie w bok</string>
+    <string name="gesture_side_detail">Zmienia strony ekranu głównego · zawsze włączone</string>
+    <string name="settings_search_button">Przycisk wyszukiwania</string>
+    <string name="settings_search_button_detail">Co otwiera lupa w prawym dolnym rogu</string>
+    <string name="settings_search_google">Google</string>
+    <string name="settings_search_apps">Wyszukiwanie aplikacji</string>
+    <string name="settings_service_title">Usługa gestów ekranu głównego</string>
+    <string name="settings_service_on">Włączona</string>
+    <string name="settings_service_off">Wyłączona · potrzebna dla gestów oznaczonych poniżej</string>
+    <string name="settings_needs_service">Wymaga usługi</string>
+    <string name="settings_section_gestures">Gesty na ekranie głównym</string>
+    <string name="settings_tile_dunes">Wydmy iDuo</string>
+    <string name="settings_tile_photo">Własne zdjęcie</string>
+    <string name="settings_tile_android">Tapety Androida</string>
+    <string name="settings_sun_detail">„Słońce” przełącza według wschodu i zachodu słońca w Twojej okolicy.</string>
+    <string name="settings_applies_to">Zmiany dotyczą</string>
+    <string name="settings_display_cover">Ekran zewnętrzny</string>
+    <string name="settings_display_inner">Ekran wewnętrzny</string>
+    <string name="settings_section_grid">Siatka i ikony</string>
+    <string name="settings_grid_detail">Liczba rzędów aplikacji</string>
+    <string name="settings_grid_value">%1$d × %2$d</string>
+    <string name="settings_names_detail">Pod ikonami na ekranie głównym i w doku</string>
+    <string name="settings_section_content">Zawartość ekranu głównego</string>
+    <string name="settings_pinned_count">Przypięte aplikacje: %1$d</string>
+    <string name="settings_status_detail">Godzina, data, bateria i sygnał</string>
+    <string name="settings_reset_cover">Przywróć domyślny układ ekranu zewnętrznego</string>
+    <string name="settings_reset_inner">Przywróć domyślny układ ekranu wewnętrznego</string>
+    <string name="settings_news_detail">Przesuń w prawo z pierwszej strony ekranu głównego, aby ją zobaczyć.</string>
 </resources>
