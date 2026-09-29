@@ -178,7 +178,7 @@
     <string name="folder_transparency">Przezroczystość tła folderu</string>
     <string name="all_apps_view">Widok wszystkich aplikacji</string>
     <string name="all_apps_view_list">Lista</string>
-    <string name="all_apps_view_grid">Siatka ze stronami</string>
+    <string name="all_apps_view_grid">Siatka</string>
     <string name="left_page">Lewa strona</string>
     <string name="left_page_rss">Własne RSS</string>
     <string name="news_settings">Ustawienia wiadomości</string>
@@ -482,4 +482,15 @@
     <string name="settings_cover_rotation">Obracaj ekran zewnętrzny</string>
     <string name="settings_cover_rotation_detail">Ekran główny na ekranie zewnętrznym obraca się razem z telefonem. Widok poziomy może jeszcze nie działać zgodnie z oczekiwaniami.</string>
     <string name="settings_experimental">Eksperymentalne</string>
+    <string name="all_apps_view_home">Na ekranach</string>
+    <string name="settings_all_apps_detail">Wszystkie aplikacje są za ostatnią stroną ekranu głównego, jako lista lub strony ikon.</string>
+    <string name="settings_apps_on_home_detail">Wszystkie aplikacje są na ekranach głównych. Aplikacje, których tam nie było, trafiły na nowe strony po prawej, nowe aplikacje dołączają do ostatniej strony, a Wszystkie aplikacje są ukryte. Po przełączeniu z powrotem strony zostają.</string>
+    <string name="settings_dock_mode">Wyświetlanie doku</string>
+    <string name="dock_mode_shown">Zawsze</string>
+    <string name="dock_mode_slide">Wysuwany</string>
+    <string name="dock_mode_hidden">Ukryty</string>
+    <string name="dock_mode_shown_detail">Dok jest zawsze po prawej.</string>
+    <string name="dock_mode_slide_detail">Przesuń w lewo od uchwytu przy prawej krawędzi, aby wysunąć dok. Chowa się po otwarciu aplikacji lub dotknięciu ekranu głównego.</string>
+    <string name="dock_mode_hidden_detail">Dok nie jest wyświetlany. Jego aplikacje pozostają zapisane na wypadek ponownego włączenia.</string>
+    <string name="dock_show">Pokaż dok</string>
 </resources>

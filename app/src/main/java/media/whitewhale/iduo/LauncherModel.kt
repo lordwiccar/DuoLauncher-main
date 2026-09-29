@@ -28,6 +28,9 @@ import java.text.Collator
 /** Home's left page: Google News headlines, or the user's own RSS sources. */
 enum class LeftPage { GOOGLE_NEWS, RSS }
 
+/** How the dock appears: always, slid in from the right edge on demand, or never. */
+enum class DockMode { SHOWN, SLIDE, HIDDEN }
+
 data class AppEntry(
     val id: String,
     val label: String,
@@ -76,6 +79,10 @@ data class LauncherState(
     val coverRotation: Boolean = false,
     /** Package of the chosen third-party icon pack, or null for the apps' own icons. */
     val iconPack: String? = null,
+    /** Every app lives on Home pages, and All apps is not shown. */
+    val appsOnHome: Boolean = false,
+    /** How the dock appears on Home. */
+    val dockMode: DockMode = DockMode.SHOWN,
     val loading: Boolean = true,
     val error: String? = null,
 ) {
@@ -87,7 +94,7 @@ data class LauncherState(
 
 class LauncherModel(application: Application) : AndroidViewModel(application) {
     private data class RefreshedApps(val entries: List<AppEntry>, val profiles: List<AppProfile>,
-        val authoritativeProfiles: Set<Long>, val removedProfiles: Set<Long>)
+        val authoritativeProfiles: Set<Long>, val removedProfiles: Set<Long>, val knownBefore: Set<String>)
     private data class UndoImportSettings(val compact: LayoutPreset, val expanded: LayoutPreset, val labels: Boolean,
         val googleSearch: Boolean, val verticalStatus: Boolean)
     private val prefs = application.getSharedPreferences("launcher", 0)
@@ -218,7 +225,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
                     iconCache.keys.retainAll(entries.map { it.id }.toSet())
                     RefreshedApps(entries, (profiles + unavailable.map { AppProfile(it.userSerial, it.profileLabel, false, true,
                         quiet = true, unlocked = false, available = false) }).distinctBy(AppProfile::userSerial),
-                        authoritativeProfiles.toSet(), removedProfileSerials)
+                        authoritativeProfiles.toSet(), removedProfileSerials, cachedBeforeProfiles.mapTo(mutableSetOf(), AppEntry::id))
                 }
                 mutable.update { old ->
                     val entries = apps.entries
@@ -245,8 +252,13 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
                         apps.removedProfiles)
                     val validPins = followedPins.map { it?.takeUnless(removedIds::contains) }
                     val validDock = followedDock.map { it?.takeUnless(removedIds::contains) }
-                    val reconciled = reconcileFolders(HomeLayout(validPins, validDock, old.widgetPlacements, followedFolders,
+                    val reconciledHome = reconcileFolders(HomeLayout(validPins, validDock, old.widgetPlacements, followedFolders,
                         old.widgetRestores, followedLeading, old.homeRows), removedIds)
+                    // With apps on Home, a newly installed app joins the end of the last page. Apps
+                    // already known stay where the user left them, including off Home.
+                    val known = apps.knownBefore + old.apps.map(AppEntry::id) + renamed.values
+                    val reconciled = if (!old.appsOnHome || known.isEmpty()) reconciledHome
+                        else appendHomeApps(reconciledHome, entries.filter { it.available && it.id !in known }.map(AppEntry::id), onNewPage = false)
                     old.copy(apps = entries, profiles = profiles, homeSlots = reconciled.slots, leadingSlots = reconciled.leadingSlots,
                         dock = reconciled.dock, folders = reconciled.folders,
                         canUndoEdit = old.canUndoEdit && old.layout == reconciled, loading = false,
@@ -486,6 +498,22 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         if (statePayloadInvalid) return
         mutable.update { it.copy(swipeUpSearch = value) }; persist()
     }
+    /**
+     * Puts every app that is not yet on Home onto new pages after the last one, alphabetically,
+     * and hides All apps; turning it off leaves the pages as they are.
+     */
+    fun setAppsOnHome(value: Boolean) {
+        if (statePayloadInvalid || value == mutable.value.appsOnHome) return
+        mutable.update { it.copy(appsOnHome = value) }; persist()
+        if (value) {
+            val state = mutable.value
+            commitLayout(appendHomeApps(state.layout, state.apps.filter { it.available }.map(AppEntry::id), onNewPage = true))
+        }
+    }
+    fun setDockMode(value: DockMode) {
+        if (statePayloadInvalid) return
+        mutable.update { it.copy(dockMode = value) }; persist()
+    }
     fun setCoverRotation(value: Boolean) {
         if (statePayloadInvalid) return
         mutable.update { it.copy(coverRotation = value) }; persist()
@@ -565,6 +593,8 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .put("swipeUpSearch", s.swipeUpSearch)
             .put("coverRotation", s.coverRotation)
             .put("iconPack", s.iconPack ?: "")
+            .put("appsOnHome", s.appsOnHome)
+            .put("dockMode", s.dockMode.name)
             .put("compact", preset(s.compact)).put("expanded", preset(s.expanded))
         val editor = prefs.edit()
         if (legacyRaw != null && sourceSchema == 2 && !prefs.contains("state_v2_backup"))
@@ -724,7 +754,9 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             swipeDownShade = j.optBoolean("swipeDownShade", true),
             swipeUpSearch = j.optBoolean("swipeUpSearch", true),
             coverRotation = j.optBoolean("coverRotation", false),
-            iconPack = j.optString("iconPack").takeIf { it.isNotEmpty() })
+            iconPack = j.optString("iconPack").takeIf { it.isNotEmpty() },
+            appsOnHome = j.optBoolean("appsOnHome", false),
+            dockMode = DockMode.entries.firstOrNull { it.name == j.optString("dockMode") } ?: DockMode.SHOWN)
             .let { it.copy(homeRows = maxOf(it.homeRows, it.layout.requiredRows())) }
     }.getOrElse {
         statePayloadInvalid = legacyRaw != null

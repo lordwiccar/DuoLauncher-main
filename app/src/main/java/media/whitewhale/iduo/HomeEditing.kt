@@ -316,6 +316,32 @@ fun removePlacement(layout: HomeLayout, source: DropTarget): HomeLayout = when (
     else -> layout
 }
 
+/**
+ * Places [ids] after everything already on Home, in order: from the first cell of the page after
+ * the last one in use when [onNewPage], else from the first free cell after the last one in use.
+ * Hidden rows and widget footprints are skipped, and pages are added as needed.
+ */
+fun appendHomeApps(layout: HomeLayout, ids: List<String>, onNewPage: Boolean): HomeLayout {
+    val placed = (layout.slots + layout.leadingSlots + layout.dock).filterNotNull().toSet() + layout.folders.flatMap { it.appIds }
+    val adding = ids.filter { it !in placed }.distinct()
+    if (adding.isEmpty()) return layout
+    val covered = layout.widgetPlacements.flatMap { it.coveredIndices() }.filter { it >= 0 }.toSet()
+    val lastUsed = maxOf(layout.slots.indexOfLast { it != null }, covered.maxOrNull() ?: -1)
+    var index = when {
+        lastUsed < 0 -> 0
+        onNewPage -> (homeCellPage(lastUsed) + 1) * HOME_CELLS
+        else -> lastUsed + 1
+    }
+    val slots = layout.slots.toMutableList()
+    adding.forEach { id ->
+        while (!layout.cellVisible(index) || index in covered || slots.getOrNull(index) != null) index++
+        while (slots.size <= index) slots += null
+        slots[index] = id
+        index++
+    }
+    return layout.copy(slots = slots)
+}
+
 fun pinHomeApp(slots: List<String?>, id: String, pinned: Boolean, blocked: Set<Int> = emptySet()): List<String?> {
     if (!pinned) return normalizeHomeSlots(slots.map { if (it == id) null else it })
     if (id in slots) return slots

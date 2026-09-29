@@ -344,7 +344,11 @@ private fun categorySummaries(state: LauncherState, appearance: AppearanceState,
         SettingsPage.APPEARANCE to stringResource(R.string.settings_color_mode_value, stringResource(appearanceLabel(appearance.mode))),
         SettingsPage.HOME to stringResource(R.string.settings_home_summary, GRID_COLUMNS, state.homeRows - 2, preset.iconSize.toInt(),
             state.widgetPlacements.size),
-        SettingsPage.DOCK to stringResource(R.string.settings_dock_summary, state.dock.size),
+        SettingsPage.DOCK to stringResource(when (state.dockMode) {
+            DockMode.SHOWN -> R.string.dock_mode_shown
+            DockMode.SLIDE -> R.string.dock_mode_slide
+            DockMode.HIDDEN -> R.string.dock_mode_hidden
+        }) + " · " + stringResource(R.string.settings_dock_summary, state.dock.size),
         SettingsPage.GESTURES to if (!homeGesturesOn && (state.swipeDownShade || state.doubleTapLock))
             stringResource(R.string.settings_gestures_off_title)
             else gestures.joinToString(" · ").ifEmpty { stringResource(R.string.settings_gestures_none) },
@@ -385,8 +389,8 @@ private fun settingsEntries(): List<SettingsEntry> {
             R.string.folder_transparency, R.string.settings_icon_pack) +
         entries(SettingsPage.HOME, R.string.grid_layout, R.string.icon_size, R.string.row_spacing, R.string.show_app_names,
             R.string.choose_home_apps, R.string.widgets, R.string.show_status, R.string.all_apps_view, R.string.reset_layout,
-            R.string.settings_cover_rotation) +
-        entries(SettingsPage.DOCK, R.string.settings_dock_count, R.string.dock_width, R.string.dock_align, R.string.dock_height) +
+            R.string.settings_cover_rotation, R.string.all_apps_view_home) +
+        entries(SettingsPage.DOCK, R.string.settings_dock_mode, R.string.dock_mode_slide, R.string.settings_dock_count, R.string.dock_width, R.string.dock_align, R.string.dock_height) +
         entries(SettingsPage.GESTURES, R.string.gesture_down, R.string.gesture_double, R.string.gesture_up,
             R.string.gesture_side, R.string.settings_search_button, R.string.settings_service_title) +
         entries(SettingsPage.NEWS, R.string.left_page, R.string.news_edition, R.string.news_topics, R.string.rss_sources) +
@@ -748,8 +752,13 @@ private fun HomePage(state: LauncherState, wide: Boolean, model: LauncherModel, 
         GroupBody {
             GroupTitle(stringResource(R.string.all_apps_view))
             Choice(listOf(stringResource(R.string.all_apps_view_list) to "library-view-list",
-                stringResource(R.string.all_apps_view_grid) to "library-view-grid"),
-                if (state.libraryGrid) 1 else 0, { model.setLibraryGrid(it == 1) })
+                stringResource(R.string.all_apps_view_grid) to "library-view-grid",
+                stringResource(R.string.all_apps_view_home) to "library-view-home"),
+                if (state.appsOnHome) 2 else if (state.libraryGrid) 1 else 0, {
+                    if (it == 2) model.setAppsOnHome(true)
+                    else { model.setAppsOnHome(false); model.setLibraryGrid(it == 1) }
+                })
+            Detail(stringResource(if (state.appsOnHome) R.string.settings_apps_on_home_detail else R.string.settings_all_apps_detail))
         }
     }
     TextButton(onClick = { model.setPreset(wide, LayoutPreset()) }, Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
@@ -760,6 +769,22 @@ private fun HomePage(state: LauncherState, wide: Boolean, model: LauncherModel, 
 @Composable
 private fun DockPage(state: LauncherState, wide: Boolean, model: LauncherModel) {
     val p = if (wide) state.expanded else state.compact
+    SettingsGroup {
+        GroupBody {
+            GroupTitle(stringResource(R.string.settings_dock_mode))
+            val modes = DockMode.entries
+            Choice(modes.map { mode -> stringResource(when (mode) {
+                DockMode.SHOWN -> R.string.dock_mode_shown
+                DockMode.SLIDE -> R.string.dock_mode_slide
+                DockMode.HIDDEN -> R.string.dock_mode_hidden
+            }) to "dock-mode-${mode.name.lowercase()}" }, modes.indexOf(state.dockMode), { model.setDockMode(modes[it]) })
+            Detail(stringResource(when (state.dockMode) {
+                DockMode.SHOWN -> R.string.dock_mode_shown_detail
+                DockMode.SLIDE -> R.string.dock_mode_slide_detail
+                DockMode.HIDDEN -> R.string.dock_mode_hidden_detail
+            }))
+        }
+    }
     SettingsGroup {
         GroupBody {
             GroupTitle(stringResource(R.string.settings_dock_count))

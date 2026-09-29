@@ -176,7 +176,7 @@
     <string name="folder_transparency">Folder background transparency</string>
     <string name="all_apps_view">All apps view</string>
     <string name="all_apps_view_list">List</string>
-    <string name="all_apps_view_grid">Grid in pages</string>
+    <string name="all_apps_view_grid">Grid</string>
     <string name="left_page">Left page</string>
     <string name="left_page_rss">My RSS feeds</string>
     <string name="left_page_google_news" translatable="false">Google News</string>
@@ -467,4 +467,15 @@
     <string name="settings_cover_rotation">Rotate the cover screen</string>
     <string name="settings_cover_rotation_detail">Home on the cover screen turns with the phone. Landscape may not work as expected yet.</string>
     <string name="settings_experimental">Experimental</string>
+    <string name="all_apps_view_home">On Home</string>
+    <string name="settings_all_apps_detail">All apps sits after the last Home page, as a list or as pages of icons.</string>
+    <string name="settings_apps_on_home_detail">Every app sits on Home. Apps not yet on Home were placed on new pages to the right, new apps join the last page, and All apps is hidden. Switching back keeps your pages.</string>
+    <string name="settings_dock_mode">Show the dock</string>
+    <string name="dock_mode_shown">Always</string>
+    <string name="dock_mode_slide">Slide in</string>
+    <string name="dock_mode_hidden">Hidden</string>
+    <string name="dock_mode_shown_detail">The dock stays on the right.</string>
+    <string name="dock_mode_slide_detail">Swipe left from the handle at the right edge to show the dock. It slides away when you open an app or touch Home.</string>
+    <string name="dock_mode_hidden_detail">The dock is not shown. Its apps stay saved for when you show it again.</string>
+    <string name="dock_show">Show the dock</string>
 </resources>

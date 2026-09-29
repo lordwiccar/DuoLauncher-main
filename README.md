@@ -19,9 +19,9 @@ A native Android launcher built around a right-side dock and a home screen that 
 - Overlapping unfolded page pairs: an extra workspace beside Home 1, then Home 1 beside Home 2, and so on.
 - Android widgets, visual widget selection, resizing, native scrolling, and drag-and-drop between pages.
 - App dragging, pages created during an edge drag, Home folders made by dropping one app onto another, and separate personal/work catalogs where device policy permits.
-- All apps as an alphabetical list or a paged grid, Home search for apps and Google with a swipe up, and a left news page with Google News or your own RSS feeds.
+- All apps as an alphabetical list, a paged grid or right on the Home pages, Home search for apps and Google with a swipe up, and a left news page with Google News or your own RSS feeds.
 - Full-screen Settings with search, a live Home preview, and a list beside the open section on the inner screen.
-- A 4 × 4, 4 × 5 or 4 × 6 Home grid and four to eight dock apps.
+- A 4 × 4, 4 × 5 or 4 × 6 Home grid and four to eight dock apps, with the dock always shown, sliding in from the edge or hidden.
 - Android's own wallpaper on Home, set from a photo or the bundled dunes; third-party icon packs; light/dark/system or sunrise/sunset appearance; and layout export/import.
 - English, Czech, Slovak, Polish, and German, following the system language or chosen in **Language**.
 

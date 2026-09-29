@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add a third All apps view, On Home: every app that is not on Home yet is placed on new pages to the right, alphabetically, newly installed apps join the last page, and the All apps page is hidden. Switching back keeps the pages.
+- Choose how the dock appears: always, sliding in from a handle at the right edge (it slides away when you open an app or touch Home), or hidden.
 - Keep the cover screen upright by default. Rotating it is an experimental choice under Settings → Home → Screen; the inner screen always follows the phone.
 - Apply third-party icon packs from Google Play (the ADW and Nova format) under Settings → Wallpaper & appearance → Icon pack. Apps a pack does not draw keep their own icon, set on the pack's backdrop when it has one.
 - Fix text in dark mode: headings and other text in Settings were black on the dark background.

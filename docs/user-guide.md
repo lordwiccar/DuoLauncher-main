@@ -14,7 +14,7 @@ To make iDuo the launcher, choose **Set as home app** at the top of **Settings**
 - Swipe right from Home 1 for the news page. Swipe left, press Back, or use its right-pointing arrow to return.
 - **News page** in Settings chooses between **Google News** and **My RSS feeds**, and picks the Google News edition and sections or manages your own sources. The small settings icon at the top left of the page does the same: type a feed address, or a website address and iDuo finds its feed. Pull down or use the refresh button to update; tap an article to open it in the browser.
 - Swipe past the last Home page for **All apps**. Its **Search apps** field always searches installed apps locally.
-- **Home → All apps view** switches All apps between an alphabetical **List** and a **Grid in pages** that you swipe sideways; swiping past its first page returns to Home.
+- **Home → All apps view** switches All apps between an alphabetical **List** and a **Grid** of pages that you swipe sideways; swiping past its first page returns to Home. **On Home** puts every app on Home instead: apps that are not on Home yet go onto new pages to the right, alphabetically, newly installed apps join the last page, and the All apps page and its button disappear. Switching back keeps those pages. An app you remove from Home in this view stays reachable through Home search, and **Choose Home apps** puts it back.
 - The dock and its search control stay on the right. The page controls also open the news page or All apps.
 - Pressing the system Home control from an app returns to the Home page or unfolded pair you last had visible. From All apps, search, or the news page it returns to the last Home view.
 
@@ -25,7 +25,7 @@ Long press an empty Home cell or any bare wallpaper on Home, such as the space b
 - **Customization**
   - **Wallpaper & appearance**: the wallpaper (**iDuo dunes**, **Your photo** or **Android wallpapers**), the **Color mode**, an **Icon pack** and folder transparency.
   - **Home**: **Grid layout** (4 × 4, 4 × 5 or 4 × 6 apps below the widget band, chosen on a scrolling wheel; the unfolded screen shows two pages side by side), icon size, row spacing, app names, the Home apps, the widgets on the current page, the status display, **Rotate the cover screen** and the **All apps view**. A small Home preview stays at the top with the choice of **Cover screen** or **Inner screen**, which the size and spacing settings apply to.
-  - **Dock**: the number of dock apps (4–8), its width and its position.
+  - **Dock**: whether the dock is shown **Always**, **Slides in** or is **Hidden**, the number of dock apps (4–8), its width and its position. A sliding dock waits behind a thin handle at the right edge: swipe left from it to show the dock, and it slides away when you open an app, touch Home or swipe it right. It also appears while you drag an app, so you can drop it into the dock.
 - **Controls**
   - **Gestures & search**: the Home gestures service, a switch for each gesture, and what the search button opens.
   - **News page**: Google News or your own RSS feeds, with their edition, sections or sources.

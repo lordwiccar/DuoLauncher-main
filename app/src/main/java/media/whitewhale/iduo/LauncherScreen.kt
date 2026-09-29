@@ -2,6 +2,8 @@
 
 package media.whitewhale.iduo
 
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.systemGestureExclusion
 import android.appwidget.AppWidgetProviderInfo
 import android.os.UserManager
 import androidx.activity.compose.BackHandler
@@ -165,6 +167,10 @@ fun LauncherScreen(
     LaunchedEffect(sheet) { if (sheet.isEmpty()) customizationPage = SettingsPage.OVERVIEW }
     var openFolderId by rememberSaveable { mutableStateOf<String?>(null) }
     var spotlight by rememberSaveable { mutableStateOf(false) }
+    // A sliding dock opens from the right edge and closes when Home is touched or left.
+    var dockOpen by rememberSaveable { mutableStateOf(false) }
+    val dockReveal = remember { androidx.compose.animation.core.Animatable(if (state.dockMode == DockMode.SHOWN) 1f else 0f) }
+    androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_PAUSE) { dockOpen = false }
     var createFolderFirstId by rememberSaveable { mutableStateOf<String?>(null) }
     var savedPage by rememberSaveable { mutableIntStateOf(0) }
     var lastHomePage by rememberSaveable { mutableIntStateOf(0) }
@@ -181,7 +187,9 @@ fun LauncherScreen(
     var expandedWorkspace by remember { mutableStateOf(false) }
     // Home's left page (Google News or RSS) is physical page 0, so Home 1 is page 1.
     val firstHome = 1
-    val pageCount = visibleHomePages + 1
+    // All apps follows the Home pages unless every app lives on Home.
+    val hasLibrary = !state.appsOnHome
+    val pageCount = visibleHomePages + if (hasLibrary) 1 else 0
     val nativePager = rememberPagerState(initialPage = savedPage.coerceIn(-firstHome, pageCount - 1) + firstHome, pageCount = { pageCount + firstHome })
     val pager = remember(nativePager) { LauncherPager(nativePager, firstHome) }
     fun leaveTemporaryWidgetPage() {
@@ -215,7 +223,7 @@ fun LauncherScreen(
         if (homePages != previousHomePages && !drag.active) {
             // Pin edits in the library keep the library selected; a completed drop stays on home.
             if (state.editRevision == previousEditRevision) {
-                if (pager.currentPage == previousHomePages) pager.scrollToPage(homePages)
+                if (hasLibrary && pager.currentPage == previousHomePages) pager.scrollToPage(homePages)
                 else if (pager.currentPage >= pageCount) pager.scrollToPage(homePages - 1)
             } else if (pager.currentPage >= homePages) pager.scrollToPage(homePages - 1)
         }
@@ -230,7 +238,7 @@ fun LauncherScreen(
             ?: lastHomePage.coerceIn(0, homePages - 1)
         drag.clear(); widgetSession = null; resizeSlot = null; sheet = ""; widgetPackage = null
         widgetExactTarget = false; widgetPlacementMessage = null; selectedId = null; appMoveMenu = false
-        openFolderId = null; createFolderFirstId = null; emptyCellIndex = null; spotlight = false
+        openFolderId = null; createFolderFirstId = null; emptyCellIndex = null; spotlight = false; dockOpen = false
         focus.clearFocus(); keyboard?.hide()
         pager.animateScrollToPage(page)
     } }
@@ -403,7 +411,7 @@ fun LauncherScreen(
             val wide = maxWidth.value >= 650f
             val preset = if (wide) state.expanded else state.compact
             val density = LocalDensity.current
-            val inLibrary = pager.currentPage == visibleHomePages
+            val inLibrary = hasLibrary && pager.currentPage == visibleHomePages
             var statusHeight by remember { mutableFloatStateOf(0f) }
             val geometry = homeGeometry(maxWidth.value, maxHeight.value, preset, state.labels,
                 statusRailHeight = if (state.verticalStatus) statusHeight + 22f else 0f,
@@ -455,6 +463,28 @@ fun LauncherScreen(
                 WorkspacePageMotion(firstHome, visibleHomePages, with(density) { pagerWidth.toPx() }, with(density) { homeStride.toPx() })
             } else null
             val dockScroll = rememberScrollState()
+            val dockShown = state.dockMode == DockMode.SHOWN || (state.dockMode == DockMode.SLIDE && (dockOpen || drag.active))
+            var dockDragging by remember { mutableStateOf(false) }
+            LaunchedEffect(dockShown, dockDragging) {
+                if (!dockDragging) dockReveal.animateTo(if (dockShown) 1f else 0f,
+                    androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow))
+            }
+            // The slide covers the dock, its 12dp margin and a little more, so no edge peeks out.
+            val dockTravel = with(density) { (preset.dockWidth + 24f).dp.toPx() }
+            // Read only by gesture code, so plain holders: layout writes them without recomposing.
+            val dockBounds = remember { arrayOf(androidx.compose.ui.geometry.Rect.Zero) }
+            val dockHandleBounds = remember { arrayOf(androidx.compose.ui.geometry.Rect.Zero) }
+            val dockDrag: (Float) -> Unit = { dx ->
+                scope.launch { dockReveal.snapTo((dockReveal.value - dx / dockTravel).coerceIn(0f, 1f)) }
+            }
+            var dockDragStart by remember { mutableFloatStateOf(0f) }
+            val dockDragBegin: (Offset) -> Unit = { dockDragging = true; dockDragStart = dockReveal.value }
+            val dockDragEnd: () -> Unit = {
+                dockDragging = false
+                // A short pull is enough either way: a sixth of the way in opens it, a sixth out closes it.
+                dockOpen = if (dockDragStart >= .5f) dockReveal.value > .85f else dockReveal.value > .15f
+                scope.launch { dockReveal.animateTo(if (dockOpen || drag.active) 1f else 0f) }
+            }
             var gestureOriginInRoot by remember { mutableStateOf(Offset.Zero) }
             var gestureOriginInWindow by remember { mutableStateOf(Offset.Zero) }
             val pagerInputEnabled = pager.currentPage in -firstHome..visibleHomePages && !drag.active &&
@@ -513,17 +543,22 @@ fun LauncherScreen(
                 canStartUpwardSwipe = { point -> homeOwnsVerticalSwipe(point, upward = true) },
                 onUpwardSwipe = if (state.swipeUpSearch) ({ spotlight = true }) else null,
                 childPagesHorizontally = { point, travel ->
-                    drag.childPager?.let { child -> child.bounds().contains(point + gestureOriginInRoot) && child.canPage(travel) } == true
+                    val rootPoint = point + gestureOriginInRoot
+                    // A sliding dock takes a leftward swipe at its edge handle and a rightward one over itself.
+                    (state.dockMode == DockMode.SLIDE && ((travel < 0f && !dockOpen && dockHandleBounds[0].contains(rootPoint)) ||
+                        (travel > 0f && dockOpen && dockBounds[0].contains(rootPoint)))) ||
+                        drag.childPager?.let { child -> child.bounds().contains(rootPoint) && child.canPage(travel) } == true
                 },
             ).pointerInput(Unit) {
                 // Bare wallpaper anywhere on Home opens Home options. Icons, cells, the dock and
                 // controls consume their own presses first, and a page swipe cancels this one.
-                detectTapGestures(onLongPress = { openHomeOptionsAt(it, size.width) }, onDoubleTap = { lockAt(it) })
+                detectTapGestures(onTap = { dockOpen = false },
+                    onLongPress = { openHomeOptionsAt(it, size.width) }, onDoubleTap = { lockAt(it) })
             }) {
             val leftPageTitle = stringResource(leftPageTitle(state.leftPage))
             val pagerModifier = Modifier.fillMaxHeight().width(pagerWidth).testTag("app-pager")
                 .semantics { stateDescription = if (pager.currentPage == -1) leftPageTitle
-                    else if (pager.currentPage == visibleHomePages) launcherActivity.getString(R.string.all_apps)
+                    else if (hasLibrary && pager.currentPage == visibleHomePages) launcherActivity.getString(R.string.all_apps)
                     else launcherActivity.getString(R.string.home_page_of, pager.currentPage + 1, visibleHomePages) }
             if (geometry.expanded) {
                 Box(pagerModifier) {
@@ -583,17 +618,41 @@ fun LauncherScreen(
                             if (contentHeight < 500.dp) 0f else 23f).coerceAtLeast(0f)
                     },
                 compact = contentHeight < 500.dp, iconSize = dockIconSize(geometry.iconSize).dp)
-            Surface(Modifier.align(Alignment.TopEnd).padding(end = 12.dp).offset(y = geometry.dockTop.dp)
+            if (state.dockMode != DockMode.HIDDEN) Surface(Modifier.align(Alignment.TopEnd).padding(end = 12.dp).offset(y = geometry.dockTop.dp)
                 .width(preset.dockWidth.dp).height(geometry.dockHeight.dp).graphicsLayer {
                     // Composite the stationary dock independently of the shared pager layer.
                     compositingStrategy = androidx.compose.ui.graphics.CompositingStrategy.Offscreen
-                }.testTag("dock"),
+                    translationX = (1f - dockReveal.value) * dockTravel
+                }.onGloballyPositioned { dockBounds[0] = it.boundsInRoot() }
+                .then(if (state.dockMode == DockMode.SLIDE) Modifier.pointerInput(Unit) {
+                    detectHorizontalDragGestures(onDragStart = dockDragBegin, onDragEnd = dockDragEnd,
+                        onDragCancel = dockDragEnd) { change, dx -> if (dx > 0f || dockReveal.value < 1f) { change.consume(); dockDrag(dx) } }
+                } else Modifier).testTag("dock"),
                 shape = RoundedCornerShape(30.dp), color = Glass.copy(alpha = .32f),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .3f))) {
                 Column(Modifier.padding(vertical = 8.dp).verticalScroll(dockScroll)) {
                     DockAppColumn(state.dock, previewLayout.dock, appsById, geometry.dockRowHeight,
                         dockIconSize(geometry.iconSize), drag, insertionTarget,
                         onLaunch = onLaunchFrom, onChoose = { dockSlot = it; sheet = "dock" })
+                }
+            }
+            if (state.dockMode == DockMode.SLIDE && dockReveal.value < 1f) {
+                // Android lets an app claim at most 200dp of an edge from the back gesture, so
+                // the handle is that tall, centred on the dock.
+                val handleHeight = minOf(200f, geometry.dockHeight)
+                Box(Modifier.align(Alignment.TopEnd).offset(y = (geometry.dockTop + (geometry.dockHeight - handleHeight) / 2f).dp)
+                    .width(28.dp).height(handleHeight.dp).systemGestureExclusion()
+                    .onGloballyPositioned { dockHandleBounds[0] = it.boundsInRoot() }
+                    .pointerInput(Unit) {
+                        detectHorizontalDragGestures(onDragStart = dockDragBegin, onDragEnd = dockDragEnd,
+                            onDragCancel = dockDragEnd) { change, dx -> change.consume(); dockDrag(dx) }
+                    }
+                    .semantics { contentDescription = launcherActivity.getString(R.string.dock_show) }
+                    .clickable { dockOpen = true }.testTag("dock-handle"),
+                    contentAlignment = Alignment.CenterEnd) {
+                    Box(Modifier.padding(end = 4.dp).width(4.dp).height(56.dp)
+                        .graphicsLayer { alpha = 1f - dockReveal.value }
+                        .background(Color.White.copy(alpha = .7f), RoundedCornerShape(2.dp)))
                 }
             }
             Column(Modifier.align(Alignment.BottomStart).width(pagerWidth).padding(start = 16.dp, bottom = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -614,7 +673,7 @@ fun LauncherScreen(
                             else Box(Modifier.size(if (index == pager.currentPage) 6.dp else 4.dp).background(Color.White.copy(alpha = if (index == pager.currentPage) 1f else .4f), CircleShape))
                         }
                     } else Text("${minOf(pager.currentPage + 1, homePages)} / $homePages", color = Color.White, fontSize = 12.sp)
-                    IconButton(onClick = openLibrary, Modifier.size(32.dp).testTag("library-page-link")) {
+                    if (hasLibrary) IconButton(onClick = openLibrary, Modifier.size(32.dp).testTag("library-page-link")) {
                         Icon(Icons.AutoMirrored.Rounded.FormatListBulleted, stringResource(R.string.all_apps_page), tint = Color.White.copy(alpha = if (pager.currentPage == homePages) 1f else .6f), modifier = Modifier.size(17.dp))
                     }
                 }
@@ -1281,9 +1340,9 @@ private fun ExpandedWorkspace(
         }
     }
     val libraryPhysicalPage = firstHome + visibleHomePages
-    val showLibrary by remember(nativePager, libraryPhysicalPage) {
+    val showLibrary by remember(nativePager, libraryPhysicalPage, state.appsOnHome) {
         derivedStateOf(structuralEqualityPolicy()) {
-            nativePager.currentPage + nativePager.currentPageOffsetFraction >= libraryPhysicalPage - 1.25f
+            !state.appsOnHome && nativePager.currentPage + nativePager.currentPageOffsetFraction >= libraryPhysicalPage - 1.25f
         }
     }
 

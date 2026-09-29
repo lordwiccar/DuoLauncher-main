@@ -178,7 +178,7 @@
     <string name="folder_transparency">Priehľadnosť pozadia priečinka</string>
     <string name="all_apps_view">Zobrazenie všetkých aplikácií</string>
     <string name="all_apps_view_list">Zoznam</string>
-    <string name="all_apps_view_grid">Mriežka po stránkach</string>
+    <string name="all_apps_view_grid">Mriežka</string>
     <string name="left_page">Ľavá stránka</string>
     <string name="left_page_rss">Vlastné RSS</string>
     <string name="news_settings">Nastavenia správ</string>
@@ -482,4 +482,15 @@
     <string name="settings_cover_rotation">Otáčať vonkajší displej</string>
     <string name="settings_cover_rotation_detail">Plocha na vonkajšom displeji sa otáča s telefónom. Zobrazenie na šírku zatiaľ nemusí fungovať podľa očakávania.</string>
     <string name="settings_experimental">Experimentálne</string>
+    <string name="all_apps_view_home">Na plochách</string>
+    <string name="settings_all_apps_detail">Všetky aplikácie sú za poslednou plochou, ako zoznam alebo strany ikon.</string>
+    <string name="settings_apps_on_home_detail">Všetky aplikácie sú na plochách. Aplikácie, ktoré na ploche neboli, sa rozmiestnili na nové plochy vpravo, nové aplikácie sa pridajú na poslednú plochu a Všetky aplikácie sa nezobrazujú. Po prepnutí späť plochy zostanú.</string>
+    <string name="settings_dock_mode">Zobrazenie doku</string>
+    <string name="dock_mode_shown">Vždy</string>
+    <string name="dock_mode_slide">Vysúvací</string>
+    <string name="dock_mode_hidden">Skrytý</string>
+    <string name="dock_mode_shown_detail">Dok je stále vpravo.</string>
+    <string name="dock_mode_slide_detail">Dok vysuniete potiahnutím doľava od úchytu pri pravom okraji. Zasunie sa po otvorení aplikácie alebo dotyku plochy.</string>
+    <string name="dock_mode_hidden_detail">Dok sa nezobrazuje. Jeho aplikácie zostanú uložené pre prípad, že ho znova zapnete.</string>
+    <string name="dock_show">Zobraziť dok</string>
 </resources>
