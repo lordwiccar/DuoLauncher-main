@@ -3,6 +3,19 @@
 package media.whitewhale.iduo
 
 import android.graphics.BitmapFactory
+import androidx.activity.BackEventCompat
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.findViewTreeOnBackPressedDispatcherOwner
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -109,6 +122,8 @@ internal fun SettingsScreen(state: LauncherState, initiallyWide: Boolean, model:
         LaunchedEffect(dark) {
             (view.parent as? DialogWindowProvider)?.window?.let { window ->
                 window.setDimAmount(0f)
+                // The page slides itself; the window's own fade would only blur that motion.
+                window.setWindowAnimations(0)
                 WindowCompat.getInsetsController(window, view).apply {
                     isAppearanceLightStatusBars = !dark; isAppearanceLightNavigationBars = !dark
                 }
@@ -116,29 +131,40 @@ internal fun SettingsScreen(state: LauncherState, initiallyWide: Boolean, model:
         }
         CompositionLocalProvider(LocalSettingsColors provides if (dark) DarkSettings else LightSettings) {
             val colors = LocalSettingsColors.current
+            val scope = rememberCoroutineScope()
             var wide by rememberSaveable { mutableStateOf(initiallyWide) }
             var query by rememberSaveable { mutableStateOf("") }
-            BoxWithConstraints(Modifier.fillMaxSize().background(colors.page).windowInsetsPadding(WindowInsets.safeDrawing)
-                .testTag("settings-screen")) {
+            // Settings rises from the bottom once; a recreated activity shows it in place.
+            var entered by rememberSaveable { mutableStateOf(false) }
+            val rise = remember { Animatable(if (entered) 0f else 1f) }
+            LaunchedEffect(Unit) { rise.animateTo(0f, tween(340, easing = EmphasizedDecelerate)); entered = true }
+            var closing by remember { mutableStateOf(false) }
+            val close: () -> Unit = {
+                if (!closing) { closing = true; scope.launch { rise.animateTo(1f, tween(260, easing = EmphasizedAccelerate)); onClose() } }
+            }
+            val back = remember { PredictiveBackState() }
+            BoxWithConstraints(Modifier.fillMaxSize().graphicsLayer { translationY = rise.value * size.height }
+                .background(colors.page).windowInsetsPadding(WindowInsets.safeDrawing).testTag("settings-screen")) {
                 val twoPane = maxWidth >= 600.dp
                 // On a wide screen the list stays visible, so its first page opens beside it.
                 val shown = if (twoPane && page == SettingsPage.OVERVIEW) SettingsPage.APPEARANCE else page
-                ModalDialogBackHandler {
+                val backCloses = query.isEmpty() && (if (twoPane) shown.parent == SettingsPage.OVERVIEW else page == SettingsPage.OVERVIEW)
+                SettingsBackHandler(back, preview = query.isEmpty()) {
                     if (query.isNotEmpty() && (page == SettingsPage.OVERVIEW || twoPane)) query = ""
                     else if (shown.parent != SettingsPage.OVERVIEW) onPage(shown.parent)
                     else if (!twoPane && page != SettingsPage.OVERVIEW) onPage(SettingsPage.OVERVIEW)
-                    else onClose()
+                    else close()
                 }
                 val overview: @Composable (Modifier, SettingsPage?) -> Unit = { modifier, selected ->
                     SettingsOverview(state, isDefaultHome, homeGesturesOn, query, { query = it }, selected, onPage,
-                        onClose, onMakeDefault, onShadeSetup, model, appearance, modifier)
+                        close, onMakeDefault, onShadeSetup, model, appearance, modifier)
                 }
-                val detail: @Composable (Modifier) -> Unit = { modifier ->
-                    SettingsDetail(shown, twoPane, onBack = { onPage(shown.parent) }, modifier = modifier,
-                        pinned = if (shown == SettingsPage.HOME || shown == SettingsPage.DOCK) ({
+                val detail: @Composable (SettingsPage, Modifier) -> Unit = { target, modifier ->
+                    SettingsDetail(target, twoPane, onBack = { onPage(target.parent) }, modifier = modifier,
+                        pinned = if (target == SettingsPage.HOME || target == SettingsPage.DOCK) ({
                             DisplayHeader(state, wide, { wide = it }, backgrounds.previewBitmap)
                         }) else null) {
-                        when (shown) {
+                        when (target) {
                             SettingsPage.OVERVIEW -> Unit
                             SettingsPage.APPEARANCE -> AppearancePage(model, state, appearance, onAppearanceMode, onAppearanceManual,
                                 onAppearanceDeviceLocation, onAppearanceClear, backgrounds, onWallpaperSettings)
@@ -154,14 +180,91 @@ internal fun SettingsScreen(state: LauncherState, initiallyWide: Boolean, model:
                         }
                     }
                 }
-                if (twoPane) Row(Modifier.fillMaxSize()) {
+                // A back swipe previews its result: what would leave shrinks toward the swipe.
+                val whole = if (backCloses) Modifier.predictiveBack(back) else Modifier
+                val pane = if (backCloses) Modifier else Modifier.predictiveBack(back)
+                if (twoPane) Row(Modifier.fillMaxSize().then(whole)) {
                     overview(Modifier.width(300.dp).fillMaxHeight(), shown.let { if (it.parent == SettingsPage.SUPPORT) SettingsPage.SUPPORT else it })
                     VerticalDivider(color = colors.divider)
-                    detail(Modifier.weight(1f).fillMaxHeight())
-                } else if (page == SettingsPage.OVERVIEW) overview(Modifier.fillMaxSize(), null)
-                else detail(Modifier.fillMaxSize())
+                    // Beside a fixed list, a changed page only cross-fades.
+                    AnimatedContent(shown, Modifier.weight(1f).fillMaxHeight().then(pane), label = "settings pane",
+                        transitionSpec = { fadeIn(tween(220, delayMillis = 60)) togetherWith fadeOut(tween(120)) }) { target ->
+                        detail(target, Modifier.fillMaxSize().background(colors.page))
+                    }
+                } else AnimatedContent(page, Modifier.fillMaxSize().then(whole).then(pane), label = "settings page",
+                    transitionSpec = {
+                        // Deeper pages enter from the right; going back sends them out to the right.
+                        if (targetState.depth > initialState.depth)
+                            slideInHorizontally(tween(300, easing = EmphasizedDecelerate)) { it } togetherWith
+                                (slideOutHorizontally(tween(300, easing = EmphasizedDecelerate)) { -it / 4 } + fadeOut(tween(300)))
+                        else (slideInHorizontally(tween(300, easing = EmphasizedDecelerate)) { -it / 4 } + fadeIn(tween(300))) togetherWith
+                            slideOutHorizontally(tween(300, easing = EmphasizedDecelerate)) { it }
+                    }) { target ->
+                    // Opaque, so a page sliding over another never shows the one beneath.
+                    if (target == SettingsPage.OVERVIEW) overview(Modifier.fillMaxSize().background(colors.page), null)
+                    else detail(target, Modifier.fillMaxSize().background(colors.page))
+                }
             }
         }
+    }
+}
+
+private val EmphasizedDecelerate = CubicBezierEasing(.05f, .7f, .1f, 1f)
+private val EmphasizedAccelerate = CubicBezierEasing(.3f, 0f, .8f, .15f)
+
+private val SettingsPage.depth get() = when {
+    this == SettingsPage.OVERVIEW -> 0
+    parent == SettingsPage.OVERVIEW -> 1
+    else -> 2
+}
+
+/** How far a system back swipe has gone, and from which edge. */
+private class PredictiveBackState {
+    val progress = Animatable(0f)
+    var fromLeft by mutableStateOf(true)
+}
+
+/** Shrinks the content toward the swipe as Android's predictive back gesture moves. */
+private fun Modifier.predictiveBack(state: PredictiveBackState) = graphicsLayer {
+    val p = state.progress.value
+    if (p > 0f) {
+        val scale = 1f - .1f * p
+        scaleX = scale; scaleY = scale
+        translationX = (if (state.fromLeft) 1f else -1f) * 32.dp.toPx() * p
+        shape = RoundedCornerShape(28.dp * p); clip = true
+    }
+}
+
+/**
+ * Back inside the settings window, including the predictive back gesture on Android 14 and later.
+ * [preview] turns the swipe preview off where Back only clears the search.
+ */
+@Composable
+private fun SettingsBackHandler(state: PredictiveBackState, preview: Boolean, onBack: () -> Unit) {
+    val localView = LocalView.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    val scope = rememberCoroutineScope()
+    val currentOnBack by rememberUpdatedState(onBack)
+    val currentPreview by rememberUpdatedState(preview)
+    val dispatcherOwner = remember(localView) {
+        (localView.parent as? DialogWindowProvider)?.window?.decorView?.findViewTreeOnBackPressedDispatcherOwner()
+    }
+    DisposableEffect(dispatcherOwner, lifecycleOwner) {
+        val callback = object : OnBackPressedCallback(dispatcherOwner != null) {
+            override fun handleOnBackStarted(backEvent: BackEventCompat) {
+                state.fromLeft = backEvent.swipeEdge == BackEventCompat.EDGE_LEFT
+            }
+            override fun handleOnBackProgressed(backEvent: BackEventCompat) {
+                if (currentPreview) scope.launch { state.progress.snapTo(backEvent.progress) }
+            }
+            override fun handleOnBackCancelled() { scope.launch { state.progress.animateTo(0f, tween(200)) } }
+            override fun handleOnBackPressed() {
+                currentOnBack()
+                scope.launch { state.progress.animateTo(0f, tween(300, easing = EmphasizedDecelerate)) }
+            }
+        }
+        dispatcherOwner?.onBackPressedDispatcher?.addCallback(lifecycleOwner, callback)
+        onDispose { callback.remove() }
     }
 }
 

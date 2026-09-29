@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Redesign Settings. It opens over the whole screen, groups its sections into Customization, Controls and System & support, shows each section's current setting, and finds any setting by name. The inner screen shows the list beside the open section. Home keeps a live preview and the Cover or Inner screen choice at the top, the dock has its own section, each Home gesture has its own switch next to the status of the Home gestures service, and the news page is set up directly in Settings.
+- Animate Settings: it rises from the bottom and slides away when closed, pages slide in from the right on the cover screen and cross-fade beside the list on the inner screen, and the predictive back gesture shrinks the page as you swipe.
 - The app-search choice of the search button now opens Home search instead of All apps.
 - Add About & feedback to customization: About, with the version, the developer, the original Duo Launcher project and the licences; an in-app Changelog; and Send feedback, which opens a Google form.
 - Lock the screen with a double tap on empty Home space, through the optional accessibility service (now "Home gestures"), so fingerprint and face unlock stay available. It can be turned off under Gestures & search.
