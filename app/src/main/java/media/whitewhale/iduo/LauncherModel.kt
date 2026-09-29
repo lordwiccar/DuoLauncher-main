@@ -65,6 +65,8 @@ data class LauncherState(
     val libraryGrid: Boolean = false,
     /** What Home's left page shows. */
     val leftPage: LeftPage = LeftPage.GOOGLE_NEWS,
+    /** A double tap on empty Home space locks the screen. */
+    val doubleTapLock: Boolean = true,
     val loading: Boolean = true,
     val error: String? = null,
 ) {
@@ -457,6 +459,11 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         if (statePayloadInvalid) return
         mutable.update { it.copy(leftPage = value) }; persist()
     }
+    /** A device-local gesture setting. */
+    fun setDoubleTapLock(value: Boolean) {
+        if (statePayloadInvalid) return
+        mutable.update { it.copy(doubleTapLock = value) }; persist()
+    }
     fun setGoogleSearch(value: Boolean) { if (statePayloadInvalid) return; undoLayout = null; undoImportSettings = null; mutable.update { it.copy(googleSearch = value, canUndoEdit = false) }; persist() }
     fun setPreset(expanded: Boolean, value: LayoutPreset) {
         if (statePayloadInvalid) return
@@ -522,6 +529,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .put("folderTransparency", s.folderTransparency.toDouble())
             .put("libraryGrid", s.libraryGrid)
             .put("leftPage", s.leftPage.name)
+            .put("doubleTapLock", s.doubleTapLock)
             .put("compact", preset(s.compact)).put("expanded", preset(s.expanded))
         val editor = prefs.edit()
         if (legacyRaw != null && sourceSchema == 2 && !prefs.contains("state_v2_backup"))
@@ -676,7 +684,8 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
                 .takeIf { it.isFinite() }?.coerceIn(0f, MAX_FOLDER_TRANSPARENCY) ?: DEFAULT_FOLDER_TRANSPARENCY,
             libraryGrid = j.optBoolean("libraryGrid", false),
             // Layouts from before Google News chose "DISCOVER", which now falls back to Google News.
-            leftPage = LeftPage.entries.firstOrNull { it.name == j.optString("leftPage") } ?: LeftPage.GOOGLE_NEWS)
+            leftPage = LeftPage.entries.firstOrNull { it.name == j.optString("leftPage") } ?: LeftPage.GOOGLE_NEWS,
+            doubleTapLock = j.optBoolean("doubleTapLock", true))
             .let { it.copy(homeRows = maxOf(it.homeRows, it.layout.requiredRows())) }
     }.getOrElse {
         statePayloadInvalid = legacyRaw != null

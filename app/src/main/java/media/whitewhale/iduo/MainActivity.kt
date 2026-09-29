@@ -133,14 +133,19 @@ class MainActivity : ComponentActivity() {
         model.refresh(); appearance.refresh(systemDark()); updateDefaultHome()
     }
 
-    internal fun openSystemShade(panel: ShadePanel) {
-        when (SystemShadeAccessibilityService.open(this, panel)) {
+    internal fun openSystemShade(panel: ShadePanel) =
+        handleGesture(SystemShadeAccessibilityService.open(this, panel), R.string.shade_rejected)
+
+    internal fun lockScreen() =
+        handleGesture(SystemShadeAccessibilityService.lockScreen(this), R.string.lock_rejected)
+
+    private fun handleGesture(result: ShadeOpenResult, rejected: Int) {
+        when (result) {
             ShadeOpenResult.OPENED -> Unit
             ShadeOpenResult.SERVICE_DISABLED -> showShadeSetup()
             ShadeOpenResult.SERVICE_STARTING -> Toast.makeText(this,
                 R.string.shade_starting, Toast.LENGTH_SHORT).show()
-            ShadeOpenResult.ACTION_REJECTED -> Toast.makeText(this,
-                R.string.shade_rejected, Toast.LENGTH_SHORT).show()
+            ShadeOpenResult.ACTION_REJECTED -> Toast.makeText(this, rejected, Toast.LENGTH_SHORT).show()
         }
     }
 

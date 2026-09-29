@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- System integration -->
-    <string name="shade_service_label">Gesty panelu iDuo Launcher</string>
-    <string name="shade_service_description">Pozwala gestom na ekranie głównym iDuo Launcher otwierać systemowe powiadomienia i panel Szybkich ustawień. Nie odczytuje zawartości ekranu ani nie obserwuje aktywności w innych aplikacjach.</string>
+    <string name="shade_service_label">Gesty ekranu głównego iDuo Launcher</string>
+    <string name="shade_service_description">Pozwala gestom na ekranie głównym iDuo Launcher otwierać systemowe powiadomienia i panel Szybkich ustawień oraz blokować ekran. Nie odczytuje zawartości ekranu ani nie obserwuje aktywności w innych aplikacjach.</string>
 
     <!-- Common actions -->
     <string name="back">Wstecz</string>
@@ -111,7 +111,7 @@
     <string name="show_status">Pokaż stan w prawym górnym rogu</string>
     <string name="search_opens_google">Przycisk wyszukiwania otwiera Google</string>
     <string name="search_local_note">Lista wszystkich aplikacji zawsze ma własne wyszukiwanie.</string>
-    <string name="gestures_note">Przesuń w bok w dowolnym miejscu ekranu głównego, aby zmienić stronę. Przesuń w dół, aby otworzyć powiadomienia lub szybkie ustawienia.</string>
+    <string name="gestures_note">Przesuń w bok w dowolnym miejscu ekranu głównego, aby zmienić stronę. Przesuń w dół, aby otworzyć powiadomienia lub szybkie ustawienia, w górę, aby wyszukiwać.</string>
 
     <string name="backup_detail">Zapisz bieżący układ ekranu głównego, foldery, widżety i ustawienia układu.</string>
     <string name="backup_restore_note">Przed zmianą ekranu głównego przywracanie zawsze pokazuje podsumowanie.</string>
@@ -122,9 +122,9 @@
     <string name="help_customize_title">Dostosuj dowolną stronę</string>
     <string name="help_customize">Przytrzymaj puste miejsce i wybierz Dostosuj launcher. Jeśli strona jest pełna, przytrzymaj wąski pasek przy jej lewej krawędzi.</string>
     <string name="help_widgets">Dodawaj widżety Androida do pustych komórek ekranu głównego. Przytrzymaj widżet, aby go przenieść lub usunąć.</string>
-    <string name="help_shade_title">Powiadomienia i szybkie ustawienia</string>
-    <string name="help_shade">Przesuń w dół na ekranie głównym. Za pierwszym razem iDuo wyjaśni opcjonalne ustawienie Ułatwień dostępu w Androidzie. Usługa jedynie otwiera panele systemowe.</string>
-    <string name="help_shade_setup">Skonfiguruj gesty panelu</string>
+    <string name="help_shade_title">Powiadomienia, szybkie ustawienia i blokada</string>
+    <string name="help_shade">Przesuń w dół na ekranie głównym, aby otworzyć panele systemowe; dotknij dwukrotnie pustego miejsca, aby zablokować ekran. Za pierwszym razem iDuo wyjaśni opcjonalne ustawienie Ułatwień dostępu w Androidzie. Usługa jedynie otwiera panele systemowe i blokuje ekran.</string>
+    <string name="help_shade_setup">Skonfiguruj gesty ekranu głównego</string>
     <string name="help_search_title">Wyszukiwanie</string>
     <string name="help_search">Przesuń palcem w górę na ekranie głównym, aby wyszukiwać. Podczas pisania pojawiają się pasujące aplikacje; klawisz wyszukiwania lub lupa wyszukuje frazę w Google.</string>
     <string name="spotlight_hint">Szukaj aplikacji i w Google</string>
@@ -381,9 +381,11 @@
 
 
     <!-- Shade gestures -->
-    <string name="shade_setup_title">Włącz gesty panelu</string>
-    <string name="shade_setup_message">Android wymaga włączenia gestów panelu iDuo Launcher w ustawieniach Ułatwień dostępu. Usługa jedynie otwiera powiadomienia lub szybkie ustawienia; nie odczytuje zawartości ekranu ani nie obserwuje innych aplikacji.</string>
-    <string name="shade_starting">Gesty panelu uruchamiają się. Przesuń ponownie w dół.</string>
+    <string name="shade_setup_title">Włącz gesty ekranu głównego</string>
+    <string name="shade_setup_message">Android wymaga włączenia gestów ekranu głównego iDuo Launcher w ustawieniach Ułatwień dostępu. Usługa jedynie otwiera powiadomienia lub szybkie ustawienia i blokuje ekran; nie odczytuje zawartości ekranu ani nie obserwuje innych aplikacji.</string>
+    <string name="shade_starting">Gesty ekranu głównego uruchamiają się. Spróbuj ponownie.</string>
+    <string name="double_tap_lock">Dotknij dwukrotnie, aby zablokować ekran</string>
+    <string name="lock_rejected">Android nie mógł zablokować ekranu.</string>
     <string name="shade_rejected">Android nie mógł otworzyć panelu systemowego.</string>
     <string name="accessibility_unavailable">Ustawienia Ułatwień dostępu są niedostępne.</string>
 

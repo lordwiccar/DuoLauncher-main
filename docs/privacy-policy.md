@@ -39,7 +39,7 @@ Google search, the apps you open, and **widgets** are provided by their own apps
 
 ## Accessibility service (optional)
 
-The optional "shade gestures" accessibility service lets a downward swipe on Home open the notification panel or Quick Settings. It uses only the system actions that open those panels. It **cannot read screen content**, does not observe other apps, does not perform gestures on your behalf and collects no data. The app explains this before you turn the service on, and you can turn it off at any time in Android's Accessibility settings.
+The optional "Home gestures" accessibility service lets a downward swipe on Home open the notification panel or Quick Settings, and a double tap on empty Home space lock the screen. It uses only the system actions that open those panels and lock the screen. It **cannot read screen content**, does not observe other apps, does not perform gestures on your behalf and collects no data. The app explains this before you turn the service on, and you can turn it off at any time in Android's Accessibility settings.
 
 ## Permissions
 
@@ -109,7 +109,7 @@ Vyhledávání Google, spouštěné aplikace a **widgety** poskytují jejich vla
 
 ## Služba usnadnění přístupu (volitelná)
 
-Volitelná služba „gesta panelu“ umožňuje přejetím dolů na ploše otevřít oznámení nebo Rychlé nastavení. Používá jen systémové akce, které tyto panely otevírají. **Nemůže číst obsah obrazovky**, nesleduje jiné aplikace, neprovádí gesta za vás a nesbírá žádná data. Aplikace to vysvětlí před zapnutím služby a službu můžete kdykoli vypnout v nastavení Usnadnění přístupu.
+Volitelná služba „gesta plochy“ umožňuje přejetím dolů na ploše otevřít oznámení nebo Rychlé nastavení a dvojím klepnutím na volné místo plochy zamknout obrazovku. Používá jen systémové akce, které tyto panely otevírají a zamykají obrazovku. **Nemůže číst obsah obrazovky**, nesleduje jiné aplikace, neprovádí gesta za vás a nesbírá žádná data. Aplikace to vysvětlí před zapnutím služby a službu můžete kdykoli vypnout v nastavení Usnadnění přístupu.
 
 ## Oprávnění
 

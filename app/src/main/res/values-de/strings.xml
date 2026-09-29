@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- System integration -->
-    <string name="shade_service_label">iDuo Launcher-Leistengesten</string>
-    <string name="shade_service_description">Ermöglicht es den Startbildschirm-Gesten von iDuo Launcher, die Systembenachrichtigungen und die Schnelleinstellungen zu öffnen. Es werden weder Bildschirminhalte gelesen noch Aktivitäten in anderen Apps beobachtet.</string>
+    <string name="shade_service_label">iDuo Launcher-Startbildschirmgesten</string>
+    <string name="shade_service_description">Ermöglicht es den Startbildschirm-Gesten von iDuo Launcher, die Systembenachrichtigungen und die Schnelleinstellungen zu öffnen und den Bildschirm zu sperren. Es werden weder Bildschirminhalte gelesen noch Aktivitäten in anderen Apps beobachtet.</string>
 
     <!-- Common actions -->
     <string name="back">Zurück</string>
@@ -111,7 +111,7 @@
     <string name="show_status">Status oben rechts anzeigen</string>
     <string name="search_opens_google">Suchtaste öffnet Google</string>
     <string name="search_local_note">Die App-Übersicht behält immer ihre eigene App-Suche.</string>
-    <string name="gestures_note">Wische irgendwo auf dem Startbildschirm seitwärts, um die Seite zu wechseln. Wische nach unten für Benachrichtigungen oder Schnelleinstellungen.</string>
+    <string name="gestures_note">Wische irgendwo auf dem Startbildschirm seitwärts, um die Seite zu wechseln. Wische nach unten für Benachrichtigungen oder Schnelleinstellungen, nach oben für die Suche.</string>
 
     <string name="backup_detail">Speichert das aktuelle Startbildschirm-Layout, Ordner, Widgets und Layouteinstellungen.</string>
     <string name="backup_restore_note">Vor einer Änderung des Startbildschirms zeigt die Wiederherstellung eine Übersicht.</string>
@@ -122,9 +122,9 @@
     <string name="help_customize_title">Jede Seite anpassen</string>
     <string name="help_customize">Halte eine freie Stelle gedrückt und wähle „Launcher anpassen“. Ist eine Seite voll, halte den schmalen Bereich am linken Rand gedrückt.</string>
     <string name="help_widgets">Füge Android-Widgets in leere Felder des Startbildschirms ein. Halte ein Widget gedrückt, um es zu verschieben oder zu entfernen.</string>
-    <string name="help_shade_title">Benachrichtigungen und Schnelleinstellungen</string>
-    <string name="help_shade">Wische auf dem Startbildschirm nach unten. Beim ersten Mal erklärt iDuo die optionale Bedienungshilfen-Einstellung von Android. Der Dienst öffnet nur die Systemleisten.</string>
-    <string name="help_shade_setup">Leistengesten einrichten</string>
+    <string name="help_shade_title">Benachrichtigungen, Schnelleinstellungen und Sperren</string>
+    <string name="help_shade">Wische auf dem Startbildschirm nach unten für die Systemleisten; tippe doppelt auf eine freie Stelle, um den Bildschirm zu sperren. Beim ersten Mal erklärt iDuo die optionale Bedienungshilfen-Einstellung von Android. Der Dienst öffnet nur die Systemleisten und sperrt den Bildschirm.</string>
+    <string name="help_shade_setup">Startbildschirmgesten einrichten</string>
     <string name="help_search_title">Suche</string>
     <string name="help_search">Wische auf dem Startbildschirm nach oben, um zu suchen. Beim Tippen erscheinen passende Apps; die Suchtaste oder die Lupe sucht den Begriff bei Google.</string>
     <string name="spotlight_hint">Apps und Google durchsuchen</string>
@@ -365,9 +365,11 @@
 
 
     <!-- Shade gestures -->
-    <string name="shade_setup_title">Leistengesten aktivieren</string>
-    <string name="shade_setup_message">Android verlangt, dass du die Leistengesten von iDuo Launcher in den Bedienungshilfen aktivierst. Dieser Dienst öffnet nur Benachrichtigungen oder Schnelleinstellungen; er liest keine Bildschirminhalte und beobachtet keine anderen Apps.</string>
-    <string name="shade_starting">Leistengesten werden gestartet. Wische erneut nach unten.</string>
+    <string name="shade_setup_title">Startbildschirmgesten aktivieren</string>
+    <string name="shade_setup_message">Android verlangt, dass du die Startbildschirmgesten von iDuo Launcher in den Bedienungshilfen aktivierst. Dieser Dienst öffnet nur Benachrichtigungen oder Schnelleinstellungen und sperrt den Bildschirm; er liest keine Bildschirminhalte und beobachtet keine anderen Apps.</string>
+    <string name="shade_starting">Startbildschirmgesten werden gestartet. Versuche es erneut.</string>
+    <string name="double_tap_lock">Doppeltippen sperrt den Bildschirm</string>
+    <string name="lock_rejected">Android konnte den Bildschirm nicht sperren.</string>
     <string name="shade_rejected">Android konnte die Systemleiste nicht öffnen.</string>
     <string name="accessibility_unavailable">Die Bedienungshilfen-Einstellungen sind nicht verfügbar.</string>
 

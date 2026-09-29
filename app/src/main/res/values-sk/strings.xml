@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- System integration -->
-    <string name="shade_service_label">Gestá panela iDuo Launcher</string>
-    <string name="shade_service_description">Umožňuje gestám na ploche iDuo Launcher otvárať systémové upozornenia a panel Rýchle nastavenia. Nečíta obsah obrazovky ani nesleduje činnosť v iných aplikáciách.</string>
+    <string name="shade_service_label">Gestá plochy iDuo Launcher</string>
+    <string name="shade_service_description">Umožňuje gestám na ploche iDuo Launcher otvárať systémové upozornenia a panel Rýchle nastavenia a zamykať obrazovku. Nečíta obsah obrazovky ani nesleduje činnosť v iných aplikáciách.</string>
 
     <!-- Common actions -->
     <string name="back">Späť</string>
@@ -111,7 +111,7 @@
     <string name="show_status">Zobraziť stav vpravo hore</string>
     <string name="search_opens_google">Tlačidlo vyhľadávania otvorí Google</string>
     <string name="search_local_note">Zoznam všetkých aplikácií má vždy vlastné vyhľadávanie.</string>
-    <string name="gestures_note">Strany prepnete potiahnutím do strany kdekoľvek na ploche. Potiahnutím nadol otvoríte upozornenia alebo rýchle nastavenia.</string>
+    <string name="gestures_note">Strany prepnete potiahnutím do strany kdekoľvek na ploche. Potiahnutím nadol otvoríte upozornenia alebo rýchle nastavenia, potiahnutím nahor vyhľadávanie.</string>
 
     <string name="backup_detail">Uloží aktuálne rozloženie plochy, priečinky, miniaplikácie a nastavenia rozloženia.</string>
     <string name="backup_restore_note">Pred zmenou plochy obnovenie vždy zobrazí prehľad.</string>
@@ -122,9 +122,9 @@
     <string name="help_customize_title">Prispôsobenie ľubovoľnej strany</string>
     <string name="help_customize">Podržte prst na voľnom mieste a zvoľte Prispôsobiť spúšťač. Ak je strana plná, podržte prst na úzkom páse pri jej ľavom okraji.</string>
     <string name="help_widgets">Pridávajte miniaplikácie Androidu do prázdnych buniek plochy. Podržaním miniaplikáciu presuniete alebo odoberiete.</string>
-    <string name="help_shade_title">Upozornenia a rýchle nastavenia</string>
-    <string name="help_shade">Potiahnite na ploche nadol. Prvýkrát iDuo vysvetlí voliteľné nastavenie Dostupnosti v Androide. Služba iba otvára systémové panely.</string>
-    <string name="help_shade_setup">Nastaviť gestá panela</string>
+    <string name="help_shade_title">Upozornenia, rýchle nastavenia a zamknutie</string>
+    <string name="help_shade">Potiahnutím na ploche nadol otvoríte systémové panely, dvojitým klepnutím na voľné miesto zamknete obrazovku. Prvýkrát iDuo vysvetlí voliteľné nastavenie Dostupnosti v Androide. Služba iba otvára systémové panely a zamyká obrazovku.</string>
+    <string name="help_shade_setup">Nastaviť gestá plochy</string>
     <string name="help_search_title">Vyhľadávanie</string>
     <string name="help_search">Potiahnite na ploche nahor a môžete hľadať. Počas písania sa zobrazia zodpovedajúce aplikácie; kláves hľadania alebo lupa vyhľadá výraz na Googli.</string>
     <string name="spotlight_hint">Hľadať aplikácie a na Googli</string>
@@ -381,9 +381,11 @@
 
 
     <!-- Shade gestures -->
-    <string name="shade_setup_title">Zapnúť gestá panela</string>
-    <string name="shade_setup_message">Android vyžaduje, aby ste gestá panela iDuo Launcher zapli v nastaveniach Dostupnosti. Služba iba otvára upozornenia alebo rýchle nastavenia; nečíta obsah obrazovky ani nesleduje iné aplikácie.</string>
-    <string name="shade_starting">Gestá panela sa spúšťajú. Potiahnite znova nadol.</string>
+    <string name="shade_setup_title">Zapnúť gestá plochy</string>
+    <string name="shade_setup_message">Android vyžaduje, aby ste gestá plochy iDuo Launcher zapli v nastaveniach Dostupnosti. Služba iba otvára upozornenia alebo rýchle nastavenia a zamyká obrazovku; nečíta obsah obrazovky ani nesleduje iné aplikácie.</string>
+    <string name="shade_starting">Gestá plochy sa spúšťajú. Skúste to znova.</string>
+    <string name="double_tap_lock">Zamknúť obrazovku dvojitým klepnutím</string>
+    <string name="lock_rejected">Android nedokázal zamknúť obrazovku.</string>
     <string name="shade_rejected">Android nedokázal otvoriť systémový panel.</string>
     <string name="accessibility_unavailable">Nastavenia Dostupnosti nie sú dostupné.</string>
 

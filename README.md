@@ -49,7 +49,8 @@ Updates install over the existing app when they are signed with the same key. Un
 | Scroll a widget | Swipe vertically inside its content; hold still to pick it up |
 | Customize | Long press any empty Home space or bare wallpaper |
 | Search | Swipe up on Home, type to find apps; the search key or the magnifier searches Google |
-| Notifications / Quick Settings | Swipe down from Home's left 70% / right 30%, after enabling optional shade gestures |
+| Notifications / Quick Settings | Swipe down from Home's left 70% / right 30%, after enabling optional Home gestures |
+| Lock the screen | Double-tap empty space on Home, after enabling optional Home gestures |
 
 The surrounding status ring shows battery, the inner arcs show Wi-Fi strength, and the lower dots show cellular strength. Unknown readings are not displayed as full signal. This rail applies to Home only.
 
@@ -58,7 +59,7 @@ The surrounding status ring shows battery, the inner arcs show Wi-Fi strength, a
 No launcher account, server, advertising, analytics, or automatic crash-upload service is used. Layouts stay on the device unless explicitly exported or shared. The app connects to the internet only for the optional RSS reader, directly to the sources you add.
 
 - **Widgets:** Android asks to allow binding; providers may have their own setup.
-- **Shade gestures:** the optional accessibility service opens notifications and Quick Settings. It cannot read window contents or inject gestures.
+- **Home gestures:** the optional accessibility service opens notifications and Quick Settings and locks the screen. It cannot read window contents or inject gestures.
 - **Sunrise/sunset:** manually enter coordinates or explicitly request approximate location. There is no background location request.
 - **Photos:** the system picker grants access to chosen images, without whole-library access.
 - **News:** Google News headlines are fetched from news.google.com over HTTPS, and your own RSS feeds directly from their websites. Articles open in your browser.

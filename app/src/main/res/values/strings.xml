@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- System integration -->
-    <string name="shade_service_label">iDuo Launcher shade gestures</string>
-    <string name="shade_service_description">Allows iDuo Launcher’s Home screen gestures to open the system notifications and Quick Settings panels. It does not read screen content or observe activity in other apps.</string>
+    <string name="shade_service_label">iDuo Launcher Home gestures</string>
+    <string name="shade_service_description">Allows iDuo Launcher’s Home screen gestures to open the system notifications and Quick Settings panels and to lock the screen. It does not read screen content or observe activity in other apps.</string>
 
     <!-- Common actions -->
     <string name="back">Back</string>
@@ -111,7 +111,7 @@
     <string name="show_status">Show status at upper right</string>
     <string name="search_opens_google">Search button opens Google</string>
     <string name="search_local_note">All apps always keeps local app search.</string>
-    <string name="gestures_note">Swipe sideways anywhere on Home to change pages. Swipe down for notifications or quick settings.</string>
+    <string name="gestures_note">Swipe sideways anywhere on Home to change pages. Swipe down for notifications or quick settings, swipe up to search.</string>
 
     <string name="backup_detail">Save the current Home layout, folders, widgets, and layout settings.</string>
     <string name="backup_restore_note">Restore shows a review before changing Home.</string>
@@ -122,9 +122,9 @@
     <string name="help_customize_title">Customize any page</string>
     <string name="help_customize">Long-press empty space, then choose Customize launcher. If a page is full, long-press the slim area at its left edge.</string>
     <string name="help_widgets">Add Android widgets to empty Home cells. Hold a widget to move or remove it.</string>
-    <string name="help_shade_title">Notifications and quick settings</string>
-    <string name="help_shade">Swipe down on Home. The first time, iDuo explains Android’s optional Accessibility setting. The service only opens the system panels.</string>
-    <string name="help_shade_setup">Set up shade gestures</string>
+    <string name="help_shade_title">Notifications, quick settings and locking</string>
+    <string name="help_shade">Swipe down on Home for the system panels; double-tap empty space to lock the screen. The first time, iDuo explains Android’s optional Accessibility setting. The service only opens the system panels and locks the screen.</string>
+    <string name="help_shade_setup">Set up Home gestures</string>
     <string name="help_search_title">Search</string>
     <string name="help_search">Swipe up on Home to search. Matching apps appear as you type; the search key or the magnifier searches Google.</string>
     <string name="spotlight_hint">Search apps and Google</string>
@@ -366,9 +366,11 @@
 
 
     <!-- Shade gestures -->
-    <string name="shade_setup_title">Turn on shade gestures</string>
-    <string name="shade_setup_message">Android requires you to enable iDuo Launcher shade gestures in Accessibility settings. This service only opens Notifications or Quick Settings; it doesn’t read screen content or watch other apps.</string>
-    <string name="shade_starting">Shade gestures are starting. Swipe down again.</string>
+    <string name="shade_setup_title">Turn on Home gestures</string>
+    <string name="shade_setup_message">Android requires you to enable iDuo Launcher Home gestures in Accessibility settings. This service only opens Notifications or Quick Settings and locks the screen; it doesn’t read screen content or watch other apps.</string>
+    <string name="shade_starting">Home gestures are starting. Try again.</string>
+    <string name="double_tap_lock">Double-tap to lock the screen</string>
+    <string name="lock_rejected">Android couldn’t lock the screen.</string>
     <string name="shade_rejected">Android couldn’t open the system panel.</string>
     <string name="accessibility_unavailable">Accessibility settings are unavailable.</string>
 

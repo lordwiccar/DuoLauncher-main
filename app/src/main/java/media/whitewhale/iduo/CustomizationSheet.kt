@@ -132,6 +132,7 @@ internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, mo
                     SettingsSwitch(stringResource(R.string.show_app_names), state.labels, model::setLabels, "label-switch")
                     SettingsSwitch(stringResource(R.string.show_status), state.verticalStatus, model::setVerticalStatus, "status-switch")
                     SettingsSwitch(stringResource(R.string.search_opens_google), state.googleSearch, model::setGoogleSearch, "google-search-switch")
+                    SettingsSwitch(stringResource(R.string.double_tap_lock), state.doubleTapLock, model::setDoubleTapLock, "double-tap-lock-switch")
                     Text(stringResource(R.string.search_local_note), style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(stringResource(R.string.gestures_note),

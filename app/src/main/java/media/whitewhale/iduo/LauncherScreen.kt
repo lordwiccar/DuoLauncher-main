@@ -463,6 +463,13 @@ fun LauncherScreen(
                 launcherActivity.backups.preview == null && !launcherActivity.backups.pickerPending &&
                 !launcherActivity.backgrounds.pickerPending && widgets.setupStatus == null &&
                 widgets.reconfigureWidgetId == null
+            // Only bare wallpaper on a Home page locks; icons, widgets and the dock keep their taps.
+            val lockAt by rememberUpdatedState { point: Offset ->
+                val page = pager.currentPage
+                val region = drag.hit(point + gestureOriginInRoot, setOf(page - 1, page))
+                if (state.doubleTapLock && pagerInputEnabled && page in 0 until visibleHomePages &&
+                    (region == null || region.target is DropTarget.Home && !region.movable)) launcherActivity.lockScreen()
+            }
             val openHomeOptionsAt by rememberUpdatedState { point: Offset, width: Int ->
                 val page = pager.currentPage
                 val targetPage = if (geometry.expanded && point.x < width / 2f) page - 1 else page
@@ -506,7 +513,7 @@ fun LauncherScreen(
             ).pointerInput(Unit) {
                 // Bare wallpaper anywhere on Home opens Home options. Icons, cells, the dock and
                 // controls consume their own presses first, and a page swipe cancels this one.
-                detectTapGestures(onLongPress = { openHomeOptionsAt(it, size.width) })
+                detectTapGestures(onLongPress = { openHomeOptionsAt(it, size.width) }, onDoubleTap = { lockAt(it) })
             }) {
             val leftPageTitle = stringResource(leftPageTitle(state.leftPage))
             val pagerModifier = Modifier.fillMaxHeight().width(pagerWidth).testTag("app-pager")

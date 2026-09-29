@@ -50,14 +50,14 @@ Hold still on the widget until pickup begins, then drag. On a scrollable provide
 
 Long press and release to open **Widget options**. Use **Resize on Home** or the width/height controls, then **Apply** or **Apply size**. A red or disabled preview means the proposed rectangle overlaps another item, extends beyond the page, or violates the provider's resize limits. Move the widget into the six-row grid first if iDuo says that is required.
 
-## Paging, widget scrolling, or shade gestures do the wrong thing
+## Paging, widget scrolling, or Home gestures do the wrong thing
 
 - Start a mostly horizontal swipe to change exactly one page. This works over Home, the dock, and the right rail, including over a widget.
 - Start a vertical swipe on a scrollable part of a native widget to scroll the provider. Static widget areas still allow Home's own vertical action.
-- Shade gestures work only on Home: left 70% opens Notifications, right 30% opens Quick Settings. A dock that is already vertically scrolled keeps its downward gesture.
+- Home gestures work only on Home: a swipe down on the left 70% opens Notifications, on the right 30% Quick Settings. A double tap locks the screen only on empty space; icons, folders, widgets and the dock keep their own taps. A dock that is already vertically scrolled keeps its downward gesture.
 - To drag an item between pages, keep holding at the full left or right window edge until the page turns. Ordinary swipes and held edge paging use different timing.
 
-If shade gestures are off, choose **Help & setup → Set up shade gestures**, then **Open settings** and enable iDuo Launcher yourself. If the service has just started, follow the on-screen request to swipe again. iDuo does not enable Accessibility access automatically.
+If Home gestures are off, choose **Help & setup → Set up Home gestures**, then **Open settings** and enable iDuo Launcher yourself. If the service has just started, follow the on-screen request to swipe again. iDuo does not enable Accessibility access automatically.
 
 ## An app or work profile is unavailable
 

@@ -26,7 +26,7 @@ Long press an empty Home cell or any bare wallpaper on Home, such as the space b
 - **Home layout** for the number of dock apps (4–8), **Grid layout** (4 × 4, 4 × 5 or 4 × 6 apps below the widget band, chosen on a scrolling wheel; the unfolded screen shows two pages side by side), icon size, row spacing, dock geometry, Home apps, and widgets on the visible page.
 - **Gestures & search** for app names, the upper-right status display, and Google search behavior.
 - **Backup** to save or restore the layout.
-- **Help & setup** for Home selection, widgets, shade gestures, and the news page.
+- **Help & setup** for Home selection, widgets, Home gestures, search, and the news page.
 
 After a layout edit, **Undo last layout change** appears in customization. It covers the latest supported layout change, so use it before making another edit.
 
@@ -68,9 +68,9 @@ Appearance choices are **Light**, **Dark**, **Follow system**, and **Sunrise / s
 
 Swipe up on Home to search. Matching apps appear in up to two rows as you type; tap one to open it. The keyboard's search key or the magnifier in the field opens Google's results for the phrase. Back or a tap outside the panel closes it.
 
-## Optional shade gestures
+## Optional Home gestures
 
-On Home, swipe down from the left 70% to open Notifications or from the right 30% to open Quick Settings. The first attempt offers **Turn on shade gestures** because Android requires you to enable iDuo Launcher in Accessibility settings. This is optional and must be enabled by you; **Not now** leaves it off. The service only requests the system panel actions.
+On Home, swipe down from the left 70% to open Notifications or from the right 30% to open Quick Settings, and double-tap empty space to lock the screen. Locking works like the power button, so fingerprint and face unlock stay available. The first attempt offers **Turn on Home gestures** because Android requires you to enable iDuo Launcher in Accessibility settings. This is optional and must be enabled by you; **Not now** leaves it off. The service only requests the system panel and lock actions. Turn off **Double-tap to lock the screen** under **Gestures & search** if you do not want it.
 
 ## Layout backup
 
