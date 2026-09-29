@@ -27,7 +27,10 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
-internal enum class CustomizationPage { OVERVIEW, WALLPAPER, HOME, GESTURES, LANGUAGE, BACKUP, HELP, ABOUT, CHANGELOG }
+internal enum class CustomizationPage { OVERVIEW, WALLPAPER, HOME, GESTURES, LANGUAGE, BACKUP, HELP, INFO, ABOUT, CHANGELOG;
+    /** Where Back and the header arrow lead. */
+    val parent get() = if (this == ABOUT || this == CHANGELOG) INFO else OVERVIEW
+}
 
 @Composable
 internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, model: LauncherModel,
@@ -49,6 +52,7 @@ internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, mo
         CustomizationPage.LANGUAGE -> R.string.customize_language
         CustomizationPage.BACKUP -> R.string.customize_backup
         CustomizationPage.HELP -> R.string.customize_help
+        CustomizationPage.INFO -> R.string.customize_info
         CustomizationPage.ABOUT -> R.string.customize_about
         CustomizationPage.CHANGELOG -> R.string.customize_changelog
     })
@@ -56,7 +60,7 @@ internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, mo
     LaunchedEffect(page) { bodyScroll.scrollTo(0) }
     Column(Modifier.fillMaxWidth().fillMaxHeight(.92f).padding(horizontal = 20.dp).padding(bottom = 12.dp)) {
         Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
-            if (page != CustomizationPage.OVERVIEW) IconButton(onClick = { onPage(CustomizationPage.OVERVIEW) },
+            if (page != CustomizationPage.OVERVIEW) IconButton(onClick = { onPage(page.parent) },
                 Modifier.testTag("customization-back")) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.back)) }
             Text(title, Modifier.weight(1f), style = MaterialTheme.typography.headlineSmall)
             IconButton(onClick = onClose) { Icon(Icons.Rounded.Close, stringResource(R.string.customize_close)) }
@@ -87,10 +91,8 @@ internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, mo
                         stringResource(R.string.customize_help_detail), "customization-help") {
                         onPage(CustomizationPage.HELP)
                     }
-                    CustomizationDestination(Icons.Rounded.Info, stringResource(R.string.customize_about),
-                        stringResource(R.string.customize_about_detail), "customization-about") { onPage(CustomizationPage.ABOUT) }
-                    CustomizationDestination(Icons.Rounded.History, stringResource(R.string.customize_changelog),
-                        stringResource(R.string.customize_changelog_detail), "customization-changelog") { onPage(CustomizationPage.CHANGELOG) }
+                    CustomizationDestination(Icons.Rounded.Info, stringResource(R.string.customize_info),
+                        stringResource(R.string.customize_info_detail), "customization-info") { onPage(CustomizationPage.INFO) }
                     if (isDefaultHome) TextButton(onClick = onMakeDefault, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
                         .testTag("default-home-settings")) { Text(stringResource(R.string.change_home_app)) }
                 }
@@ -160,6 +162,15 @@ internal fun CustomizationSheet(state: LauncherState, initiallyWide: Boolean, mo
                     onAddWidget = { onAddWidget(homePage) },
                     onShadeSetup = onShadeSetup,
                 )
+                CustomizationPage.INFO -> {
+                    val context = LocalContext.current
+                    CustomizationDestination(Icons.Rounded.Info, stringResource(R.string.customize_about),
+                        stringResource(R.string.customize_about_detail), "customization-about") { onPage(CustomizationPage.ABOUT) }
+                    CustomizationDestination(Icons.Rounded.History, stringResource(R.string.customize_changelog),
+                        stringResource(R.string.customize_changelog_detail), "customization-changelog") { onPage(CustomizationPage.CHANGELOG) }
+                    CustomizationDestination(Icons.Rounded.Feedback, stringResource(R.string.customize_feedback),
+                        stringResource(R.string.customize_feedback_detail), "customization-feedback") { context.openLink(FEEDBACK_URL) }
+                }
                 CustomizationPage.ABOUT -> AboutPage()
                 CustomizationPage.CHANGELOG -> ChangelogPage()
             }

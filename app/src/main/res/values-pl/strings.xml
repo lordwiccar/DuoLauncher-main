@@ -430,4 +430,8 @@
     <string name="about_third_party">Licencje stron trzecich</string>
     <string name="changelog_unreleased">Następna wersja</string>
     <string name="changelog_note">Lista zmian jest prowadzona po angielsku.</string>
+    <string name="customize_info">O aplikacji i opinie</string>
+    <string name="customize_info_detail">O aplikacji, lista zmian i opinie</string>
+    <string name="customize_feedback">Wyślij opinię</string>
+    <string name="customize_feedback_detail">Zgłoś problem lub zaproponuj pomysł w krótkim formularzu</string>
 </resources>

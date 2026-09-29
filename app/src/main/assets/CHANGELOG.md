@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Add About, with the version, the developer, the original Duo Launcher project and the licences, and an in-app Changelog.
+- Add About & feedback to customization: About, with the version, the developer, the original Duo Launcher project and the licences; an in-app Changelog; and Send feedback, which opens a Google form.
 - Lock the screen with a double tap on empty Home space, through the optional accessibility service (now "Home gestures"), so fingerprint and face unlock stay available. It can be turned off under Gestures & search.
 - Add Home search: swipe up on Home, find apps as you type (ignoring accents), and send the phrase to Google with the search key or the magnifier.
 - Replace Google Discover on the left page with Google News. Discover could not work in Play builds, because Google only lets allow-listed launchers embed it. The news page now shows Google News headlines for a chosen edition and sections, or your own RSS feeds.

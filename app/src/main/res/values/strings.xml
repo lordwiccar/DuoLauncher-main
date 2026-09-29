@@ -415,4 +415,8 @@
     <string name="about_third_party">Third-party notices</string>
     <string name="changelog_unreleased">Next version</string>
     <string name="changelog_note">The changelog is kept in English.</string>
+    <string name="customize_info">About &amp; feedback</string>
+    <string name="customize_info_detail">About, changelog and feedback</string>
+    <string name="customize_feedback">Send feedback</string>
+    <string name="customize_feedback_detail">Report a problem or suggest an idea in a short form</string>
 </resources>

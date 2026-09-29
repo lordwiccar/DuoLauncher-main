@@ -430,4 +430,8 @@
     <string name="about_third_party">Licence třetích stran</string>
     <string name="changelog_unreleased">Příští verze</string>
     <string name="changelog_note">Changelog je vedený v angličtině.</string>
+    <string name="customize_info">O aplikaci a zpětná vazba</string>
+    <string name="customize_info_detail">O aplikaci, changelog a zpětná vazba</string>
+    <string name="customize_feedback">Poslat zpětnou vazbu</string>
+    <string name="customize_feedback_detail">Nahlaste problém nebo navrhněte nápad v krátkém formuláři</string>
 </resources>

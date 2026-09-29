@@ -637,7 +637,7 @@ fun LauncherScreen(
                     ModalDialogBackHandler {
                         if ((sheet == "settings" || sheet == "settings:wallpaper") &&
                             activeCustomizationPage != CustomizationPage.OVERVIEW) {
-                            customizationPage = CustomizationPage.OVERVIEW
+                            customizationPage = activeCustomizationPage.parent
                             sheet = "settings"
                         } else {
                             customizationPage = CustomizationPage.OVERVIEW

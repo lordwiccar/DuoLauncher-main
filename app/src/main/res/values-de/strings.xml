@@ -414,4 +414,8 @@
     <string name="about_third_party">Hinweise zu Drittanbietern</string>
     <string name="changelog_unreleased">Nächste Version</string>
     <string name="changelog_note">Das Änderungsprotokoll wird auf Englisch geführt.</string>
+    <string name="customize_info">Info und Feedback</string>
+    <string name="customize_info_detail">Über die App, Änderungsprotokoll und Feedback</string>
+    <string name="customize_feedback">Feedback senden</string>
+    <string name="customize_feedback_detail">Melde ein Problem oder schlage eine Idee in einem kurzen Formular vor</string>
 </resources>

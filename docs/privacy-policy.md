@@ -37,6 +37,8 @@ Nothing passes through a server of the developer, and no personal data from the 
 
 Google search, the apps you open, and **widgets** are provided by their own apps, which control their content, accounts and network use.
 
+**Send feedback** opens a Google form in your browser. The app sends nothing itself; only what you choose to enter in the form reaches the developer, through Google Forms, and is used only to answer and improve the app. [Google's privacy policy](https://policies.google.com/privacy) applies to the form.
+
 ## Accessibility service (optional)
 
 The optional "Home gestures" accessibility service lets a downward swipe on Home open the notification panel or Quick Settings, and a double tap on empty Home space lock the screen. It uses only the system actions that open those panels and lock the screen. It **cannot read screen content**, does not observe other apps, does not perform gestures on your behalf and collects no data. The app explains this before you turn the service on, and you can turn it off at any time in Android's Accessibility settings.
@@ -106,6 +108,8 @@ Nic neprochází serverem vývojáře a z aplikace se neodesílají žádné oso
 ## Ostatní aplikace a widgety
 
 Vyhledávání Google, spouštěné aplikace a **widgety** poskytují jejich vlastní aplikace, které řídí svůj obsah, účty a síťový provoz.
+
+**Poslat zpětnou vazbu** otevře formulář Google v prohlížeči. Aplikace sama nic neodesílá; vývojáři přes Formuláře Google dorazí jen to, co do formuláře sami napíšete, a použije se jen k odpovědi a zlepšení aplikace. Pro formulář platí [zásady ochrany soukromí Googlu](https://policies.google.com/privacy).
 
 ## Služba usnadnění přístupu (volitelná)
 

@@ -30,6 +30,7 @@ internal const val DEVELOPER_EMAIL = "studio@whitewhale.media"
 internal const val PROJECT_URL = "https://github.com/lordwiccar/iduo-launcher"
 internal const val PRIVACY_URL = "https://lordwiccar.github.io/iduo-launcher/privacy-policy.html"
 internal const val UPSTREAM_URL = "https://github.com/jakesgoodapps/DuoLauncher"
+internal const val FEEDBACK_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf-s-I6Pd8hi7mgYOcvu5_xWqGST4qzGBLK5K94D3aLukqH0g/viewform?usp=dialog"
 
 /** One release in CHANGELOG.md: its heading and its entries, each a paragraph or a bullet. */
 internal data class ChangelogRelease(val title: String, val entries: List<ChangelogEntry>)
@@ -79,7 +80,7 @@ internal fun plainMarkdown(text: String): String =
 private fun Context.asset(path: String): String =
     runCatching { assets.open(path).bufferedReader().use { it.readText() } }.getOrDefault("")
 
-private fun Context.openLink(uri: String) {
+internal fun Context.openLink(uri: String) {
     runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
 }
 
