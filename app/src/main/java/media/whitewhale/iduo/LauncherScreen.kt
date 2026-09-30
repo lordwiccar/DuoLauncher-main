@@ -382,11 +382,25 @@ fun LauncherScreen(
     val folderBlur by animateDpAsState(if (backdropBlurred) FOLDER_BACKDROP_BLUR else 0.dp, label = "folder blur")
     val behindFolder = if (folderBlur > 0.dp) Modifier.blur(folderBlur) else Modifier
     // Android's wallpaper lies behind this window, so the window blurs it rather than Compose.
-    val wallpaperBlur = with(LocalDensity.current) { FOLDER_BACKDROP_BLUR.roundToPx() }
-    DisposableEffect(backdropBlurred) {
-        launcherActivity.window.setWallpaperBlur(if (backdropBlurred) wallpaperBlur else 0)
-        onDispose { launcherActivity.window.setWallpaperBlur(0) }
+    // It blurs fully behind an open folder or search, and as All apps or the news page slides
+    // in, so their labels stay readable on busy wallpapers.
+    val wallpaperBlurPx = with(LocalDensity.current) { WALLPAPER_BACKDROP_BLUR.toPx() }
+    LaunchedEffect(nativePager, firstHome, visibleHomePages, hasLibrary, wallpaperBlurPx) {
+        var applied = -1
+        snapshotFlow {
+            val position = nativePager.currentPage + nativePager.currentPageOffsetFraction - firstHome
+            val panel = maxOf((-position).coerceIn(0f, 1f),
+                if (hasLibrary) (position - (visibleHomePages - 1)).coerceIn(0f, 1f) else 0f)
+            (maxOf(panel, folderBlur / FOLDER_BACKDROP_BLUR) * wallpaperBlurPx).roundToInt()
+        }.collect { radius ->
+            // Each change relayouts the window, so small steps mid-swipe are skipped.
+            if (radius == 0 || radius >= wallpaperBlurPx.roundToInt() || kotlin.math.abs(radius - applied) >= 4) {
+                if (radius != applied) launcherActivity.window.setWallpaperBlur(radius)
+                applied = radius
+            }
+        }
     }
+    DisposableEffect(Unit) { onDispose { launcherActivity.window.setWallpaperBlur(0) } }
     // Let a wallpaper wider than the screen scroll with the Home pages.
     LaunchedEffect(nativePager, homePages, firstHome) {
         val wallpapers = android.app.WallpaperManager.getInstance(launcherActivity)

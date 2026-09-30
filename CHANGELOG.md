@@ -7,6 +7,7 @@
 - Give the cover screen its own Home under Settings → Home → Screen layouts: Mirror keeps one Home for both screens, Separate gives the cover its own pages, apps, folders and widgets, starting from a copy of the inner screen's. Widgets from other apps are copied as placeholders that reconnect with a tap. Mirroring again keeps the cover's layout for later, and layout backups include it.
 - Show five columns on the cover screen when it has its own Home and its dock slides in or is hidden. A sliding dock covers the last column while it is out.
 - Move the cover screen's status to the top: battery, Wi-Fi and signal in the left corner, the date and time in the right one.
+- Blur the wallpaper behind All apps, the news page and open folders, and Home more strongly behind a folder, so labels stay readable on busy wallpapers. The blur follows the swipe as the page slides in.
 - Keep the cover screen upright by default. Rotating it is an experimental choice under Settings → Home → Screen; the inner screen always follows the phone.
 - Apply third-party icon packs from Google Play (the ADW and Nova format) under Settings → Wallpaper & appearance → Icon pack. Apps a pack does not draw keep their own icon, set on the pack's backdrop when it has one.
 - Fix text in dark mode: headings and other text in Settings were black on the dark background.
