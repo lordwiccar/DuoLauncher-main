@@ -19,7 +19,7 @@ The following information is used only on your device and is never sent to the d
 
 - **Installed apps** (names, icons and launch entries, including eligible work-profile apps), to show them on Home, in the dock and in All apps.
 - **Your layout and settings** (Home pages, dock, folders and folder names, widget positions, appearance, language, All apps view, left-page choice), stored in the app's private storage.
-- **Device status** (battery, Wi-Fi and mobile signal strength, airplane mode), shown in the Home status rail while Home is visible. Signal display does not use location.
+- **Device status** (battery, Wi-Fi and mobile signal strength, airplane mode), shown in the Home status display while Home is visible. Signal display does not use location.
 - **Wallpaper photo.** When you choose a photo, Android's photo picker gives the app access only to that image. The app sets it as your Android wallpaper on the screens you choose and keeps a private copy on the device to draw transitions.
 - **Approximate location (optional).** Only if you tap "Use device location" for the sunrise/sunset appearance, the app requests approximate location once to calculate sunrise and sunset times on the device. Coordinates you enter or obtain are stored on the device until you clear them. There is no background location access.
 - **News settings and articles.** Your Google News edition and sections, the RSS addresses you add, and the most recently downloaded headlines are stored on the device.
@@ -53,7 +53,7 @@ The optional "Home gestures" accessibility service lets a downward swipe on Home
 | --- | --- |
 | Bind app widgets | Host Android widgets on Home (Android asks you to allow each one). |
 | Internet | Download news for the news page: Google News, or the RSS sources you add. |
-| Network and Wi-Fi state | Show connection and signal strength in the status rail. |
+| Network and Wi-Fi state | Show connection and signal strength in the Home status display. |
 | Approximate location | Optional, on request, to calculate sunrise and sunset times on the device. |
 | Set wallpaper | Set a photo or the bundled dunes as your Android wallpaper when you ask. |
 | Accessibility service | Optional, see above. |

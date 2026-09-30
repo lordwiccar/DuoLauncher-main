@@ -478,4 +478,16 @@
     <string name="dock_mode_hidden_detail">Das Dock wird nicht angezeigt. Seine Apps bleiben gespeichert, falls du es wieder einblendest.</string>
     <string name="dock_show">Dock anzeigen</string>
     <string name="dock_mode_inner_always">Auf dem inneren Display ist das Dock immer sichtbar. Auf dem äußeren Display kann es eingeblendet werden oder ausgeblendet bleiben.</string>
+    <string name="settings_display_layout">Bildschirmlayouts</string>
+    <string name="display_layout_mirror">Spiegeln</string>
+    <string name="display_layout_separate">Getrennt</string>
+    <string name="display_layout_mirror_detail">Beide Displays zeigen dieselben Startbildschirmseiten.</string>
+    <string name="display_layout_separate_detail">Das äußere Display hat eigene Seiten, Apps, Ordner und Widgets; das Dock bleibt gemeinsam. Widgets anderer Apps werden als Platzhalter kopiert, die du mit einem Tippen wieder verbindest.</string>
+    <string name="display_layout_mirror_confirm_title">Inneres Display spiegeln?</string>
+    <string name="display_layout_mirror_confirm">Beide Displays zeigen den Startbildschirm des inneren Displays. Das eigene Layout des äußeren Displays bleibt gespeichert und kehrt zurück, wenn du wieder Getrennt wählst.</string>
+    <string name="cover_columns">Spalten auf dem äußeren Display</string>
+    <string name="cover_columns_detail">Fünf Spalten nutzen den Platz des Docks. Ein eingeblendetes Dock verdeckt die letzte Spalte.</string>
+    <string name="cover_columns_locked">Fünf Spalten sind verfügbar, wenn das Dock auf dem äußeren Display eingeblendet wird oder ausgeblendet ist.</string>
+    <string name="display_layout_edit_on_cover">Apps und Widgets des äußeren Layouts ordnest du auf dem äußeren Display an.</string>
+    <string name="display_layout_edit_on_inner">Apps und Widgets des inneren Layouts ordnest du auf dem inneren Display an.</string>
 </resources>

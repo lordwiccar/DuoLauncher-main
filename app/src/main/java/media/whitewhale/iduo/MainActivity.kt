@@ -81,6 +81,8 @@ class MainActivity : ComponentActivity() {
         appearance = AppearanceStore(this)
         enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT))
+        // Pick the cover's or the inner screen's Home before the first frame, so folding never shows the other one.
+        model.showDisplay(resources.configuration.screenWidthDp < 650)
         widgets = WidgetController(this, model) { }.also { it.restore(savedInstanceState) }
         backups = BackupController(this, model, widgets) { }.also { it.restore() }
         backgrounds = LauncherBackgroundController(this) { }

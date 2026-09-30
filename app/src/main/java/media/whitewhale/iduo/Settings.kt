@@ -169,7 +169,7 @@ internal fun SettingsScreen(state: LauncherState, initiallyWide: Boolean, model:
                             SettingsPage.OVERVIEW -> Unit
                             SettingsPage.APPEARANCE -> AppearancePage(model, state, appearance, onAppearanceMode, onAppearanceManual,
                                 onAppearanceDeviceLocation, onAppearanceClear, backgrounds, onWallpaperSettings)
-                            SettingsPage.HOME -> HomePage(state, wide, model, homePage, maxRowsFit, onEditPins, onWidget, onAddWidget, onRemoveWidget)
+                            SettingsPage.HOME -> HomePage(state, wide, initiallyWide, model, homePage, maxRowsFit, onEditPins, onWidget, onAddWidget, onRemoveWidget)
                             SettingsPage.DOCK -> DockPage(state, wide, model)
                             SettingsPage.GESTURES -> GesturesPage(state, model, homeGesturesOn, onShadeSetup)
                             SettingsPage.NEWS -> NewsSettingsPage(state, model)
@@ -389,7 +389,8 @@ private fun settingsEntries(): List<SettingsEntry> {
             R.string.folder_transparency, R.string.settings_icon_pack) +
         entries(SettingsPage.HOME, R.string.grid_layout, R.string.icon_size, R.string.row_spacing, R.string.show_app_names,
             R.string.choose_home_apps, R.string.widgets, R.string.show_status, R.string.all_apps_view, R.string.reset_layout,
-            R.string.settings_cover_rotation, R.string.all_apps_view_home) +
+            R.string.settings_cover_rotation, R.string.all_apps_view_home, R.string.settings_display_layout,
+            R.string.display_layout_separate, R.string.cover_columns) +
         entries(SettingsPage.DOCK, R.string.settings_dock_mode, R.string.dock_mode_slide, R.string.settings_dock_count, R.string.dock_width, R.string.dock_align, R.string.dock_height) +
         entries(SettingsPage.GESTURES, R.string.gesture_down, R.string.gesture_double, R.string.gesture_up,
             R.string.gesture_side, R.string.settings_search_button, R.string.settings_service_title) +
@@ -555,7 +556,7 @@ private fun AppearancePage(model: LauncherModel, state: LauncherState, appearanc
             GroupTitle(stringResource(R.string.wallpaper))
             Detail(stringResource(R.string.wallpaper_detail))
             if (backgrounds.previewPending) {
-                MiniHomePreview(backgrounds.previewBitmap, state, state.compact, 200.dp)
+                MiniHomePreview(backgrounds.previewBitmap, state, state.layout, state.compact, 200.dp)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(onClick = backgrounds::cancelPreview, Modifier.weight(1f).heightIn(min = 48.dp)
                         .testTag("background-preview-cancel"), enabled = !backgrounds.loading) { Text(stringResource(R.string.cancel)) }
@@ -673,7 +674,8 @@ private fun IconPackOption(icon: android.graphics.drawable.Drawable?, label: Str
 @Composable
 private fun DisplayHeader(state: LauncherState, wide: Boolean, onWide: (Boolean) -> Unit, staged: android.graphics.Bitmap?) {
     Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
-        MiniHomePreview(staged, state, if (wide) state.expanded else state.compact, 176.dp)
+        MiniHomePreview(staged, state, state.layoutFor(cover = !wide), if (wide) state.expanded else state.compact, 176.dp,
+            dock = wide || state.dockMode != DockMode.HIDDEN)
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Detail(stringResource(R.string.settings_applies_to))
             listOf(false to R.string.settings_display_cover, true to R.string.settings_display_inner).forEach { (value, label) ->
@@ -693,14 +695,43 @@ private fun DisplayHeader(state: LauncherState, wide: Boolean, onWide: (Boolean)
 }
 
 @Composable
-private fun HomePage(state: LauncherState, wide: Boolean, model: LauncherModel, homePage: Int, maxRowsFit: Int,
+private fun HomePage(state: LauncherState, wide: Boolean, onWideScreen: Boolean, model: LauncherModel, homePage: Int, maxRowsFit: Int,
     onEditPins: () -> Unit, onWidget: (Int) -> Unit, onAddWidget: (Int) -> Unit, onRemoveWidget: (Int) -> Unit) {
     val p = if (wide) state.expanded else state.compact
     var choosingRows by rememberSaveable { mutableStateOf(false) }
+    var confirmMirror by rememberSaveable { mutableStateOf(false) }
+    // The settings may describe the other screen than the one in use; its layout may differ.
+    val shown = state.layoutFor(cover = !wide)
+    val otherScreen = state.separateCover && wide != onWideScreen
+    SectionCaption(stringResource(R.string.settings_display_layout))
+    SettingsGroup {
+        GroupBody {
+            Choice(listOf(stringResource(R.string.display_layout_mirror) to "display-layout-mirror",
+                stringResource(R.string.display_layout_separate) to "display-layout-separate"),
+                if (state.separateCover) 1 else 0, { if (it == 1) model.setSeparateCover(true) else if (state.separateCover) confirmMirror = true })
+            Detail(stringResource(if (state.separateCover) R.string.display_layout_separate_detail else R.string.display_layout_mirror_detail))
+        }
+    }
+    if (confirmMirror) AlertDialog(onDismissRequest = { confirmMirror = false },
+        title = { Text(stringResource(R.string.display_layout_mirror_confirm_title)) },
+        text = { Text(stringResource(R.string.display_layout_mirror_confirm)) },
+        confirmButton = { TextButton(onClick = { confirmMirror = false; model.setSeparateCover(false) },
+            Modifier.testTag("display-layout-mirror-confirm")) { Text(stringResource(R.string.display_layout_mirror)) } },
+        dismissButton = { TextButton(onClick = { confirmMirror = false }) { Text(stringResource(R.string.cancel)) } })
     SectionCaption(stringResource(R.string.settings_section_grid))
     SettingsGroup {
         ValueRow(stringResource(R.string.grid_layout), stringResource(R.string.settings_grid_detail),
-            stringResource(R.string.settings_grid_value, state.homeColumns, state.homeRows - 2), tag = "grid-layout") { choosingRows = true }
+            stringResource(R.string.settings_grid_value, shown.columns, shown.rows - 2), tag = "grid-layout") { choosingRows = true }
+        if (!wide && state.separateCover) {
+            GroupDivider()
+            GroupBody {
+                GroupTitle(stringResource(R.string.cover_columns))
+                val canFive = state.dockMode != DockMode.SHOWN
+                if (canFive) Choice(listOf("4" to "cover-columns-4", "5" to "cover-columns-5"), shown.columns - DEFAULT_HOME_COLUMNS,
+                    { model.setCoverColumns(DEFAULT_HOME_COLUMNS + it) })
+                Detail(stringResource(if (canFive) R.string.cover_columns_detail else R.string.cover_columns_locked))
+            }
+        }
         GroupDivider()
         SliderRow(stringResource(R.string.icon_size), stringResource(R.string.value_dp, p.iconSize.toInt()), p.iconSize, 40f..68f) {
             model.setPreset(wide, p.copy(iconSize = it)) }
@@ -710,11 +741,18 @@ private fun HomePage(state: LauncherState, wide: Boolean, model: LauncherModel, 
         SwitchRow(stringResource(R.string.show_app_names), stringResource(R.string.settings_names_detail), state.labels,
             model::setLabels, "label-switch")
     }
-    if (choosingRows) GridLayoutDialog(state.homeRows, state.homeColumns, maxRowsFit, onDismiss = { choosingRows = false }) { rows ->
-        model.setHomeRows(rows); choosingRows = false
+    if (choosingRows) GridLayoutDialog(shown.rows, shown.columns, if (wide == onWideScreen) maxRowsFit else GRID_ROWS,
+        onDismiss = { choosingRows = false }) { rows ->
+        model.setHomeRows(rows, cover = !wide); choosingRows = false
     }
     SectionCaption(stringResource(R.string.settings_section_content))
-    SettingsGroup {
+    // Apps and widgets are arranged on the screen whose layout they belong to.
+    if (otherScreen) SettingsGroup {
+        GroupBody { Detail(stringResource(if (wide) R.string.display_layout_edit_on_inner else R.string.display_layout_edit_on_cover)) }
+        GroupDivider()
+        SwitchRow(stringResource(R.string.show_status), stringResource(R.string.settings_status_detail), state.verticalStatus,
+            model::setVerticalStatus, "status-switch")
+    } else SettingsGroup {
         val pinned = (state.homeSlots + state.leadingSlots).count { it != null }
         ValueRow(stringResource(R.string.choose_home_apps), stringResource(R.string.settings_pinned_count, pinned),
             tag = "choose-home-apps", onClick = onEditPins)
@@ -1060,12 +1098,12 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
 }
 
 /** A small Home: the wallpaper, the first Home icons at [preset]'s size and spacing, and the dock. */
-@Composable private fun MiniHomePreview(stagedBitmap: android.graphics.Bitmap?, state: LauncherState, preset: LayoutPreset,
-    previewHeight: Dp) {
+@Composable private fun MiniHomePreview(stagedBitmap: android.graphics.Bitmap?, state: LauncherState, layout: HomeLayout,
+    preset: LayoutPreset, previewHeight: Dp, dock: Boolean = true) {
     val apps = remember(state.apps) { state.apps.associateBy { it.id } }
-    val rows = (state.homeRows - 2).coerceAtLeast(1)
-    val homeIcons = (0 until rows).map { row -> List(state.homeColumns) { column ->
-        state.homeSlots.getOrNull(row * GRID_COLUMNS + column)?.let(apps::get) } }
+    val rows = (layout.rows - 2).coerceAtLeast(1)
+    val homeIcons = (0 until rows).map { row -> List(layout.columns) { column ->
+        layout.slots.getOrNull(row * GRID_COLUMNS + column)?.let(apps::get) } }
     val dockIcons = state.dock.mapNotNull { id -> id?.let(apps::get) }
     val scale = previewHeight.value * .632f / 250f
     fun unit(value: Float) = (value * scale).dp
@@ -1074,7 +1112,7 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
         .testTag("customization-home-preview")) {
         WallpaperStandIn()
         stagedBitmap?.let { Image(it.asImageBitmap(), null, Modifier.matchParentSize(), contentScale = ContentScale.Crop) }
-        Column(Modifier.fillMaxSize().padding(start = unit(14f), top = unit(18f), end = unit(52f)),
+        Column(Modifier.fillMaxSize().padding(start = unit(14f), top = unit(18f), end = unit(if (dock) 52f else 14f)),
             verticalArrangement = Arrangement.spacedBy(unit(4f + preset.rowGap * .5f))) {
             Box(Modifier.fillMaxWidth().height(unit(40f)).background(MaterialTheme.colorScheme.surface.copy(alpha = .38f), RoundedCornerShape(unit(12f))))
             homeIcons.forEach { row -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -1084,7 +1122,7 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
                 }
             } }
         }
-        Column(Modifier.align(Alignment.CenterEnd).padding(end = unit(10f)).width(unit(36f * preset.dockWidth / 68f))
+        if (dock) Column(Modifier.align(Alignment.CenterEnd).padding(end = unit(10f)).width(unit(36f * preset.dockWidth / 68f))
             .background(MaterialTheme.colorScheme.surface.copy(alpha = .42f), RoundedCornerShape(unit(18f)))
             .padding(vertical = unit(8f)), horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(unit(8f))) {

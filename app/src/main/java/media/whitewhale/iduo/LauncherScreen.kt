@@ -411,6 +411,8 @@ fun LauncherScreen(
         BoxWithConstraints(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
             val wide = maxWidth.value >= 650f
             val preset = if (wide) state.expanded else state.compact
+            // The activity picks the screen's layout before drawing; this follows window resizes.
+            LaunchedEffect(wide) { model.showDisplay(!wide) }
             val density = LocalDensity.current
             val inLibrary = hasLibrary && pager.currentPage == visibleHomePages
             // The inner screen always shows its dock; only the cover's may slide in or hide.
@@ -621,7 +623,9 @@ fun LauncherScreen(
                     }
                 }
             }
-            if (coverStatus) CoverStatusBar(deviceStatus, Modifier.align(Alignment.TopStart).offset(y = -topInset)
+            // Sheets bring back Android's own status bar in the same band, so this one steps aside.
+            val systemBarShown = sheet.isNotEmpty() || emptyCellIndex != null || selectedId != null
+            if (coverStatus && !systemBarShown) CoverStatusBar(deviceStatus, Modifier.align(Alignment.TopStart).offset(y = -topInset)
                 .fillMaxWidth().height(coverStatusHeight).padding(horizontal = 20.dp))
             if (state.verticalStatus && wide) StatusRail(deviceStatus,
                 Modifier.align(Alignment.TopEnd).padding(end = 12.dp).offset(y = geometry.contentTop.dp)

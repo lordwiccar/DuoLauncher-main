@@ -494,4 +494,16 @@
     <string name="dock_mode_hidden_detail">Dok nie jest wyświetlany. Jego aplikacje pozostają zapisane na wypadek ponownego włączenia.</string>
     <string name="dock_show">Pokaż dok</string>
     <string name="dock_mode_inner_always">Na ekranie wewnętrznym dok jest zawsze widoczny. Wysuwany lub ukryty może być na ekranie zewnętrznym.</string>
+    <string name="settings_display_layout">Układ ekranów</string>
+    <string name="display_layout_mirror">Odbicie</string>
+    <string name="display_layout_separate">Osobno</string>
+    <string name="display_layout_mirror_detail">Oba ekrany pokazują te same strony ekranu głównego.</string>
+    <string name="display_layout_separate_detail">Ekran zewnętrzny ma własne strony, aplikacje, foldery i widżety, a dok pozostaje wspólny. Widżety innych aplikacji są kopiowane jako symbole zastępcze, które podłączysz ponownie jednym dotknięciem.</string>
+    <string name="display_layout_mirror_confirm_title">Odbić ekran wewnętrzny?</string>
+    <string name="display_layout_mirror_confirm">Oba ekrany pokażą ekran główny ekranu wewnętrznego. Własny układ ekranu zewnętrznego zostanie zachowany i wróci, gdy ponownie wybierzesz Osobno.</string>
+    <string name="cover_columns">Kolumny na ekranie zewnętrznym</string>
+    <string name="cover_columns_detail">Pięć kolumn wykorzystuje miejsce doku. Wysunięty dok zakrywa ostatnią kolumnę.</string>
+    <string name="cover_columns_locked">Pięć kolumn jest dostępnych, gdy dok na ekranie zewnętrznym jest wysuwany lub ukryty.</string>
+    <string name="display_layout_edit_on_cover">Aplikacje i widżety układu ekranu zewnętrznego układasz na ekranie zewnętrznym.</string>
+    <string name="display_layout_edit_on_inner">Aplikacje i widżety układu ekranu wewnętrznego układasz na ekranie wewnętrznym.</string>
 </resources>

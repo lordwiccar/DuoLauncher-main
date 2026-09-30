@@ -494,4 +494,16 @@
     <string name="dock_mode_hidden_detail">Dock se nezobrazuje. Jeho aplikace zůstanou uložené pro případ, že ho znovu zapnete.</string>
     <string name="dock_show">Zobrazit dock</string>
     <string name="dock_mode_inner_always">Na vnitřním displeji je dock vždy zobrazený. Vysouvací nebo skrytý může být na vnějším displeji.</string>
+    <string name="settings_display_layout">Rozvržení displejů</string>
+    <string name="display_layout_mirror">Zrcadlit</string>
+    <string name="display_layout_separate">Samostatně</string>
+    <string name="display_layout_mirror_detail">Oba displeje ukazují stejné plochy.</string>
+    <string name="display_layout_separate_detail">Vnější displej má vlastní plochy, aplikace, složky a widgety, dock zůstává společný. Widgety jiných aplikací se zkopírují jako zástupci, které znovu připojíte klepnutím.</string>
+    <string name="display_layout_mirror_confirm_title">Zrcadlit vnitřní displej?</string>
+    <string name="display_layout_mirror_confirm">Oba displeje ukážou plochu vnitřního displeje. Vlastní plocha vnějšího displeje zůstane uložená a vrátí se, když znovu zvolíte Samostatně.</string>
+    <string name="cover_columns">Sloupce na vnějším displeji</string>
+    <string name="cover_columns_detail">Pět sloupců využije místo docku. Vysunutý dock poslední sloupec překryje.</string>
+    <string name="cover_columns_locked">Pět sloupců je k dispozici, když je dock na vnějším displeji vysouvací nebo skrytý.</string>
+    <string name="display_layout_edit_on_cover">Aplikace a widgety plochy vnějšího displeje uspořádáte na vnějším displeji.</string>
+    <string name="display_layout_edit_on_inner">Aplikace a widgety plochy vnitřního displeje uspořádáte na vnitřním displeji.</string>
 </resources>

@@ -479,4 +479,16 @@
     <string name="dock_mode_hidden_detail">The dock is not shown. Its apps stay saved for when you show it again.</string>
     <string name="dock_show">Show the dock</string>
     <string name="dock_mode_inner_always">On the inner screen the dock is always shown. It can slide in or hide on the cover screen.</string>
+    <string name="settings_display_layout">Screen layouts</string>
+    <string name="display_layout_mirror">Mirror</string>
+    <string name="display_layout_separate">Separate</string>
+    <string name="display_layout_mirror_detail">Both screens show the same Home pages.</string>
+    <string name="display_layout_separate_detail">The cover screen has its own Home pages, apps, folders and widgets; the dock stays shared. Widgets from other apps are copied as placeholders you reconnect with a tap.</string>
+    <string name="display_layout_mirror_confirm_title">Mirror the inner screen?</string>
+    <string name="display_layout_mirror_confirm">Both screens will show the inner screen\'s Home. The cover\'s own layout is kept and comes back when you choose Separate again.</string>
+    <string name="cover_columns">Columns on the cover screen</string>
+    <string name="cover_columns_detail">Five columns use the dock\'s room. A sliding dock covers the last column while it is out.</string>
+    <string name="cover_columns_locked">Five columns are available when the cover\'s dock slides in or is hidden.</string>
+    <string name="display_layout_edit_on_cover">Apps and widgets of the cover\'s layout are arranged on the cover screen.</string>
+    <string name="display_layout_edit_on_inner">Apps and widgets of the inner screen\'s layout are arranged on the inner screen.</string>
 </resources>
