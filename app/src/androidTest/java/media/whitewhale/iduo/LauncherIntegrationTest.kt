@@ -228,7 +228,8 @@ class LauncherIntegrationTest {
             val full = model().state.value.layout
             val preferences = compose.activity.getSharedPreferences("launcher", 0).getString("state", null)
             val revision = model().state.value.editRevision
-            compose.onNodeWithTag("dock-slot-0").performTouchInput { longClick() }
+            // A long touch on a dock app starts dragging it; the slot's own action opens the chooser.
+            compose.onNodeWithTag("dock-slot-0").performSemanticsAction(SemanticsActions.OnLongClick)
             compose.onNodeWithTag("search-field").performTextInput(clock.label)
             compose.onNodeWithTag("dock-full-guidance").assertIsDisplayed()
             compose.onNodeWithTag("picker-app-${clock.id}").assertIsNotEnabled().performTouchInput { click() }

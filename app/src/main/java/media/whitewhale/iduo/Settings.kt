@@ -703,15 +703,6 @@ private fun HomePage(state: LauncherState, wide: Boolean, onWideScreen: Boolean,
     // The settings may describe the other screen than the one in use; its layout may differ.
     val shown = state.layoutFor(cover = !wide)
     val otherScreen = state.separateCover && wide != onWideScreen
-    SectionCaption(stringResource(R.string.settings_display_layout))
-    SettingsGroup {
-        GroupBody {
-            Choice(listOf(stringResource(R.string.display_layout_mirror) to "display-layout-mirror",
-                stringResource(R.string.display_layout_separate) to "display-layout-separate"),
-                if (state.separateCover) 1 else 0, { if (it == 1) model.setSeparateCover(true) else if (state.separateCover) confirmMirror = true })
-            Detail(stringResource(if (state.separateCover) R.string.display_layout_separate_detail else R.string.display_layout_mirror_detail))
-        }
-    }
     if (confirmMirror) AlertDialog(onDismissRequest = { confirmMirror = false },
         title = { Text(stringResource(R.string.display_layout_mirror_confirm_title)) },
         text = { Text(stringResource(R.string.display_layout_mirror_confirm)) },
@@ -782,6 +773,14 @@ private fun HomePage(state: LauncherState, wide: Boolean, onWideScreen: Boolean,
     }
     SectionCaption(stringResource(R.string.settings_section_screen))
     SettingsGroup {
+        GroupBody {
+            GroupTitle(stringResource(R.string.settings_display_layout))
+            Choice(listOf(stringResource(R.string.display_layout_mirror) to "display-layout-mirror",
+                stringResource(R.string.display_layout_separate) to "display-layout-separate"),
+                if (state.separateCover) 1 else 0, { if (it == 1) model.setSeparateCover(true) else if (state.separateCover) confirmMirror = true })
+            Detail(stringResource(if (state.separateCover) R.string.display_layout_separate_detail else R.string.display_layout_mirror_detail))
+        }
+        GroupDivider()
         SwitchRow(stringResource(R.string.settings_cover_rotation), stringResource(R.string.settings_cover_rotation_detail),
             state.coverRotation, model::setCoverRotation, "cover-rotation-switch", badge = stringResource(R.string.settings_experimental))
     }

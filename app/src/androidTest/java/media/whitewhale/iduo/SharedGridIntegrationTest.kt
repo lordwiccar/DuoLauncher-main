@@ -84,7 +84,7 @@ class SharedGridIntegrationTest {
             val app = model().state.value.apps.first {
                 ComponentName.unflattenFromString(it.id)?.packageName == packageProvider.provider.packageName
             }
-            compose.runOnIdle { model().applyDrop(app.id, DropTarget.Home(8)) }
+            compose.runOnIdle { model().applyDrop(app.id, DropTarget.Home(10)) }
             compose.onNodeWithTag("home-app-${app.id}").performTouchInput { longClick() }
             compose.onNodeWithText("Widgets").performClick()
             compose.onNodeWithTag("visual-widget-picker").assertIsDisplayed()
@@ -115,7 +115,7 @@ class SharedGridIntegrationTest {
             val first = freed.placement(1) ?: error("Fixture needs the second migrated widget")
             begin("widget-slot-${first.slot}"); drop("home-cell-$source")
             assertEquals("An app collision must reject the widget move", freed, model().state.value.layout)
-            compose.runOnIdle { model().applyDrop(app.id, DropTarget.Home(12)) }
+            compose.runOnIdle { model().applyDrop(app.id, DropTarget.Home(15)) }
             val movable = model().state.value.layout
             begin("widget-slot-${first.slot}"); drop("home-cell-0")
             assertEquals(first.copy(column = 0, row = 0), model().placement(first.slot))
@@ -185,7 +185,7 @@ class SharedGridIntegrationTest {
         var createdId = -1
         try {
             val pageAnchor = model().state.value.apps.first { it.id !in before.dock }.id
-            compose.runOnIdle { model().applyDrop(pageAnchor, DropTarget.Home(47)) }
+            compose.runOnIdle { model().applyDrop(pageAnchor, DropTarget.Home(58)) }
             compose.onNodeWithContentDescription("Home page 2").performClick()
             compose.waitForIdle()
             compose.onNodeWithTag("home-cell-$HOME_CELLS").performTouchInput { longClick() }
