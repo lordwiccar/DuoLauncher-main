@@ -41,6 +41,7 @@ android {
         versionCode = 3
         versionName = "1.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders["appLabel"] = "iDuo Launcher"
     }
     signingConfigs {
         if (releaseStoreFile != null) {
@@ -62,7 +63,14 @@ android {
             )
             if (releaseStoreFile != null) signingConfig = signingConfigs.getByName("release")
         }
+        // A debug-signed build that installs beside the Play version, for trying changes on a phone.
+        create("phone") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".debug"
+            manifestPlaceholders["appLabel"] = "iDuo Debug"
+        }
     }
+    sourceSets.getByName("phone").java.srcDir("src/release/java")
     buildFeatures { compose = true }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
