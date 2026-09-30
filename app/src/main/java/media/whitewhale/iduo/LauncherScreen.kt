@@ -381,18 +381,30 @@ fun LauncherScreen(
     val backdropBlurred = openFolderId != null || spotlight
     val folderBlur by animateDpAsState(if (backdropBlurred) FOLDER_BACKDROP_BLUR else 0.dp, label = "folder blur")
     val behindFolder = if (folderBlur > 0.dp) Modifier.blur(folderBlur) else Modifier
-    // Android's wallpaper lies behind this window, so the window blurs it rather than Compose.
-    // It blurs fully behind an open folder or search, and as All apps or the news page slides
-    // in, so their labels stay readable on busy wallpapers.
-    val wallpaperBlurPx = with(LocalDensity.current) { WALLPAPER_BACKDROP_BLUR.toPx() }
-    LaunchedEffect(nativePager, firstHome, visibleHomePages, hasLibrary, wallpaperBlurPx) {
-        var applied = -1
-        snapshotFlow {
+    // The wallpaper blurs fully behind an open folder or search, and as All apps or the news
+    // page slides in, so their labels stay readable on busy wallpapers.
+    val wallpaperBlurProgress by remember(nativePager, firstHome, visibleHomePages, hasLibrary) {
+        derivedStateOf {
             val position = nativePager.currentPage + nativePager.currentPageOffsetFraction - firstHome
             val panel = maxOf((-position).coerceIn(0f, 1f),
                 if (hasLibrary) (position - (visibleHomePages - 1)).coerceIn(0f, 1f) else 0f)
-            (maxOf(panel, folderBlur / FOLDER_BACKDROP_BLUR) * wallpaperBlurPx).roundToInt()
-        }.collect { radius ->
+            maxOf(panel, folderBlur / FOLDER_BACKDROP_BLUR)
+        }
+    }
+    // Android's wallpaper lies behind this window, so the window blurs it where Android allows
+    // that. Some devices, Samsung's among them, turn cross-window blur off; there Home draws a
+    // blurred stand-in of the wallpaper instead.
+    val windowManager = launcherActivity.windowManager
+    var windowBlurs by remember { mutableStateOf(windowManager.isCrossWindowBlurEnabled) }
+    DisposableEffect(windowManager) {
+        val listener = java.util.function.Consumer<Boolean> { windowBlurs = it }
+        windowManager.addCrossWindowBlurEnabledListener(listener)
+        onDispose { windowManager.removeCrossWindowBlurEnabledListener(listener) }
+    }
+    val wallpaperBlurPx = with(LocalDensity.current) { WALLPAPER_BACKDROP_BLUR.toPx() }
+    LaunchedEffect(windowBlurs, wallpaperBlurPx) {
+        var applied = -1
+        snapshotFlow { if (windowBlurs) (wallpaperBlurProgress * wallpaperBlurPx).roundToInt() else 0 }.collect { radius ->
             // Each change relayouts the window, so small steps mid-swipe are skipped.
             if (radius == 0 || radius >= wallpaperBlurPx.roundToInt() || kotlin.math.abs(radius - applied) >= 4) {
                 if (radius != applied) launcherActivity.window.setWallpaperBlur(radius)
@@ -422,6 +434,10 @@ fun LauncherScreen(
             }
         },
         onFinish = { cancelled -> finishDrag(cancelled) })) {
+        if (!windowBlurs && wallpaperBlurProgress > 0f) WallpaperStandIn(Modifier.fillMaxSize()
+            .graphicsLayer { alpha = wallpaperBlurProgress }
+            .blur(WALLPAPER_BACKDROP_BLUR, androidx.compose.ui.draw.BlurredEdgeTreatment.Rectangle)
+            .testTag("wallpaper-blur"))
         BoxWithConstraints(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
             val wide = maxWidth.value >= 650f
             val preset = if (wide) state.expanded else state.compact

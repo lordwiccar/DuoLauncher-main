@@ -41,6 +41,17 @@ class AppsOnHomeTest {
         assertEquals(2, result.pageCount)
     }
 
+    @Test fun turningOffTakesOnlyTheAddedAppsOffHome() {
+        val start = layout(0 to "a").copy(folders = listOf(FolderEntry("folder:1", "F", listOf("moved", "other"))))
+        val added = appendHomeApps(start, listOf("b", "c"), onNewPage = true)
+        val after = removeHomeApps(added, setOf("b", "c", "moved"))
+        // The pages On Home added disappear with their apps; an app moved into a folder stays there.
+        assertEquals(listOf("a"), after.slots)
+        assertEquals(1, after.pageCount)
+        assertEquals(start.folders, after.folders)
+        assertEquals(start.dock, after.dock)
+    }
+
     @Test fun nothingToAddKeepsTheLayout() {
         val start = layout(0 to "a")
         assertSame(start, appendHomeApps(start, listOf("a"), onNewPage = true))

@@ -82,6 +82,8 @@ data class LauncherState(
     val iconPack: String? = null,
     /** Every app lives on Home pages, and All apps is not shown. */
     val appsOnHome: Boolean = false,
+    /** Apps that On Home put on Home, taken off again when it is turned off. */
+    val homeAddedApps: Set<String> = emptySet(),
     /** How the dock appears on the cover screen; the inner screen always shows it. */
     val dockMode: DockMode = DockMode.SHOWN,
     /** The cover screen has its own Home layout instead of mirroring the inner screen's. */
@@ -277,19 +279,22 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
                     // With apps on Home, a newly installed app joins the end of the last page. Apps
                     // already known stay where the user left them, including off Home.
                     val known = apps.knownBefore + old.apps.map(AppEntry::id) + renamed.values
-                    val reconciled = if (!old.appsOnHome || known.isEmpty()) reconciledHome
-                        else appendHomeApps(reconciledHome, entries.filter { it.available && it.id !in known }.map(AppEntry::id), onNewPage = false)
+                    val installedNow = if (!old.appsOnHome || known.isEmpty()) emptyList()
+                        else entries.filter { it.available && it.id !in known }.map(AppEntry::id)
+                    val reconciled = if (installedNow.isEmpty()) reconciledHome
+                        else appendHomeApps(reconciledHome, installedNow, onNewPage = false)
                     // The layout not on screen loses removed apps too, and gains new ones when it is in use.
                     val other = old.otherLayout?.let { stored ->
                         val followed = stored.copy(slots = stored.slots.map(::follow),
                             folders = stored.folders.map { folder -> folder.copy(appIds = folder.appIds.map { renamed[it] ?: it }) })
                         val cleaned = reconcileFolders(followed.copy(slots = followed.slots.map { it?.takeUnless(removedIds::contains) }),
                             removedIds).copy(dock = reconciled.dock)
-                        if (!old.appsOnHome || !old.separateCover || known.isEmpty()) cleaned
-                            else appendHomeApps(cleaned, entries.filter { it.available && it.id !in known }.map(AppEntry::id), onNewPage = false)
+                        if (installedNow.isEmpty() || !old.separateCover) cleaned
+                            else appendHomeApps(cleaned, installedNow, onNewPage = false)
                     }
                     old.copy(apps = entries, profiles = profiles, homeSlots = reconciled.slots, leadingSlots = reconciled.leadingSlots,
                         dock = reconciled.dock, folders = reconciled.folders, otherLayout = other,
+                        homeAddedApps = (old.homeAddedApps.map { renamed[it] ?: it } + installedNow).toSet() - removedIds,
                         canUndoEdit = old.canUndoEdit && old.layout == reconciled, loading = false,
                         error = if (statePayloadInvalid) old.error else null)
                 }
@@ -547,15 +552,27 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
     }
     /**
      * Puts every app that is not yet on Home onto new pages after the last one, alphabetically,
-     * and hides All apps; turning it off leaves the pages as they are.
+     * and hides All apps. Turning it off takes the apps it added off Home again, except those
+     * since moved into a folder or the dock.
      */
     fun setAppsOnHome(value: Boolean) {
         if (statePayloadInvalid || value == mutable.value.appsOnHome) return
-        mutable.update { it.copy(appsOnHome = value) }; persist()
+        val separate = mutable.value.separateCover
+        val otherIsCover = !mutable.value.showingCover
         if (value) {
             val ids = mutable.value.apps.filter { it.available }.map(AppEntry::id)
-            if (mutable.value.separateCover) updateLayoutFor(!mutable.value.showingCover) { appendHomeApps(it, ids, onNewPage = true) }
+            fun placed(layout: HomeLayout) = (layout.slots + layout.leadingSlots + layout.dock).filterNotNull().toSet() +
+                layout.folders.flatMap { it.appIds }
+            val added = ids.filter { it !in placed(mutable.value.layout) }.toMutableSet()
+            if (separate) mutable.value.layoutFor(cover = otherIsCover).let { other -> added += ids.filter { it !in placed(other) } }
+            mutable.update { it.copy(appsOnHome = true, homeAddedApps = added) }; persist()
+            if (separate) updateLayoutFor(otherIsCover) { appendHomeApps(it, ids, onNewPage = true) }
             commitLayout(appendHomeApps(mutable.value.layout, ids, onNewPage = true))
+        } else {
+            val added = mutable.value.homeAddedApps
+            mutable.update { it.copy(appsOnHome = false, homeAddedApps = emptySet()) }; persist()
+            if (separate) updateLayoutFor(otherIsCover) { removeHomeApps(it, added) }
+            commitLayout(removeHomeApps(mutable.value.layout, added))
         }
     }
     fun setDockMode(value: DockMode) {
@@ -722,6 +739,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .put("coverRotation", s.coverRotation)
             .put("iconPack", s.iconPack ?: "")
             .put("appsOnHome", s.appsOnHome)
+            .put("homeAddedApps", JSONArray(s.homeAddedApps.toList()))
             .put("dockMode", s.dockMode.name)
             .put("separateCover", s.separateCover)
             .put("compact", preset(s.compact)).put("expanded", preset(s.expanded))
@@ -894,6 +912,8 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             coverRotation = j.optBoolean("coverRotation", false),
             iconPack = j.optString("iconPack").takeIf { it.isNotEmpty() },
             appsOnHome = j.optBoolean("appsOnHome", false),
+            homeAddedApps = j.optJSONArray("homeAddedApps")?.let { array ->
+                (0 until array.length()).mapNotNull { array.optString(it).takeIf(String::isNotBlank) }.toSet() } ?: emptySet(),
             dockMode = DockMode.entries.firstOrNull { it.name == j.optString("dockMode") } ?: DockMode.SHOWN,
             separateCover = j.optBoolean("separateCover", false))
             .let { it.copy(homeRows = maxOf(it.homeRows, it.layout.requiredRows())) }

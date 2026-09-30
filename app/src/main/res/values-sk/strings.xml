@@ -484,7 +484,7 @@
     <string name="settings_experimental">Experimentálne</string>
     <string name="all_apps_view_home">Na plochách</string>
     <string name="settings_all_apps_detail">Všetky aplikácie sú za poslednou plochou, ako zoznam alebo strany ikon.</string>
-    <string name="settings_apps_on_home_detail">Všetky aplikácie sú na plochách. Aplikácie, ktoré na ploche neboli, sa rozmiestnili na nové plochy vpravo, nové aplikácie sa pridajú na poslednú plochu a Všetky aplikácie sa nezobrazujú. Po prepnutí späť plochy zostanú.</string>
+    <string name="settings_apps_on_home_detail">Všetky aplikácie sú na plochách. Aplikácie, ktoré na ploche neboli, sa rozmiestnili na nové plochy vpravo, nové aplikácie sa pridajú na poslednú plochu a Všetky aplikácie sa nezobrazujú. Po prepnutí späť sa pridané aplikácie z plôch znova odoberú.</string>
     <string name="settings_dock_mode">Zobrazenie doku</string>
     <string name="dock_mode_shown">Vždy</string>
     <string name="dock_mode_slide">Vysúvací</string>

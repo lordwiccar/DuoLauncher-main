@@ -484,7 +484,7 @@
     <string name="settings_experimental">Eksperymentalne</string>
     <string name="all_apps_view_home">Na ekranach</string>
     <string name="settings_all_apps_detail">Wszystkie aplikacje są za ostatnią stroną ekranu głównego, jako lista lub strony ikon.</string>
-    <string name="settings_apps_on_home_detail">Wszystkie aplikacje są na ekranach głównych. Aplikacje, których tam nie było, trafiły na nowe strony po prawej, nowe aplikacje dołączają do ostatniej strony, a Wszystkie aplikacje są ukryte. Po przełączeniu z powrotem strony zostają.</string>
+    <string name="settings_apps_on_home_detail">Wszystkie aplikacje są na ekranach głównych. Aplikacje, których tam nie było, trafiły na nowe strony po prawej, nowe aplikacje dołączają do ostatniej strony, a Wszystkie aplikacje są ukryte. Po przełączeniu z powrotem dodane aplikacje znikają z ekranów głównych.</string>
     <string name="settings_dock_mode">Wyświetlanie doku</string>
     <string name="dock_mode_shown">Zawsze</string>
     <string name="dock_mode_slide">Wysuwany</string>

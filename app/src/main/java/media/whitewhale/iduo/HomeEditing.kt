@@ -351,6 +351,12 @@ fun appendHomeApps(layout: HomeLayout, ids: List<String>, onNewPage: Boolean): H
     return layout.copy(slots = slots)
 }
 
+/** Takes [ids] off Home's pages, leaving folders, the dock and the unfolded-only page as they are. */
+fun removeHomeApps(layout: HomeLayout, ids: Set<String>): HomeLayout {
+    if (ids.isEmpty() || layout.slots.none { it in ids }) return layout
+    return layout.copy(slots = layout.slots.map { it?.takeUnless(ids::contains) }.dropLastWhile { it == null })
+}
+
 fun pinHomeApp(slots: List<String?>, id: String, pinned: Boolean, blocked: Set<Int> = emptySet()): List<String?> {
     if (!pinned) return normalizeHomeSlots(slots.map { if (it == id) null else it })
     if (id in slots) return slots

@@ -468,7 +468,7 @@
     <string name="settings_experimental">Experimentell</string>
     <string name="all_apps_view_home">Startseiten</string>
     <string name="settings_all_apps_detail">Alle Apps folgen nach der letzten Startbildschirmseite, als Liste oder als Symbolseiten.</string>
-    <string name="settings_apps_on_home_detail">Alle Apps liegen auf dem Startbildschirm. Apps, die dort noch nicht waren, kamen auf neue Seiten rechts, neue Apps landen auf der letzten Seite, und Alle Apps wird ausgeblendet. Beim Zurückschalten bleiben die Seiten erhalten.</string>
+    <string name="settings_apps_on_home_detail">Alle Apps liegen auf dem Startbildschirm. Apps, die dort noch nicht waren, kamen auf neue Seiten rechts, neue Apps landen auf der letzten Seite, und Alle Apps wird ausgeblendet. Beim Zurückschalten werden die hinzugefügten Apps wieder entfernt.</string>
     <string name="settings_dock_mode">Dock anzeigen</string>
     <string name="dock_mode_shown">Immer</string>
     <string name="dock_mode_slide">Einblenden</string>
