@@ -94,7 +94,7 @@
     <string name="add_widget_to_page">Přidat widget na tuto stránku</string>
 
     <string name="show_app_names">Zobrazit názvy aplikací</string>
-    <string name="show_status">Zobrazit stav vpravo nahoře</string>
+    <string name="show_status">Zobrazit čas a stav</string>
 
     <string name="backup_detail">Uloží aktuální rozložení plochy, složky, widgety a nastavení rozložení.</string>
     <string name="backup_restore_note">Před změnou plochy obnovení vždy zobrazí přehled.</string>
@@ -468,7 +468,7 @@
     <string name="settings_names_detail">Pod ikonami na ploše a v docku</string>
     <string name="settings_section_content">Obsah plochy</string>
     <string name="settings_pinned_count">Připnutých aplikací: %1$d</string>
-    <string name="settings_status_detail">Čas, datum, baterie a signál</string>
+    <string name="settings_status_detail">Čas, datum, baterie a signál: na vnějším displeji nahoře, na vnitřním nad dockem</string>
     <string name="settings_reset_cover">Obnovit výchozí rozvržení vnějšího displeje</string>
     <string name="settings_reset_inner">Obnovit výchozí rozvržení vnitřního displeje</string>
     <string name="settings_news_detail">Zobrazí se přejetím doprava z první stránky plochy.</string>
@@ -493,4 +493,5 @@
     <string name="dock_mode_slide_detail">Dock vysunete tažením doleva od úchytu u pravého okraje. Zasune se po otevření aplikace nebo dotyku plochy.</string>
     <string name="dock_mode_hidden_detail">Dock se nezobrazuje. Jeho aplikace zůstanou uložené pro případ, že ho znovu zapnete.</string>
     <string name="dock_show">Zobrazit dock</string>
+    <string name="dock_mode_inner_always">Na vnitřním displeji je dock vždy zobrazený. Vysouvací nebo skrytý může být na vnějším displeji.</string>
 </resources>

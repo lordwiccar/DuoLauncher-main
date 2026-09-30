@@ -169,7 +169,8 @@ fun LauncherScreen(
     var spotlight by rememberSaveable { mutableStateOf(false) }
     // A sliding dock opens from the right edge and closes when Home is touched or left.
     var dockOpen by rememberSaveable { mutableStateOf(false) }
-    val dockReveal = remember { androidx.compose.animation.core.Animatable(if (state.dockMode == DockMode.SHOWN) 1f else 0f) }
+    val startsWide = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp >= 650
+    val dockReveal = remember { androidx.compose.animation.core.Animatable(if (startsWide || state.dockMode == DockMode.SHOWN) 1f else 0f) }
     androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_PAUSE) { dockOpen = false }
     var createFolderFirstId by rememberSaveable { mutableStateOf<String?>(null) }
     var savedPage by rememberSaveable { mutableIntStateOf(0) }
@@ -412,16 +413,26 @@ fun LauncherScreen(
             val preset = if (wide) state.expanded else state.compact
             val density = LocalDensity.current
             val inLibrary = hasLibrary && pager.currentPage == visibleHomePages
+            // The inner screen always shows its dock; only the cover's may slide in or hide.
+            val dockMode = if (wide) DockMode.SHOWN else state.dockMode
+            val dockColumn = dockMode == DockMode.SHOWN
+            // On the cover, status runs across the top: in the camera's band when there is one.
+            val coverStatus = !wide && state.verticalStatus
+            val topInset = with(density) { WindowInsets.safeDrawing.getTop(this).toDp() }
+            val coverStatusHeight = maxOf(topInset, 36.dp)
+            val topBar = if (coverStatus) (coverStatusHeight - topInset).value else 0f
             var statusHeight by remember { mutableFloatStateOf(0f) }
             val geometry = homeGeometry(maxWidth.value, maxHeight.value, preset, state.labels,
-                statusRailHeight = if (state.verticalStatus) statusHeight + 22f else 0f,
+                statusRailHeight = if (state.verticalStatus && wide) statusHeight + 22f else 0f,
                 labelHeight = with(density) { 14.sp.toDp().value } + 6f, inLibrary = inLibrary,
-                homeBottomSpace = if (isDefaultHome) 44f else 88f, dockSlots = state.dock.size, homeRows = state.homeRows)
+                homeBottomSpace = if (isDefaultHome) 44f else 88f, dockSlots = state.dock.size, homeRows = state.homeRows,
+                columns = state.homeColumns, dockColumn = dockColumn, topBar = topBar)
             // The most Home rows this screen can show in full, measured like the page itself.
             val maxRowsFit = (GRID_ROWS downTo DEFAULT_HOME_ROWS + 1).firstOrNull { rows ->
                 homeGeometry(maxWidth.value, maxHeight.value, preset, state.labels,
                     labelHeight = with(density) { 14.sp.toDp().value } + 6f,
-                    homeBottomSpace = if (isDefaultHome) 44f else 88f, homeRows = rows).gridFits
+                    homeBottomSpace = if (isDefaultHome) 44f else 88f, homeRows = rows,
+                    columns = state.homeColumns, dockColumn = dockColumn, topBar = topBar).gridFits
             } ?: DEFAULT_HOME_ROWS
             SideEffect {
                 resizePitchX = with(density) { (geometry.gridWidth / state.homeColumns).dp.toPx() }
@@ -455,7 +466,7 @@ fun LauncherScreen(
             }
             val contentHeight = maxHeight
             val panelWidth = maxWidth - geometry.homeWidth.dp
-            val pagerWidth = maxWidth - preset.dockWidth.dp - 28.dp
+            val pagerWidth = if (dockColumn) maxWidth - preset.dockWidth.dp - 28.dp else maxWidth
             val leftColumnOrigin = (maxWidth / 2f - geometry.gridWidth.dp) / 2f - 16.dp
             val homeStride = panelWidth - leftColumnOrigin
             val bottomSpace = if (isDefaultHome) 44.dp else 88.dp
@@ -463,7 +474,7 @@ fun LauncherScreen(
                 WorkspacePageMotion(firstHome, visibleHomePages, with(density) { pagerWidth.toPx() }, with(density) { homeStride.toPx() })
             } else null
             val dockScroll = rememberScrollState()
-            val dockShown = state.dockMode == DockMode.SHOWN || (state.dockMode == DockMode.SLIDE && (dockOpen || drag.active))
+            val dockShown = dockMode == DockMode.SHOWN || (dockMode == DockMode.SLIDE && (dockOpen || drag.active))
             var dockDragging by remember { mutableStateOf(false) }
             LaunchedEffect(dockShown, dockDragging) {
                 if (!dockDragging) dockReveal.animateTo(if (dockShown) 1f else 0f,
@@ -545,7 +556,7 @@ fun LauncherScreen(
                 childPagesHorizontally = { point, travel ->
                     val rootPoint = point + gestureOriginInRoot
                     // A sliding dock takes a leftward swipe at its edge handle and a rightward one over itself.
-                    (state.dockMode == DockMode.SLIDE && ((travel < 0f && !dockOpen && dockHandleBounds[0].contains(rootPoint)) ||
+                    (dockMode == DockMode.SLIDE && ((travel < 0f && !dockOpen && dockHandleBounds[0].contains(rootPoint)) ||
                         (travel > 0f && dockOpen && dockBounds[0].contains(rootPoint)))) ||
                         drag.childPager?.let { child -> child.bounds().contains(rootPoint) && child.canPage(travel) } == true
                 },
@@ -610,7 +621,9 @@ fun LauncherScreen(
                     }
                 }
             }
-            if (state.verticalStatus) StatusRail(deviceStatus,
+            if (coverStatus) CoverStatusBar(deviceStatus, Modifier.align(Alignment.TopStart).offset(y = -topInset)
+                .fillMaxWidth().height(coverStatusHeight).padding(horizontal = 20.dp))
+            if (state.verticalStatus && wide) StatusRail(deviceStatus,
                 Modifier.align(Alignment.TopEnd).padding(end = 12.dp).offset(y = geometry.contentTop.dp)
                     .width(preset.dockWidth.dp).onSizeChanged {
                         // The normal rail's 20dp location slot and 3dp gap do not move the dock.
@@ -618,17 +631,18 @@ fun LauncherScreen(
                             if (contentHeight < 500.dp) 0f else 23f).coerceAtLeast(0f)
                     },
                 compact = contentHeight < 500.dp, iconSize = dockIconSize(geometry.iconSize).dp)
-            if (state.dockMode != DockMode.HIDDEN) Surface(Modifier.align(Alignment.TopEnd).padding(end = 12.dp).offset(y = geometry.dockTop.dp)
+            if (dockMode != DockMode.HIDDEN) Surface(Modifier.align(Alignment.TopEnd).padding(end = 12.dp).offset(y = geometry.dockTop.dp)
                 .width(preset.dockWidth.dp).height(geometry.dockHeight.dp).graphicsLayer {
                     // Composite the stationary dock independently of the shared pager layer.
                     compositingStrategy = androidx.compose.ui.graphics.CompositingStrategy.Offscreen
                     translationX = (1f - dockReveal.value) * dockTravel
                 }.onGloballyPositioned { dockBounds[0] = it.boundsInRoot() }
-                .then(if (state.dockMode == DockMode.SLIDE) Modifier.pointerInput(Unit) {
+                .then(if (dockMode == DockMode.SLIDE) Modifier.pointerInput(Unit) {
                     detectHorizontalDragGestures(onDragStart = dockDragBegin, onDragEnd = dockDragEnd,
                         onDragCancel = dockDragEnd) { change, dx -> if (dx > 0f || dockReveal.value < 1f) { change.consume(); dockDrag(dx) } }
                 } else Modifier).testTag("dock"),
-                shape = RoundedCornerShape(30.dp), color = Glass.copy(alpha = .32f),
+                // A dock that slides over icons is nearly opaque, so they do not show through it.
+                shape = RoundedCornerShape(30.dp), color = Glass.copy(alpha = if (dockColumn) .32f else .9f),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .3f))) {
                 Column(Modifier.padding(vertical = 8.dp).verticalScroll(dockScroll)) {
                     DockAppColumn(state.dock, previewLayout.dock, appsById, geometry.dockRowHeight,
@@ -636,7 +650,7 @@ fun LauncherScreen(
                         onLaunch = onLaunchFrom, onChoose = { dockSlot = it; sheet = "dock" })
                 }
             }
-            if (state.dockMode == DockMode.SLIDE && dockReveal.value < 1f) {
+            if (dockMode == DockMode.SLIDE && dockReveal.value < 1f) {
                 // Android lets an app claim at most 200dp of an edge from the back gesture, so
                 // the handle is that tall, centred on the dock.
                 val handleHeight = minOf(200f, geometry.dockHeight)

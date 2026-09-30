@@ -94,7 +94,7 @@
     <string name="add_widget_to_page">Widget zu dieser Seite hinzufügen</string>
 
     <string name="show_app_names">App-Namen anzeigen</string>
-    <string name="show_status">Status oben rechts anzeigen</string>
+    <string name="show_status">Uhrzeit und Status anzeigen</string>
 
     <string name="backup_detail">Speichert das aktuelle Startbildschirm-Layout, Ordner, Widgets und Layouteinstellungen.</string>
     <string name="backup_restore_note">Vor einer Änderung des Startbildschirms zeigt die Wiederherstellung eine Übersicht.</string>
@@ -452,7 +452,7 @@
     <string name="settings_names_detail">Unter den Symbolen auf dem Startbildschirm und im Dock</string>
     <string name="settings_section_content">Inhalt des Startbildschirms</string>
     <string name="settings_pinned_count">Angeheftete Apps: %1$d</string>
-    <string name="settings_status_detail">Uhrzeit, Datum, Akku und Signal</string>
+    <string name="settings_status_detail">Uhrzeit, Datum, Akku und Signal: auf dem äußeren Display oben, auf dem inneren über dem Dock</string>
     <string name="settings_reset_cover">Layout des Außendisplays zurücksetzen</string>
     <string name="settings_reset_inner">Layout des Innendisplays zurücksetzen</string>
     <string name="settings_news_detail">Wische auf der ersten Startbildschirmseite nach rechts, um sie zu sehen.</string>
@@ -477,4 +477,5 @@
     <string name="dock_mode_slide_detail">Wische vom Griff am rechten Rand nach links, um das Dock einzublenden. Es verschwindet, wenn du eine App öffnest oder den Startbildschirm berührst.</string>
     <string name="dock_mode_hidden_detail">Das Dock wird nicht angezeigt. Seine Apps bleiben gespeichert, falls du es wieder einblendest.</string>
     <string name="dock_show">Dock anzeigen</string>
+    <string name="dock_mode_inner_always">Auf dem inneren Display ist das Dock immer sichtbar. Auf dem äußeren Display kann es eingeblendet werden oder ausgeblendet bleiben.</string>
 </resources>

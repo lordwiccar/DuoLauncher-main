@@ -94,7 +94,7 @@
     <string name="add_widget_to_page">Dodaj widżet do tej strony</string>
 
     <string name="show_app_names">Pokaż nazwy aplikacji</string>
-    <string name="show_status">Pokaż stan w prawym górnym rogu</string>
+    <string name="show_status">Pokaż czas i stan</string>
 
     <string name="backup_detail">Zapisz bieżący układ ekranu głównego, foldery, widżety i ustawienia układu.</string>
     <string name="backup_restore_note">Przed zmianą ekranu głównego przywracanie zawsze pokazuje podsumowanie.</string>
@@ -468,7 +468,7 @@
     <string name="settings_names_detail">Pod ikonami na ekranie głównym i w doku</string>
     <string name="settings_section_content">Zawartość ekranu głównego</string>
     <string name="settings_pinned_count">Przypięte aplikacje: %1$d</string>
-    <string name="settings_status_detail">Godzina, data, bateria i sygnał</string>
+    <string name="settings_status_detail">Czas, data, bateria i sygnał: na ekranie zewnętrznym u góry, na wewnętrznym nad dokiem</string>
     <string name="settings_reset_cover">Przywróć domyślny układ ekranu zewnętrznego</string>
     <string name="settings_reset_inner">Przywróć domyślny układ ekranu wewnętrznego</string>
     <string name="settings_news_detail">Przesuń w prawo z pierwszej strony ekranu głównego, aby ją zobaczyć.</string>
@@ -493,4 +493,5 @@
     <string name="dock_mode_slide_detail">Przesuń w lewo od uchwytu przy prawej krawędzi, aby wysunąć dok. Chowa się po otwarciu aplikacji lub dotknięciu ekranu głównego.</string>
     <string name="dock_mode_hidden_detail">Dok nie jest wyświetlany. Jego aplikacje pozostają zapisane na wypadek ponownego włączenia.</string>
     <string name="dock_show">Pokaż dok</string>
+    <string name="dock_mode_inner_always">Na ekranie wewnętrznym dok jest zawsze widoczny. Wysuwany lub ukryty może być na ekranie zewnętrznym.</string>
 </resources>

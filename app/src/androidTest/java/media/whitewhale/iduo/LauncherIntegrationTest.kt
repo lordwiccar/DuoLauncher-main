@@ -294,16 +294,18 @@ class LauncherIntegrationTest {
 
     @Test fun statusRailCanBeDisabledAndRestored() {
         ready()
-        compose.onNodeWithTag("status-rail").assertIsDisplayed()
+        // The inner screen shows status as a rail above the dock, the cover as a bar across the top.
+        val status = hasTestTag("status-rail") or hasTestTag("cover-status")
+        compose.onNode(status).assertIsDisplayed()
         compose.openHomeCustomization()
         compose.onNodeWithTag("customization-home").performClick()
         compose.onNodeWithTag("status-switch").performScrollTo().performClick()
         compose.closeSettingsPage()
-        compose.onNodeWithTag("status-rail").assertDoesNotExist()
+        compose.onNode(status).assertDoesNotExist()
         compose.activityRule.scenario.recreate()
         ready()
-        compose.onNodeWithTag("status-rail").assertDoesNotExist()
+        compose.onNode(status).assertDoesNotExist()
         compose.runOnIdle { model().setVerticalStatus(true) }
-        compose.onNodeWithTag("status-rail").assertIsDisplayed()
+        compose.onNode(status).assertIsDisplayed()
     }
 }

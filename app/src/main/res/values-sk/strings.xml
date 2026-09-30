@@ -94,7 +94,7 @@
     <string name="add_widget_to_page">Pridať miniaplikáciu na túto stranu</string>
 
     <string name="show_app_names">Zobraziť názvy aplikácií</string>
-    <string name="show_status">Zobraziť stav vpravo hore</string>
+    <string name="show_status">Zobraziť čas a stav</string>
 
     <string name="backup_detail">Uloží aktuálne rozloženie plochy, priečinky, miniaplikácie a nastavenia rozloženia.</string>
     <string name="backup_restore_note">Pred zmenou plochy obnovenie vždy zobrazí prehľad.</string>
@@ -468,7 +468,7 @@
     <string name="settings_names_detail">Pod ikonami na ploche a v doku</string>
     <string name="settings_section_content">Obsah plochy</string>
     <string name="settings_pinned_count">Pripnutých aplikácií: %1$d</string>
-    <string name="settings_status_detail">Čas, dátum, batéria a signál</string>
+    <string name="settings_status_detail">Čas, dátum, batéria a signál: na vonkajšom displeji hore, na vnútornom nad dokom</string>
     <string name="settings_reset_cover">Obnoviť predvolené rozloženie vonkajšieho displeja</string>
     <string name="settings_reset_inner">Obnoviť predvolené rozloženie vnútorného displeja</string>
     <string name="settings_news_detail">Zobrazí sa potiahnutím doprava z prvej strany plochy.</string>
@@ -493,4 +493,5 @@
     <string name="dock_mode_slide_detail">Dok vysuniete potiahnutím doľava od úchytu pri pravom okraji. Zasunie sa po otvorení aplikácie alebo dotyku plochy.</string>
     <string name="dock_mode_hidden_detail">Dok sa nezobrazuje. Jeho aplikácie zostanú uložené pre prípad, že ho znova zapnete.</string>
     <string name="dock_show">Zobraziť dok</string>
+    <string name="dock_mode_inner_always">Na vnútornom displeji je dok vždy zobrazený. Vysúvací alebo skrytý môže byť na vonkajšom displeji.</string>
 </resources>

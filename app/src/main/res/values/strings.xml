@@ -94,7 +94,7 @@
     <string name="add_widget_to_page">Add widget to this page</string>
 
     <string name="show_app_names">Show app names</string>
-    <string name="show_status">Show status at upper right</string>
+    <string name="show_status">Show time and status</string>
 
     <string name="backup_detail">Save the current Home layout, folders, widgets, and layout settings.</string>
     <string name="backup_restore_note">Restore shows a review before changing Home.</string>
@@ -453,7 +453,7 @@
     <string name="settings_names_detail">Under icons on Home and in the dock</string>
     <string name="settings_section_content">Home content</string>
     <string name="settings_pinned_count">Pinned apps: %1$d</string>
-    <string name="settings_status_detail">Time, date, battery and signal</string>
+    <string name="settings_status_detail">Time, date, battery and signal: across the top of the cover screen, above the dock on the inner screen</string>
     <string name="settings_reset_cover">Reset the cover screen layout</string>
     <string name="settings_reset_inner">Reset the inner screen layout</string>
     <string name="settings_news_detail">Swipe right from the first Home page to see it.</string>
@@ -478,4 +478,5 @@
     <string name="dock_mode_slide_detail">Swipe left from the handle at the right edge to show the dock. It slides away when you open an app or touch Home.</string>
     <string name="dock_mode_hidden_detail">The dock is not shown. Its apps stay saved for when you show it again.</string>
     <string name="dock_show">Show the dock</string>
+    <string name="dock_mode_inner_always">On the inner screen the dock is always shown. It can slide in or hide on the cover screen.</string>
 </resources>

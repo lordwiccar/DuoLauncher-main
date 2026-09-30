@@ -769,7 +769,13 @@ private fun HomePage(state: LauncherState, wide: Boolean, model: LauncherModel, 
 @Composable
 private fun DockPage(state: LauncherState, wide: Boolean, model: LauncherModel) {
     val p = if (wide) state.expanded else state.compact
-    SettingsGroup {
+    // Only the cover's dock may slide in or hide; the inner screen always shows it.
+    if (wide) SettingsGroup {
+        GroupBody {
+            GroupTitle(stringResource(R.string.settings_dock_mode))
+            Detail(stringResource(R.string.dock_mode_inner_always))
+        }
+    } else SettingsGroup {
         GroupBody {
             GroupTitle(stringResource(R.string.settings_dock_mode))
             val modes = DockMode.entries
