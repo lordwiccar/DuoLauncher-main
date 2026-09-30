@@ -551,7 +551,7 @@ class SharedGridIntegrationTest {
             base().put("widgets", JSONArray().put(widget(slot = 4, page = 1, row = 6, spanX = 4, spanY = 4))),
             base().put("widgets", JSONArray().put(widget(slot = 5, page = 0, row = 6, spanX = 4, spanY = 4))),
             base().put("widgets", JSONArray().put(widget(slot = 5, page = 1, column = 1, row = 6, spanX = 3, spanY = 4))),
-            base().put("schema", 10).put("widgets", JSONArray()),
+            base().put("schema", 11).put("widgets", JSONArray()),
             base().put("schema", 8).put("widgets", JSONArray()).put("folders", JSONArray()).put("leadingSlots", JSONArray()),
             base().put("schema", 8).put("widgets", JSONArray()).put("folders", JSONArray())
                 .put("leadingSlots", leading(0 to "duplicate", 1 to "duplicate")),

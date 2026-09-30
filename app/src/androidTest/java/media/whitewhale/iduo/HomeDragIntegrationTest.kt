@@ -194,7 +194,7 @@ class HomeDragIntegrationTest {
                 compose.onNodeWithTag("app-pager").fetchSemanticsNode().config[SemanticsProperties.StateDescription] == "Home page 2 of 2"
             }
             compose.waitForIdle()
-            val destination = center("home-cell-47")
+            val destination = center("home-cell-58")
             root().performTouchInput { moveTo(destination, 300); up() }
             compose.waitForIdle()
             assertNull("Result: ${model().state.value.homeSlots}", model().state.value.homeSlots[source])

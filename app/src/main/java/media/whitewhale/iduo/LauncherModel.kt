@@ -63,6 +63,7 @@ data class LauncherState(
     val labels: Boolean = true,
     val verticalStatus: Boolean = true,
     val homeRows: Int = DEFAULT_HOME_ROWS,
+    val homeColumns: Int = DEFAULT_HOME_COLUMNS,
     /** How see-through an open folder's background is, from opaque (0) to [MAX_FOLDER_TRANSPARENCY]. */
     val folderTransparency: Float = DEFAULT_FOLDER_TRANSPARENCY,
     /** All apps as horizontal pages of a grid instead of a vertical list. */
@@ -88,7 +89,7 @@ data class LauncherState(
 ) {
     val order: List<String> get() = homeSlots.filterNotNull()
     val widgets: List<Int> get() = layout.widgets
-    val layout: HomeLayout get() = HomeLayout(homeSlots, dock, widgetPlacements, folders, widgetRestores, leadingSlots, homeRows)
+    val layout: HomeLayout get() = HomeLayout(homeSlots, dock, widgetPlacements, folders, widgetRestores, leadingSlots, homeRows, homeColumns)
     val homePages get() = layout.pageCount
 }
 
@@ -253,7 +254,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
                     val validPins = followedPins.map { it?.takeUnless(removedIds::contains) }
                     val validDock = followedDock.map { it?.takeUnless(removedIds::contains) }
                     val reconciledHome = reconcileFolders(HomeLayout(validPins, validDock, old.widgetPlacements, followedFolders,
-                        old.widgetRestores, followedLeading, old.homeRows), removedIds)
+                        old.widgetRestores, followedLeading, old.homeRows, old.homeColumns), removedIds)
                     // With apps on Home, a newly installed app joins the end of the last page. Apps
                     // already known stay where the user left them, including off Home.
                     val known = apps.knownBefore + old.apps.map(AppEntry::id) + renamed.values
@@ -416,7 +417,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             old.labels == preview.labels && old.googleSearch == preview.googleSearch && old.verticalStatus == preview.verticalStatus) return false
         undoLayout = old.layout to preview.layout
         undoImportSettings = UndoImportSettings(old.compact, old.expanded, old.labels, old.googleSearch, old.verticalStatus)
-        mutable.value = old.copy(homeSlots = preview.layout.slots, leadingSlots = preview.layout.leadingSlots, dock = preview.layout.dock, homeRows = preview.layout.rows,
+        mutable.value = old.copy(homeSlots = preview.layout.slots, leadingSlots = preview.layout.leadingSlots, dock = preview.layout.dock, homeRows = preview.layout.rows, homeColumns = preview.layout.columns,
             widgetPlacements = preview.layout.widgetPlacements, folders = preview.layout.folders,
             widgetRestores = preview.layout.widgetRestores, compact = preview.compact, expanded = preview.expanded,
             labels = preview.labels, googleSearch = preview.googleSearch, verticalStatus = preview.verticalStatus,
@@ -441,7 +442,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         if (old.layout == next) return false
         undoLayout = old.layout to next
         undoImportSettings = null
-        mutable.value = old.copy(homeSlots = next.slots, leadingSlots = next.leadingSlots, dock = next.dock, homeRows = next.rows,
+        mutable.value = old.copy(homeSlots = next.slots, leadingSlots = next.leadingSlots, dock = next.dock, homeRows = next.rows, homeColumns = next.columns,
             widgetPlacements = next.widgetPlacements, folders = next.folders,
             widgetRestores = next.widgetRestores,
             editRevision = old.editRevision + 1, canUndoEdit = true)
@@ -457,7 +458,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         val settings = undoImportSettings
         mutable.value = old.copy(homeSlots = reconcileHomeSlots(before.slots, installed),
             leadingSlots = before.leadingSlots.map { it?.takeIf(installed::contains) },
-            dock = before.dock.map { it?.takeIf(installed::contains) }, widgetPlacements = before.widgetPlacements, folders = before.folders, homeRows = before.rows,
+            dock = before.dock.map { it?.takeIf(installed::contains) }, widgetPlacements = before.widgetPlacements, folders = before.folders, homeRows = before.rows, homeColumns = before.columns,
             widgetRestores = before.widgetRestores, compact = settings?.compact ?: old.compact,
             expanded = settings?.expanded ?: old.expanded, labels = settings?.labels ?: old.labels,
             googleSearch = settings?.googleSearch ?: old.googleSearch, verticalStatus = settings?.verticalStatus ?: old.verticalStatus,
@@ -555,7 +556,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         val installed = (mutable.value.apps.map { it.id } + layout.folders.map { it.id }).toSet()
         mutable.update { it.copy(homeSlots = reconcileHomeSlots(layout.slots, installed),
             leadingSlots = layout.slotsForPage(-1).map { id -> id?.takeIf { it in installed || isFolderId(it) } },
-            dock = layout.dock.map { id -> id?.takeIf { it in installed || isFolderId(it) } }, widgetPlacements = layout.widgetPlacements, homeRows = layout.rows,
+            dock = layout.dock.map { id -> id?.takeIf { it in installed || isFolderId(it) } }, widgetPlacements = layout.widgetPlacements, homeRows = layout.rows, homeColumns = layout.columns,
             folders = layout.folders, widgetRestores = layout.widgetRestores,
             canUndoEdit = false, editRevision = it.editRevision + 1) }
         undoLayout = null
@@ -577,7 +578,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .put("slot", restore.slot).put("provider", restore.providerComponent).put("userSerial", restore.userSerial)
             .put("title", restore.title).put("profileLabel", restore.profileLabel).put("work", restore.isWork)
             .put("sourceScope", restore.sourceScope)) } }
-        val data = JSONObject().put("schema", 9).put("pinned", JSONArray(s.order)).put("homeSlots", JSONArray(s.homeSlots))
+        val data = JSONObject().put("schema", 10).put("pinned", JSONArray(s.order)).put("homeSlots", JSONArray(s.homeSlots))
             .put("leadingSlots", JSONArray(s.leadingSlots)).put("dock", JSONArray(s.dock))
             .put("widgets", widgets).put("labels", s.labels)
             .put("folders", folders)
@@ -611,6 +612,8 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             editor.putString("state_v7_backup", legacyRaw)
         if (legacyRaw != null && sourceSchema < 9 && !prefs.contains("state_v8_backup"))
             editor.putString("state_v8_backup", legacyRaw)
+        if (legacyRaw != null && sourceSchema < 10 && !prefs.contains("state_v9_backup"))
+            editor.putString("state_v9_backup", legacyRaw)
         editor.putString("state", data.toString()).putBoolean("initialized", true).apply()
     }
 
@@ -628,17 +631,23 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         val order = j.optJSONArray(if (j.optInt("schema", 1) >= 2) "pinned" else "order") ?: JSONArray()
         val cells = j.optJSONArray("homeSlots").takeIf { j.optInt("schema", 1) >= 4 } ?: order
         val schema = j.optInt("schema", 1)
-        require(schema <= 9) { "Unsupported saved-state schema $schema" }
+        require(schema <= 10) { "Unsupported saved-state schema $schema" }
         val storedSlots = List(cells.length()) { cells.optString(it).takeIf { id -> id.isNotBlank() && id != "null" } }
-        // Schema 9 stores eight rows per page; older schemas stored six. Schemas 2..5 are
-        // rebuilt by migrateSchema5Apps directly in the eight-row format.
-        val rawSlots = if (schema <= 8 && schema !in 2..5) upgradeLegacySlots(storedSlots) else storedSlots
+        // Schema 10 stores five columns of eight rows per page; schema 9 stored four columns of
+        // eight rows, older schemas four of six. Schemas 2..5 are rebuilt by migrateSchema5Apps
+        // directly in the current format.
+        val rawSlots = when {
+            schema in 2..5 || schema >= 10 -> storedSlots
+            schema == 9 -> upgradeLegacySlots(storedSlots, GRID_ROWS)
+            else -> upgradeLegacySlots(storedSlots)
+        }
         val legacySlots = normalizeHomeSlots(rawSlots)
         val rawLeadingSlots = if (schema >= 8) {
             val leading = j.optJSONArray("leadingSlots") ?: error("Schema 8 requires a leading slot array")
-            val storedCells = if (schema >= 9) HOME_CELLS else LEGACY_HOME_CELLS
+            val storedCells = when { schema >= 10 -> HOME_CELLS; schema == 9 -> SCHEMA9_HOME_CELLS; else -> LEGACY_HOME_CELLS }
             require(leading.length() == storedCells)
-            upgradeLegacyLeadingSlots(List(storedCells) { leading.optString(it).takeIf { id -> id.isNotBlank() && id != "null" } })
+            val stored = List(storedCells) { leading.optString(it).takeIf { id -> id.isNotBlank() && id != "null" } }
+            if (schema >= 10) stored else upgradeLegacyLeadingSlots(stored, if (schema == 9) GRID_ROWS else LEGACY_GRID_ROWS)
         } else List(HOME_CELLS) { null }
         val dockArray = j.optJSONArray("dock")
         val loadedDock = List((dockArray?.length() ?: 0).coerceIn(MIN_DOCK_SLOTS, MAX_DOCK_SLOTS)) {
@@ -665,11 +674,11 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
                 require(loaded.map { it.slot }.distinct().size == loaded.size) { "Widget placement slots must be unique" }
                 loaded.forEach { placement ->
                     val baseGeometry = placement.slot >= 0 && placement.id != EMPTY_WIDGET && placement.page >= -1 &&
-                        placement.column >= 0 && placement.row >= 0 && placement.spanX in 1..GRID_COLUMNS &&
-                        placement.spanY in 1..storedRows && placement.column + placement.spanX <= GRID_COLUMNS
+                        placement.column >= 0 && placement.row >= 0 && placement.spanX in 1..DEFAULT_HOME_COLUMNS &&
+                        placement.spanY in 1..storedRows && placement.column + placement.spanX <= DEFAULT_HOME_COLUMNS
                     val insideGrid = placement.row + placement.spanY <= storedRows
                     val migratedOverflow = placement.page > 0 && placement.slot / 3 == placement.page && placement.slot % 3 == 2 &&
-                        placement.column == 0 && placement.row == storedRows && placement.spanX == GRID_COLUMNS && placement.spanY == 4
+                        placement.column == 0 && placement.row == storedRows && placement.spanX == LEGACY_GRID_COLUMNS && placement.spanY == 4
                     require(baseGeometry && (insideGrid || migratedOverflow)) { "Invalid widget placement" }
                 }
             }.map { if (schema <= 8) upgradeLegacyPlacement(it) else it }

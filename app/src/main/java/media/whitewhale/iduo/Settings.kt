@@ -342,7 +342,7 @@ private fun categorySummaries(state: LauncherState, appearance: AppearanceState,
     val languageTag = AppLanguage.current(context)
     return mapOf(
         SettingsPage.APPEARANCE to stringResource(R.string.settings_color_mode_value, stringResource(appearanceLabel(appearance.mode))),
-        SettingsPage.HOME to stringResource(R.string.settings_home_summary, GRID_COLUMNS, state.homeRows - 2, preset.iconSize.toInt(),
+        SettingsPage.HOME to stringResource(R.string.settings_home_summary, state.homeColumns, state.homeRows - 2, preset.iconSize.toInt(),
             state.widgetPlacements.size),
         SettingsPage.DOCK to stringResource(when (state.dockMode) {
             DockMode.SHOWN -> R.string.dock_mode_shown
@@ -700,7 +700,7 @@ private fun HomePage(state: LauncherState, wide: Boolean, model: LauncherModel, 
     SectionCaption(stringResource(R.string.settings_section_grid))
     SettingsGroup {
         ValueRow(stringResource(R.string.grid_layout), stringResource(R.string.settings_grid_detail),
-            stringResource(R.string.settings_grid_value, GRID_COLUMNS, state.homeRows - 2), tag = "grid-layout") { choosingRows = true }
+            stringResource(R.string.settings_grid_value, state.homeColumns, state.homeRows - 2), tag = "grid-layout") { choosingRows = true }
         GroupDivider()
         SliderRow(stringResource(R.string.icon_size), stringResource(R.string.value_dp, p.iconSize.toInt()), p.iconSize, 40f..68f) {
             model.setPreset(wide, p.copy(iconSize = it)) }
@@ -710,7 +710,7 @@ private fun HomePage(state: LauncherState, wide: Boolean, model: LauncherModel, 
         SwitchRow(stringResource(R.string.show_app_names), stringResource(R.string.settings_names_detail), state.labels,
             model::setLabels, "label-switch")
     }
-    if (choosingRows) GridLayoutDialog(state.homeRows, maxRowsFit, onDismiss = { choosingRows = false }) { rows ->
+    if (choosingRows) GridLayoutDialog(state.homeRows, state.homeColumns, maxRowsFit, onDismiss = { choosingRows = false }) { rows ->
         model.setHomeRows(rows); choosingRows = false
     }
     SectionCaption(stringResource(R.string.settings_section_content))
@@ -1058,7 +1058,8 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
     previewHeight: Dp) {
     val apps = remember(state.apps) { state.apps.associateBy { it.id } }
     val rows = (state.homeRows - 2).coerceAtLeast(1)
-    val homeIcons = state.homeSlots.take(rows * GRID_COLUMNS).map { id -> id?.let(apps::get) }
+    val homeIcons = (0 until rows).map { row -> List(state.homeColumns) { column ->
+        state.homeSlots.getOrNull(row * GRID_COLUMNS + column)?.let(apps::get) } }
     val dockIcons = state.dock.mapNotNull { id -> id?.let(apps::get) }
     val scale = previewHeight.value * .632f / 250f
     fun unit(value: Float) = (value * scale).dp
@@ -1070,7 +1071,7 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
         Column(Modifier.fillMaxSize().padding(start = unit(14f), top = unit(18f), end = unit(52f)),
             verticalArrangement = Arrangement.spacedBy(unit(4f + preset.rowGap * .5f))) {
             Box(Modifier.fillMaxWidth().height(unit(40f)).background(MaterialTheme.colorScheme.surface.copy(alpha = .38f), RoundedCornerShape(unit(12f))))
-            homeIcons.chunked(GRID_COLUMNS).forEach { row -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            homeIcons.forEach { row -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 row.forEach { app ->
                     if (app != null) Image(app.icon.asImageBitmap(), null, Modifier.size(unit(icon)).clip(RoundedCornerShape(unit(icon * .3f))))
                     else Spacer(Modifier.size(unit(icon)))
@@ -1087,7 +1088,7 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
 }
 
 /** Home rows on a wheel; layouts that cannot fit this screen stay visible but cannot be chosen. */
-@Composable private fun GridLayoutDialog(current: Int, maxRowsFit: Int, onDismiss: () -> Unit, onChoose: (Int) -> Unit) {
+@Composable private fun GridLayoutDialog(current: Int, columns: Int, maxRowsFit: Int, onDismiss: () -> Unit, onChoose: (Int) -> Unit) {
     val options = (DEFAULT_HOME_ROWS..GRID_ROWS).toList()
     var chosen by remember { mutableIntStateOf(current) }
     fun fits(rows: Int) = rows <= maxOf(DEFAULT_HOME_ROWS, maxRowsFit)
@@ -1095,7 +1096,7 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(stringResource(R.string.home_rows_setting), style = MaterialTheme.typography.bodyMedium)
-                WheelPicker(options.map { stringResource(R.string.home_rows_option, GRID_COLUMNS, it - 2) },
+                WheelPicker(options.map { stringResource(R.string.home_rows_option, columns, it - 2) },
                     initial = options.indexOf(current).coerceAtLeast(0), onSelected = { chosen = options[it] },
                     enabled = { fits(options[it]) })
                 if (!fits(chosen)) Text(stringResource(R.string.home_rows_no_room),

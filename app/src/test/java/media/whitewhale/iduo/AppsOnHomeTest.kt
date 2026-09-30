@@ -31,7 +31,7 @@ class AppsOnHomeTest {
 
     @Test fun skipsHiddenRowsAndFillsFurtherPages() {
         val rows = DEFAULT_HOME_ROWS
-        val visible = rows * GRID_COLUMNS
+        val visible = rows * DEFAULT_HOME_COLUMNS
         val ids = List(visible + 2) { "app$it" }
         val result = appendHomeApps(layout(), ids, onNewPage = true)
         // An empty Home starts on its first page; the rows below the visible ones stay empty.

@@ -5,7 +5,7 @@ import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
 
-const val LAYOUT_BACKUP_VERSION = 3
+const val LAYOUT_BACKUP_VERSION = 4
 const val MAX_LAYOUT_BACKUP_BYTES = 2 * 1024 * 1024
 private const val MAX_BACKUP_HOME_CELLS = HOME_CELLS * 100
 
@@ -105,15 +105,18 @@ fun decodeLayoutBackup(raw: String, currentApps: List<AppEntry>, currentProfiles
     }
     val slotsArray = root.getJSONArray("homeSlots")
     require(slotsArray.length() <= MAX_BACKUP_HOME_CELLS)
-    // Versions 1 and 2 stored six rows per page; version 3 stores the current eight-row pages.
+    // Versions 1 and 2 stored four columns of six rows per page, version 3 four columns of
+    // eight rows, and version 4 the current five columns of eight rows.
     val legacyCells = version < 3
+    val storedRows = if (legacyCells) LEGACY_GRID_ROWS else GRID_ROWS
     val storedSlots = List(slotsArray.length()) { index -> if (slotsArray.isNull(index)) null else slotsArray.getString(index) }
-    val rawSlots = if (legacyCells) upgradeLegacySlots(storedSlots) else storedSlots
+    val rawSlots = if (version < 4) upgradeLegacySlots(storedSlots, storedRows) else storedSlots
     val rawLeadingSlots = if (version == 1) List(HOME_CELLS) { null } else {
         val array = root.getJSONArray("leadingSlots")
-        val cells = if (legacyCells) LEGACY_HOME_CELLS else HOME_CELLS
+        val cells = when { version >= 4 -> HOME_CELLS; legacyCells -> LEGACY_HOME_CELLS; else -> SCHEMA9_HOME_CELLS }
         require(array.length() == cells) { "Unfolded-only page must contain exactly $cells cells" }
-        upgradeLegacyLeadingSlots(List(cells) { index -> if (array.isNull(index)) null else array.getString(index) })
+        val stored = List(cells) { index -> if (array.isNull(index)) null else array.getString(index) }
+        if (version >= 4) stored else upgradeLegacyLeadingSlots(stored, storedRows)
     }
     val folderArray = root.getJSONArray("folders")
     val importedFolders = List(folderArray.length()) { index ->
@@ -206,10 +209,10 @@ fun decodeLayoutBackup(raw: String, currentApps: List<AppEntry>, currentProfiles
 
 internal fun validBackupPlacement(value: WidgetPlacement, rows: Int = GRID_ROWS): Boolean {
     val base = value.slot in 0..10_000 && value.page in -1..99 && value.column >= 0 && value.row >= 0 &&
-        value.spanX in 1..GRID_COLUMNS && value.spanY in 1..rows && value.column + value.spanX <= GRID_COLUMNS
+        value.spanX in 1..DEFAULT_HOME_COLUMNS && value.spanY in 1..rows && value.column + value.spanX <= DEFAULT_HOME_COLUMNS
     val inside = value.row + value.spanY <= rows
     val overflow = value.page > 0 && value.slot / 3 == value.page && value.slot % 3 == 2 && value.column == 0 &&
-        value.row == rows && value.spanX == GRID_COLUMNS && value.spanY == 4
+        value.row == rows && value.spanX == LEGACY_GRID_COLUMNS && value.spanY == 4
     return base && (inside || overflow)
 }
 

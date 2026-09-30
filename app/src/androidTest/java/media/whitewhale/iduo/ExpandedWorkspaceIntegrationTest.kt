@@ -211,8 +211,8 @@ class ExpandedWorkspaceIntegrationTest {
             assertEquals("Left pane fixture app", fixture.ids[0], model().state.value.homeSlots[8])
             assertEquals("Right pane fixture app", fixture.ids[1], model().state.value.homeSlots[HOME_CELLS])
             val leftToRight = dropApp(fixture.layout, fixture.ids[0], DropTarget.Home(HOME_CELLS))
-            beginDrag("home-cell-8", fixture.ids[0]); dropOn("home-cell-$HOME_CELLS")
-            assertEquals("left=${center("home-cell-8")} right=${center("home-cell-$HOME_CELLS")} pager=${page()}",
+            beginDrag("home-cell-10", fixture.ids[0]); dropOn("home-cell-$HOME_CELLS")
+            assertEquals("left=${center("home-cell-10")} right=${center("home-cell-$HOME_CELLS")} pager=${page()}",
                 leftToRight, model().state.value.layout)
             assertEquals("Home page 2 of 3", page())
             undo()
@@ -220,12 +220,12 @@ class ExpandedWorkspaceIntegrationTest {
             assertEquals("Home page 2 of 3", page())
 
             val rightToLeft = dropApp(fixture.layout, fixture.ids[1], DropTarget.Home(8))
-            beginDrag("home-cell-$HOME_CELLS", fixture.ids[1]); dropOn("home-cell-8")
+            beginDrag("home-cell-$HOME_CELLS", fixture.ids[1]); dropOn("home-cell-10")
             assertEquals(rightToLeft, model().state.value.layout)
             assertEquals("A drop onto the visible left pane keeps the pair selected", "Home page 2 of 3", page())
             undo()
 
-            beginDrag("home-cell-8", fixture.ids[0])
+            beginDrag("home-cell-10", fixture.ids[0])
             val bounds = root().fetchSemanticsNode().boundsInRoot
             root().performTouchInput { moveTo(Offset(bounds.center.x, 2f), 200); up() }
             compose.waitForIdle()
