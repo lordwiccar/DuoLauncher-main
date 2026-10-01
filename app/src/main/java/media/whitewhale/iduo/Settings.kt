@@ -389,7 +389,7 @@ private fun settingsEntries(): List<SettingsEntry> {
             R.string.folder_transparency, R.string.settings_icon_pack) +
         entries(SettingsPage.HOME, R.string.grid_layout, R.string.icon_size, R.string.row_spacing, R.string.show_app_names,
             R.string.choose_home_apps, R.string.widgets, R.string.show_status, R.string.all_apps_view, R.string.reset_layout,
-            R.string.settings_cover_rotation, R.string.all_apps_view_home, R.string.settings_display_layout,
+            R.string.settings_cover_rotation, R.string.all_apps_view_home, R.string.all_apps_view_folders, R.string.settings_display_layout,
             R.string.display_layout_separate, R.string.cover_columns) +
         entries(SettingsPage.DOCK, R.string.settings_dock_mode, R.string.dock_mode_slide, R.string.settings_dock_count, R.string.dock_width, R.string.dock_align, R.string.dock_height) +
         entries(SettingsPage.GESTURES, R.string.gesture_down, R.string.gesture_double, R.string.gesture_up,
@@ -790,12 +790,17 @@ private fun HomePage(state: LauncherState, wide: Boolean, onWideScreen: Boolean,
             GroupTitle(stringResource(R.string.all_apps_view))
             Choice(listOf(stringResource(R.string.all_apps_view_list) to "library-view-list",
                 stringResource(R.string.all_apps_view_grid) to "library-view-grid",
+                stringResource(R.string.all_apps_view_folders) to "library-view-folders",
                 stringResource(R.string.all_apps_view_home) to "library-view-home"),
-                if (state.appsOnHome) 2 else if (state.libraryGrid) 1 else 0, {
-                    if (it == 2) model.setAppsOnHome(true)
-                    else { model.setAppsOnHome(false); model.setLibraryGrid(it == 1) }
+                when { state.appsOnHome -> 3; state.libraryFolders -> 2; state.libraryGrid -> 1; else -> 0 }, {
+                    if (it == 3) model.setAppsOnHome(true)
+                    else { model.setAppsOnHome(false); model.setLibraryGrid(it == 1); model.setLibraryFolders(it == 2) }
                 })
-            Detail(stringResource(if (state.appsOnHome) R.string.settings_apps_on_home_detail else R.string.settings_all_apps_detail))
+            Detail(stringResource(when {
+                state.appsOnHome -> R.string.settings_apps_on_home_detail
+                state.libraryFolders -> R.string.settings_library_folders_detail
+                else -> R.string.settings_all_apps_detail
+            }))
         }
     }
     TextButton(onClick = { model.setPreset(wide, LayoutPreset()) }, Modifier.fillMaxWidth().heightIn(min = 48.dp)) {

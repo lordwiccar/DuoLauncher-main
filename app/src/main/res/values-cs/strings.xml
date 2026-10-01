@@ -520,4 +520,24 @@
     <string name="dock_recents_detail">Prázdná místa v docku ukazují naposledy otevřené aplikace. Přetažením nebo volbou Připnout v něm zůstanou.</string>
     <string name="dock_recent_app">Nedávná: %1$s</string>
     <string name="app_menu_pin">Připnout</string>
+    <string name="all_apps_view_folders">Knihovna</string>
+    <string name="settings_library_folders_detail">Všechny aplikace roztřídí aplikace do složek podle zaměření, nedávné jako první. Velká ikona ve složce aplikaci otevře, malé ikony ukážou celou složku. Při hledání se ukáže seznam.</string>
+    <string name="category_recent">Nedávné</string>
+    <string name="category_social">Komunikace</string>
+    <string name="category_productivity">Produktivita</string>
+    <string name="category_utilities">Nástroje</string>
+    <string name="category_entertainment">Zábava</string>
+    <string name="category_music">Hudba a audio</string>
+    <string name="category_photo">Foto a video</string>
+    <string name="category_games">Hry</string>
+    <string name="category_news">Zprávy a čtení</string>
+    <string name="category_shopping">Nakupování</string>
+    <string name="category_finance">Finance</string>
+    <string name="category_health">Zdraví a wellbeing</string>
+    <string name="category_education">Vzdělávání</string>
+    <string name="category_travel">Cestování a mapy</string>
+    <string name="category_google">Google</string>
+    <string name="category_maker">Od výrobce</string>
+    <string name="category_system">Systém</string>
+    <string name="category_other">Ostatní</string>
 </resources>

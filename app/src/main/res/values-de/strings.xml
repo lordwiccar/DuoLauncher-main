@@ -504,4 +504,24 @@
     <string name="dock_recents_detail">Freie Plätze im Dock zeigen die zuletzt geöffneten Apps. Zieh eine hinein oder wähle Behalten, damit sie bleibt.</string>
     <string name="dock_recent_app">Zuletzt: %1$s</string>
     <string name="app_menu_pin">Behalten</string>
+    <string name="all_apps_view_folders">Bibliothek</string>
+    <string name="settings_library_folders_detail">Alle Apps sortiert deine Apps nach Zweck in Ordner, zuletzt genutzte zuerst. Ein großes Symbol öffnet die App, die kleinen Symbole zeigen den ganzen Ordner. Bei der Suche erscheint eine Liste.</string>
+    <string name="category_recent">Zuletzt</string>
+    <string name="category_social">Kommunikation</string>
+    <string name="category_productivity">Produktivität</string>
+    <string name="category_utilities">Werkzeuge</string>
+    <string name="category_entertainment">Unterhaltung</string>
+    <string name="category_music">Musik &amp; Audio</string>
+    <string name="category_photo">Foto &amp; Video</string>
+    <string name="category_games">Spiele</string>
+    <string name="category_news">Nachrichten &amp; Lesen</string>
+    <string name="category_shopping">Shopping</string>
+    <string name="category_finance">Finanzen</string>
+    <string name="category_health">Gesundheit &amp; Wohlbefinden</string>
+    <string name="category_education">Bildung</string>
+    <string name="category_travel">Reisen &amp; Karten</string>
+    <string name="category_google">Google</string>
+    <string name="category_maker">Vom Hersteller</string>
+    <string name="category_system">System</string>
+    <string name="category_other">Andere</string>
 </resources>

@@ -520,4 +520,24 @@
     <string name="dock_recents_detail">Puste miejsca w doku pokazują ostatnio otwarte aplikacje. Przeciągnij je lub wybierz Przypnij, aby zostały.</string>
     <string name="dock_recent_app">Ostatnia: %1$s</string>
     <string name="app_menu_pin">Przypnij</string>
+    <string name="all_apps_view_folders">Biblioteka</string>
+    <string name="settings_library_folders_detail">Wszystkie aplikacje dzielą się na foldery według przeznaczenia, ostatnie najpierw. Duża ikona w folderze otwiera aplikację, małe ikony pokazują cały folder. Podczas wyszukiwania widać listę.</string>
+    <string name="category_recent">Ostatnie</string>
+    <string name="category_social">Komunikacja</string>
+    <string name="category_productivity">Produktywność</string>
+    <string name="category_utilities">Narzędzia</string>
+    <string name="category_entertainment">Rozrywka</string>
+    <string name="category_music">Muzyka i audio</string>
+    <string name="category_photo">Zdjęcia i wideo</string>
+    <string name="category_games">Gry</string>
+    <string name="category_news">Wiadomości i czytanie</string>
+    <string name="category_shopping">Zakupy</string>
+    <string name="category_finance">Finanse</string>
+    <string name="category_health">Zdrowie i wellbeing</string>
+    <string name="category_education">Edukacja</string>
+    <string name="category_travel">Podróże i mapy</string>
+    <string name="category_google">Google</string>
+    <string name="category_maker">Od producenta</string>
+    <string name="category_system">System</string>
+    <string name="category_other">Inne</string>
 </resources>

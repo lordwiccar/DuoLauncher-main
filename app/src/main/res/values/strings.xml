@@ -505,4 +505,24 @@
     <string name="dock_recents_detail">Empty dock positions show the apps you opened last. Drag one in or choose Keep to make it stay.</string>
     <string name="dock_recent_app">Recent: %1$s</string>
     <string name="app_menu_pin">Keep</string>
+    <string name="all_apps_view_folders">Library</string>
+    <string name="settings_library_folders_detail">All apps sorts your apps into folders by purpose, recent ones first. Tap one of a folder\'s large icons to open that app, or its small icons to see the whole folder. Searching shows a list.</string>
+    <string name="category_recent">Recent</string>
+    <string name="category_social">Social</string>
+    <string name="category_productivity">Productivity</string>
+    <string name="category_utilities">Utilities</string>
+    <string name="category_entertainment">Entertainment</string>
+    <string name="category_music">Music &amp; audio</string>
+    <string name="category_photo">Photo &amp; video</string>
+    <string name="category_games">Games</string>
+    <string name="category_news">News &amp; reading</string>
+    <string name="category_shopping">Shopping</string>
+    <string name="category_finance">Finance</string>
+    <string name="category_health">Health &amp; wellbeing</string>
+    <string name="category_education">Education</string>
+    <string name="category_travel">Travel &amp; maps</string>
+    <string name="category_google">Google</string>
+    <string name="category_maker">From the maker</string>
+    <string name="category_system">System</string>
+    <string name="category_other">Other</string>
 </resources>

@@ -48,6 +48,8 @@ data class AppEntry(
     val profileLabel: String = "Personal",
     val isWork: Boolean = false,
     val available: Boolean = true,
+    /** The library folder the app belongs in. */
+    val category: AppCategory = AppCategory.OTHER,
 ) {
     val packageName: String get() = component.packageName
 }
@@ -74,6 +76,8 @@ data class LauncherState(
     val folderTransparency: Float = DEFAULT_FOLDER_TRANSPARENCY,
     /** All apps as horizontal pages of a grid instead of a vertical list. */
     val libraryGrid: Boolean = false,
+    /** All apps as folders by purpose, like iOS's App Library; wins over [libraryGrid]. */
+    val libraryFolders: Boolean = false,
     /** What Home's left page shows. */
     val leftPage: LeftPage = LeftPage.GOOGLE_NEWS,
     /** A double tap on empty Home space locks the screen. */
@@ -244,8 +248,11 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
                                 val icon = iconOverrides[id]?.let { choice -> runCatching { chosenIcon(application, choice, profile) }.getOrNull() }
                                     ?: iconPack?.let { pack -> runCatching { packIcon(application, pack, info, profile) }.getOrNull() }
                                     ?: launcherIcon(runCatching { info.getBadgedIcon(0) }.getOrElse { application.packageManager.defaultActivityIcon })
+                                val appInfo = info.applicationInfo
+                                val category = appCategory(component.packageName, label, appInfo.category,
+                                    appInfo.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM != 0)
                                 AppEntry(id, label, icon, component, profile, serial, descriptor.label,
-                                    descriptor.isWork, available = true).also { iconCache[id] = it }
+                                    descriptor.isWork, available = true, category = category).also { iconCache[id] = it }
                             }
                         }
                     }
@@ -548,6 +555,10 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         mutable.update { it.copy(folderTransparency = value.coerceIn(0f, MAX_FOLDER_TRANSPARENCY)) }; persist()
     }
     /** A device-local view setting, like folder transparency. */
+    fun setLibraryFolders(value: Boolean) {
+        if (statePayloadInvalid) return
+        mutable.update { it.copy(libraryFolders = value) }; persist()
+    }
     fun setLibraryGrid(value: Boolean) {
         if (statePayloadInvalid) return
         mutable.update { it.copy(libraryGrid = value) }; persist()
@@ -773,6 +784,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .put("homeRows", s.homeRows)
             .put("folderTransparency", s.folderTransparency.toDouble())
             .put("libraryGrid", s.libraryGrid)
+            .put("libraryFolders", s.libraryFolders)
             .put("leftPage", s.leftPage.name)
             .put("doubleTapLock", s.doubleTapLock)
             .put("swipeDownShade", s.swipeDownShade)
@@ -948,6 +960,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             folderTransparency = j.optDouble("folderTransparency", DEFAULT_FOLDER_TRANSPARENCY.toDouble()).toFloat()
                 .takeIf { it.isFinite() }?.coerceIn(0f, MAX_FOLDER_TRANSPARENCY) ?: DEFAULT_FOLDER_TRANSPARENCY,
             libraryGrid = j.optBoolean("libraryGrid", false),
+            libraryFolders = j.optBoolean("libraryFolders", false),
             // Layouts from before Google News chose "DISCOVER", which now falls back to Google News.
             leftPage = LeftPage.entries.firstOrNull { it.name == j.optString("leftPage") } ?: LeftPage.GOOGLE_NEWS,
             doubleTapLock = j.optBoolean("doubleTapLock", true),

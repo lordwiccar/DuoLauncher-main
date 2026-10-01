@@ -520,4 +520,24 @@
     <string name="dock_recents_detail">Prázdne miesta v doku ukazujú naposledy otvorené aplikácie. Potiahnutím alebo voľbou Pripnúť v ňom zostanú.</string>
     <string name="dock_recent_app">Nedávna: %1$s</string>
     <string name="app_menu_pin">Pripnúť</string>
+    <string name="all_apps_view_folders">Knižnica</string>
+    <string name="settings_library_folders_detail">Všetky aplikácie roztriedi aplikácie do priečinkov podľa zamerania, nedávne ako prvé. Veľká ikona v priečinku aplikáciu otvorí, malé ikony ukážu celý priečinok. Pri hľadaní sa ukáže zoznam.</string>
+    <string name="category_recent">Nedávne</string>
+    <string name="category_social">Komunikácia</string>
+    <string name="category_productivity">Produktivita</string>
+    <string name="category_utilities">Nástroje</string>
+    <string name="category_entertainment">Zábava</string>
+    <string name="category_music">Hudba a audio</string>
+    <string name="category_photo">Foto a video</string>
+    <string name="category_games">Hry</string>
+    <string name="category_news">Správy a čítanie</string>
+    <string name="category_shopping">Nakupovanie</string>
+    <string name="category_finance">Financie</string>
+    <string name="category_health">Zdravie a wellbeing</string>
+    <string name="category_education">Vzdelávanie</string>
+    <string name="category_travel">Cestovanie a mapy</string>
+    <string name="category_google">Google</string>
+    <string name="category_maker">Od výrobcu</string>
+    <string name="category_system">Systém</string>
+    <string name="category_other">Ostatné</string>
 </resources>
