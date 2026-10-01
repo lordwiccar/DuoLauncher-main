@@ -506,4 +506,14 @@
     <string name="cover_columns_locked">Päť stĺpcov je k dispozícii, keď je dok na vonkajšom displeji vysúvací alebo skrytý.</string>
     <string name="display_layout_edit_on_cover">Aplikácie a miniaplikácie plochy vonkajšieho displeja usporiadate na vonkajšom displeji.</string>
     <string name="display_layout_edit_on_inner">Aplikácie a miniaplikácie plochy vnútorného displeja usporiadate na vnútornom displeji.</string>
+    <string name="app_menu_replace">Zmeniť</string>
+    <string name="app_menu_remove">Odobrať</string>
+    <string name="app_menu_add">Na plochu</string>
+    <string name="app_menu_uninstall">Odinštalovať</string>
+    <string name="app_menu_icon">Ikona</string>
+    <string name="app_menu_info">Informácie</string>
+    <string name="app_menu_more">Ďalšie</string>
+    <string name="app_icon_choose">Ikona pre %1$s</string>
+    <string name="app_icon_reset">Použiť vlastnú ikonu aplikácie</string>
+    <string name="app_icon_search">Hľadať ikonu</string>
 </resources>

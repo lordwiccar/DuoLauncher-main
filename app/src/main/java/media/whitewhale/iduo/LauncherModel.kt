@@ -31,6 +31,9 @@ enum class LeftPage { GOOGLE_NEWS, RSS }
 /** How the dock appears: always, slid in from the right edge on demand, or never. */
 enum class DockMode { SHOWN, SLIDE, HIDDEN }
 
+/** One drawing from an icon pack, chosen for a single app. */
+data class IconChoice(val pack: String, val drawable: String)
+
 data class AppEntry(
     val id: String,
     val label: String,
@@ -80,6 +83,8 @@ data class LauncherState(
     val coverRotation: Boolean = false,
     /** Package of the chosen third-party icon pack, or null for the apps' own icons. */
     val iconPack: String? = null,
+    /** Icons chosen by hand for single apps: app id to an icon pack's package and drawing. */
+    val iconOverrides: Map<String, IconChoice> = emptyMap(),
     /** Every app lives on Home pages, and All apps is not shown. */
     val appsOnHome: Boolean = false,
     /** Apps that On Home put on Home, taken off again when it is turned off. */
@@ -176,6 +181,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         removedPackages.clear()
         val resources = getApplication<Application>().resources
         val iconPackName = mutable.value.iconPack
+        val iconOverrides = mutable.value.iconOverrides
         val configuration = resources.configuration.let { "${it.densityDpi}|${it.locales.toLanguageTags()}|${it.uiMode}" }
         viewModelScope.launch {
             try {
@@ -223,7 +229,8 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
                             val id = profileAppId(component.flattenToString(), serial, personalSerial)
                             val label = info.label.toString()
                             iconCache[id]?.takeIf { it.label == label && it.available } ?: run {
-                                val icon = iconPack?.let { pack -> runCatching { packIcon(application, pack, info, profile) }.getOrNull() }
+                                val icon = iconOverrides[id]?.let { choice -> runCatching { chosenIcon(application, choice, profile) }.getOrNull() }
+                                    ?: iconPack?.let { pack -> runCatching { packIcon(application, pack, info, profile) }.getOrNull() }
                                     ?: launcherIcon(runCatching { info.getBadgedIcon(0) }.getOrElse { application.packageManager.defaultActivityIcon })
                                 AppEntry(id, label, icon, component, profile, serial, descriptor.label,
                                     descriptor.isWork, available = true).also { iconCache[id] = it }
@@ -665,6 +672,13 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         if (statePayloadInvalid || packageName == mutable.value.iconPack) return
         mutable.update { it.copy(iconPack = packageName) }; persist(); refresh()
     }
+    /** Draws [app] with [choice] from an icon pack, or with its usual icon again when null. */
+    fun setIconOverride(app: AppEntry, choice: IconChoice?) {
+        if (statePayloadInvalid || mutable.value.iconOverrides[app.id] == choice) return
+        mutable.update { it.copy(iconOverrides = if (choice == null) it.iconOverrides - app.id else it.iconOverrides + (app.id to choice)) }
+        persist()
+        refresh(app.packageName, app.user)
+    }
     fun setGoogleSearch(value: Boolean) { if (statePayloadInvalid) return; undoLayout = null; undoImportSettings = null; mutable.update { it.copy(googleSearch = value, canUndoEdit = false) }; persist() }
     fun setPreset(expanded: Boolean, value: LayoutPreset) {
         if (statePayloadInvalid) return
@@ -738,6 +752,8 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .put("swipeUpSearch", s.swipeUpSearch)
             .put("coverRotation", s.coverRotation)
             .put("iconPack", s.iconPack ?: "")
+            .put("iconOverrides", JSONObject().also { all -> s.iconOverrides.forEach { (id, choice) ->
+                all.put(id, JSONObject().put("pack", choice.pack).put("drawable", choice.drawable)) } })
             .put("appsOnHome", s.appsOnHome)
             .put("homeAddedApps", JSONArray(s.homeAddedApps.toList()))
             .put("dockMode", s.dockMode.name)
@@ -911,6 +927,9 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             swipeUpSearch = j.optBoolean("swipeUpSearch", true),
             coverRotation = j.optBoolean("coverRotation", false),
             iconPack = j.optString("iconPack").takeIf { it.isNotEmpty() },
+            iconOverrides = j.optJSONObject("iconOverrides")?.let { all -> all.keys().asSequence().mapNotNull { id ->
+                all.optJSONObject(id)?.let { item -> IconChoice(item.optString("pack"), item.optString("drawable"))
+                    .takeIf { it.pack.isNotBlank() && it.drawable.isNotBlank() }?.let { id to it } } }.toMap() } ?: emptyMap(),
             appsOnHome = j.optBoolean("appsOnHome", false),
             homeAddedApps = j.optJSONArray("homeAddedApps")?.let { array ->
                 (0 until array.length()).mapNotNull { array.optString(it).takeIf(String::isNotBlank) }.toSet() } ?: emptySet(),
@@ -940,6 +959,14 @@ private fun packIcon(context: Context, pack: IconPack, info: android.content.pm.
         ?: return null
     if (user == Process.myUserHandle()) return themed
     val badged = context.packageManager.getUserBadgedIcon(android.graphics.drawable.BitmapDrawable(context.resources, themed), user)
+    return badged.toBitmap(ICON_SIZE, ICON_SIZE)
+}
+
+/** An icon chosen by hand from a pack; work apps keep Android's badge. Null when the pack lacks it. */
+private fun chosenIcon(context: Context, choice: IconChoice, user: UserHandle): Bitmap? {
+    val drawn = IconPacks.load(context, choice.pack)?.drawable(choice.drawable)?.let(::launcherIcon) ?: return null
+    if (user == Process.myUserHandle()) return drawn
+    val badged = context.packageManager.getUserBadgedIcon(android.graphics.drawable.BitmapDrawable(context.resources, drawn), user)
     return badged.toBitmap(ICON_SIZE, ICON_SIZE)
 }
 

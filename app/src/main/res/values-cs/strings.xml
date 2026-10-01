@@ -506,4 +506,14 @@
     <string name="cover_columns_locked">Pět sloupců je k dispozici, když je dock na vnějším displeji vysouvací nebo skrytý.</string>
     <string name="display_layout_edit_on_cover">Aplikace a widgety plochy vnějšího displeje uspořádáte na vnějším displeji.</string>
     <string name="display_layout_edit_on_inner">Aplikace a widgety plochy vnitřního displeje uspořádáte na vnitřním displeji.</string>
+    <string name="app_menu_replace">Změnit</string>
+    <string name="app_menu_remove">Odebrat</string>
+    <string name="app_menu_add">Na plochu</string>
+    <string name="app_menu_uninstall">Odinstalovat</string>
+    <string name="app_menu_icon">Ikona</string>
+    <string name="app_menu_info">Informace</string>
+    <string name="app_menu_more">Další</string>
+    <string name="app_icon_choose">Ikona pro %1$s</string>
+    <string name="app_icon_reset">Použít vlastní ikonu aplikace</string>
+    <string name="app_icon_search">Hledat ikonu</string>
 </resources>

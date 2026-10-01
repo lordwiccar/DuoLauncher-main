@@ -490,4 +490,14 @@
     <string name="cover_columns_locked">Fünf Spalten sind verfügbar, wenn das Dock auf dem äußeren Display eingeblendet wird oder ausgeblendet ist.</string>
     <string name="display_layout_edit_on_cover">Apps und Widgets des äußeren Layouts ordnest du auf dem äußeren Display an.</string>
     <string name="display_layout_edit_on_inner">Apps und Widgets des inneren Layouts ordnest du auf dem inneren Display an.</string>
+    <string name="app_menu_replace">Ändern</string>
+    <string name="app_menu_remove">Entfernen</string>
+    <string name="app_menu_add">Hinzufügen</string>
+    <string name="app_menu_uninstall">Deinstallieren</string>
+    <string name="app_menu_icon">Symbol</string>
+    <string name="app_menu_info">App-Info</string>
+    <string name="app_menu_more">Mehr</string>
+    <string name="app_icon_choose">Symbol für %1$s</string>
+    <string name="app_icon_reset">Eigenes Symbol der App</string>
+    <string name="app_icon_search">Symbole suchen</string>
 </resources>

@@ -173,6 +173,12 @@ fun LauncherScreen(
     val dockReveal = remember { androidx.compose.animation.core.Animatable(if (startsWide || state.dockMode == DockMode.SHOWN) 1f else 0f) }
     androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_PAUSE) { dockOpen = false }
     var createFolderFirstId by rememberSaveable { mutableStateOf<String?>(null) }
+    // A long press on an app opens its menu beside the icon; without bounds (after recreation or
+    // from accessibility) the full options sheet opens instead.
+    var appMenuAnchor by remember { mutableStateOf<androidx.compose.ui.geometry.Rect?>(null) }
+    var appMenuDock by remember { mutableStateOf<Int?>(null) }
+    var iconChoiceFor by rememberSaveable { mutableStateOf<String?>(null) }
+    LaunchedEffect(selectedId) { if (selectedId == null) { appMenuAnchor = null; appMenuDock = null } }
     var savedPage by rememberSaveable { mutableIntStateOf(0) }
     var lastHomePage by rememberSaveable { mutableIntStateOf(0) }
     var libraryQuery by rememberSaveable { mutableStateOf("") }
@@ -368,10 +374,14 @@ fun LauncherScreen(
             withFrameNanos { }
             pager.scrollToPage(if (returnToLibrary) model.state.value.homePages else page.coerceIn(0, model.state.value.homePages - 1))
             if (!moved && !cancelled) {
-                if (source.target is DropTarget.Dock) { dockSlot = source.target.index; sheet = "dock" }
+                if (source.target is DropTarget.Dock) {
+                    val docked = model.state.value.dock.getOrNull(source.target.index)
+                    if (docked != null) { selectedId = docked; appMenuAnchor = source.bounds; appMenuDock = source.target.index }
+                    else { dockSlot = source.target.index; sheet = "dock" }
+                }
                 else if (source.target is DropTarget.Widget) { widgetSlot = source.target.index; sheet = "widgetActions" }
                 else if (source.appId?.let(::isFolderId) == true) openFolderId = source.appId
-                else if (source.folderId == null) selectedId = source.appId
+                else if (source.folderId == null) { selectedId = source.appId; appMenuAnchor = source.bounds; appMenuDock = null }
             }
         }
     }
@@ -1187,7 +1197,50 @@ fun LauncherScreen(
                 }
             }
         }
-        appsById[selectedId]?.let { app ->
+        val menuAnchor = appMenuAnchor
+        val closeAppMenu = { selectedId = null; appMenuAnchor = null; appMenuDock = null }
+        if (menuAnchor != null) appsById[selectedId]?.let { app ->
+            val details by produceState<AppMenuDetails?>(null, app.id) {
+                value = withContext(Dispatchers.IO) { appMenuDetails(launcherActivity, app) }
+            }
+            val dockIndex = appMenuDock
+            val pinned = state.layout.indexOfShortcut(app.id) != null
+            val actions = buildList {
+                when {
+                    dockIndex != null -> {
+                        add(AppMenuAction(AppMenuIcons.replace, stringResource(R.string.app_menu_replace), "app-menu-replace") {
+                            closeAppMenu(); dockSlot = dockIndex; sheet = "dock" })
+                        add(AppMenuAction(AppMenuIcons.remove, stringResource(R.string.app_menu_remove), "app-menu-remove") {
+                            model.setDock(dockIndex, null); closeAppMenu() })
+                    }
+                    pinned -> add(AppMenuAction(AppMenuIcons.remove, stringResource(R.string.app_menu_remove), "app-menu-remove") {
+                        model.setPinned(app.id, false); closeAppMenu() })
+                    else -> add(AppMenuAction(AppMenuIcons.add, stringResource(R.string.app_menu_add), "app-menu-add") {
+                        model.setPinned(app.id, true); closeAppMenu() })
+                }
+                if (details?.canUninstall == true) add(AppMenuAction(AppMenuIcons.uninstall, stringResource(R.string.app_menu_uninstall), "app-menu-uninstall") {
+                    closeAppMenu(); if (!requestUninstall(launcherActivity, app)) onAppInfo(app) })
+                add(AppMenuAction(AppMenuIcons.icon, stringResource(R.string.app_menu_icon), "app-menu-icon") {
+                    closeAppMenu(); iconChoiceFor = app.id })
+                add(AppMenuAction(AppMenuIcons.info, stringResource(R.string.app_menu_info), "app-menu-info") {
+                    closeAppMenu(); onAppInfo(app) })
+                if (dockIndex == null) add(AppMenuAction(AppMenuIcons.more, stringResource(R.string.app_menu_more), "app-menu-more") {
+                    appMenuAnchor = null })
+            }
+            AppShortcutMenu(app, menuAnchor, details, actions,
+                onShortcut = { shortcut ->
+                    closeAppMenu()
+                    if (!startAppShortcut(launcherActivity, shortcut, null))
+                        android.widget.Toast.makeText(launcherActivity, launcherActivity.getString(R.string.app_unavailable, shortcut.label),
+                            android.widget.Toast.LENGTH_SHORT).show()
+                },
+                onDismiss = closeAppMenu)
+        }
+        iconChoiceFor?.let { id -> appsById[id] }?.let { app ->
+            IconChoiceDialog(app, state.iconOverrides[app.id], onChoose = { model.setIconOverride(app, it); iconChoiceFor = null },
+                onDismiss = { iconChoiceFor = null })
+        }
+        if (menuAnchor == null) appsById[selectedId]?.let { app ->
             val pinned = state.layout.indexOfShortcut(app.id) != null
             val packageName = app.packageName
             val hasWidgets = packageName.isNotEmpty() && runCatching {

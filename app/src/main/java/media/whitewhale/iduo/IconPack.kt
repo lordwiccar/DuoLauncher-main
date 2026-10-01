@@ -36,13 +36,16 @@ internal class IconPack(
     private val upon: String?,
     private val scale: Float,
 ) {
+    /** Every drawing the pack names, for choosing one icon by hand. */
+    val iconNames: List<String> by lazy { drawables.values.distinct().sorted() }
+
     /** Package names the pack draws, for a fallback when an app renamed its launch activity. */
     private val byPackage: Map<String, String> = drawables.entries
         .groupBy({ it.key.substringBefore('/') }, { it.value }).mapValues { it.value.first() }
 
     // A pack's resources belong to another app, so they can only be found by name.
     @android.annotation.SuppressLint("DiscouragedApi")
-    private fun drawable(name: String): Drawable? {
+    fun drawable(name: String): Drawable? {
         val id = resources.getIdentifier(name, "drawable", packageName).takeIf { it != 0 }
             ?: resources.getIdentifier(name, "mipmap", packageName).takeIf { it != 0 } ?: return null
         return runCatching { resources.getDrawable(id, null) }.getOrNull()
@@ -85,7 +88,10 @@ internal object IconPacks {
     private val ACTIONS = listOf("org.adw.launcher.THEMES", "com.novalauncher.THEME", "com.teslacoilsw.launcher.THEME",
         "com.gau.go.launcherex.theme", "com.anddoes.launcher.THEME")
 
-    private var cached: Pair<String, IconPack>? = null
+    /** Recently read packs by stamp: the chosen pack and any opened to pick a single icon. */
+    private val cached = object : LinkedHashMap<String, IconPack>(4, .75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, IconPack>?) = size > 3
+    }
 
     fun installed(context: Context): List<IconPackInfo> {
         val pm = context.packageManager
@@ -102,9 +108,9 @@ internal object IconPacks {
     fun load(context: Context, packageName: String): IconPack? {
         val pm = context.packageManager
         val stamp = runCatching { "$packageName@" + pm.getPackageInfo(packageName, 0).lastUpdateTime }.getOrNull() ?: return null
-        cached?.takeIf { it.first == stamp }?.let { return it.second }
+        cached[stamp]?.let { return it }
         val pack = runCatching { read(context, packageName, stamp) }.getOrNull() ?: return null
-        cached = stamp to pack
+        cached[stamp] = pack
         return pack
     }
 

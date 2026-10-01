@@ -506,4 +506,14 @@
     <string name="cover_columns_locked">Pięć kolumn jest dostępnych, gdy dok na ekranie zewnętrznym jest wysuwany lub ukryty.</string>
     <string name="display_layout_edit_on_cover">Aplikacje i widżety układu ekranu zewnętrznego układasz na ekranie zewnętrznym.</string>
     <string name="display_layout_edit_on_inner">Aplikacje i widżety układu ekranu wewnętrznego układasz na ekranie wewnętrznym.</string>
+    <string name="app_menu_replace">Zmień</string>
+    <string name="app_menu_remove">Usuń</string>
+    <string name="app_menu_add">Na ekran</string>
+    <string name="app_menu_uninstall">Odinstaluj</string>
+    <string name="app_menu_icon">Ikona</string>
+    <string name="app_menu_info">Informacje</string>
+    <string name="app_menu_more">Więcej</string>
+    <string name="app_icon_choose">Ikona dla %1$s</string>
+    <string name="app_icon_reset">Użyj własnej ikony aplikacji</string>
+    <string name="app_icon_search">Szukaj ikony</string>
 </resources>

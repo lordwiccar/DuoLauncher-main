@@ -491,4 +491,14 @@
     <string name="cover_columns_locked">Five columns are available when the cover\'s dock slides in or is hidden.</string>
     <string name="display_layout_edit_on_cover">Apps and widgets of the cover\'s layout are arranged on the cover screen.</string>
     <string name="display_layout_edit_on_inner">Apps and widgets of the inner screen\'s layout are arranged on the inner screen.</string>
+    <string name="app_menu_replace">Change</string>
+    <string name="app_menu_remove">Remove</string>
+    <string name="app_menu_add">Add to Home</string>
+    <string name="app_menu_uninstall">Uninstall</string>
+    <string name="app_menu_icon">Icon</string>
+    <string name="app_menu_info">App info</string>
+    <string name="app_menu_more">More</string>
+    <string name="app_icon_choose">Icon for %1$s</string>
+    <string name="app_icon_reset">Use the app\'s own icon</string>
+    <string name="app_icon_search">Search icons</string>
 </resources>

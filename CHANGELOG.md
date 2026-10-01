@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Long press an app on Home, in the dock or in All apps, and let go without moving it, for a menu beside the icon: the app's own shortcuts (such as New tab or Compose), then Remove, Uninstall, Icon, App info and More for the earlier options. In the dock, Change picks another app. Shortcuts appear while iDuo is the Home app.
+- Give a single app an icon from an installed icon pack under Icon in that menu, with search; Use the app's own icon undoes it.
 - Add a third All apps view, On Home: every app that is not on Home yet is placed on new pages to the right, alphabetically, newly installed apps join the last page, and the All apps page is hidden. Switching back takes the apps it added off Home again, except those moved into a folder or the dock.
 - Choose how the cover screen's dock appears: always, sliding in from a handle at the right edge (it slides away when you open an app or touch Home), or hidden. The inner screen always shows its dock. Without a dock, the cover's grid spreads across the whole width.
 - Give the cover screen its own Home under Settings → Home → Screen layouts: Mirror keeps one Home for both screens, Separate gives the cover its own pages, apps, folders and widgets, starting from a copy of the inner screen's. Widgets from other apps are copied as placeholders that reconnect with a tap. Mirroring again keeps the cover's layout for later, and layout backups include it.
