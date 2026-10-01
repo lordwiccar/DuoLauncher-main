@@ -376,7 +376,8 @@ fun LauncherScreen(
             if (!moved && !cancelled) {
                 if (source.target is DropTarget.Dock) {
                     val docked = model.state.value.dock.getOrNull(source.target.index)
-                    if (docked != null) { selectedId = docked; appMenuAnchor = source.bounds; appMenuDock = source.target.index }
+                    if (docked != null && isFolderId(docked)) openFolderId = docked
+                    else if (docked != null) { selectedId = docked; appMenuAnchor = source.bounds; appMenuDock = source.target.index }
                     else { dockSlot = source.target.index; sheet = "dock" }
                 }
                 else if (source.target is DropTarget.Widget) { widgetSlot = source.target.index; sheet = "widgetActions" }
@@ -695,7 +696,8 @@ fun LauncherScreen(
                 Column(Modifier.padding(vertical = 8.dp).verticalScroll(dockScroll)) {
                     DockAppColumn(state.dock, previewLayout.dock, appsById, geometry.dockRowHeight,
                         dockIconSize(geometry.iconSize), drag, insertionTarget,
-                        onLaunch = onLaunchFrom, onChoose = { dockSlot = it; sheet = "dock" })
+                        onLaunch = onLaunchFrom, onChoose = { dockSlot = it; sheet = "dock" },
+                        folders = state.folders, onFolder = { openFolderId = it })
                 }
             }
             if (dockMode == DockMode.SLIDE && dockReveal.value < 1f) {
@@ -1763,7 +1765,10 @@ private fun DockAppColumn(
     target: DropTarget?,
     onLaunch: (AppEntry, android.graphics.Rect?) -> Unit,
     onChoose: (Int) -> Unit,
+    folders: List<FolderEntry> = emptyList(),
+    onFolder: (String) -> Unit = {},
 ) {
+    val foldersById = remember(folders) { folders.associateBy(FolderEntry::id) }
     val draggedId = drag.source?.appId
     val dockTarget = (target as? DropTarget.Dock)?.index
     val source = drag.source?.target as? DropTarget.Dock
@@ -1790,6 +1795,7 @@ private fun DockAppColumn(
         savedDock.indices.forEach { index ->
             val cell = DropTarget.Dock(index)
             val savedApp = appsById[savedDock[index]]
+            val savedFolder = foldersById[savedDock[index]]
             val previewId = previewDock.getOrNull(index)
             val highlighted = drag.active && target == cell
             val gap = hiddenIndex == index
@@ -1804,10 +1810,16 @@ private fun DockAppColumn(
                 }
             }
             Box(Modifier.fillMaxWidth().height(rowHeight.dp).offset(y = (rowHeight * index).dp)
-                .testTag("dock-slot-$index").dropRegion(drag, cell, savedApp?.id)
-                .semantics(mergeDescendants = true) { contentDescription = savedApp?.label ?: resources.getString(R.string.dock_choose_slot, index + 1) }
+                .testTag("dock-slot-$index").dropRegion(drag, cell, savedApp?.id ?: savedFolder?.id)
+                .semantics(mergeDescendants = true) {
+                    contentDescription = savedApp?.label ?: savedFolder?.title ?: resources.getString(R.string.dock_choose_slot, index + 1)
+                }
                 .combinedClickable(interactionSource = interactions[index], indication = LocalIndication.current, role = Role.Button, onClick = {
-                    if (savedApp != null) onLaunch(savedApp, launchBounds[index]) else onChoose(index)
+                    when {
+                        savedApp != null -> onLaunch(savedApp, launchBounds[index])
+                        savedFolder != null -> onFolder(savedFolder.id)
+                        else -> onChoose(index)
+                    }
                 }, onLongClick = null)
                 .semantics { onLongClick(chooseDockApp) { onChoose(index); true } })
         }
@@ -1817,7 +1829,9 @@ private fun DockAppColumn(
             val savedIndex = savedDock.indexOf(id)
             val previewIndex = previewDock.indexOf(id)
             val renderIndex = previewIndex.takeIf { it >= 0 } ?: savedIndex.takeIf { it >= 0 } ?: return@forEach
-            val app = appsById[id] ?: return@forEach
+            val app = appsById[id]
+            val folder = foldersById[id]
+            if (app == null && folder == null) return@forEach
             key(id) {
                 val animatedOffset by animateIntOffsetAsState(
                     IntOffset(0, (renderIndex * rowHeightPx).roundToInt()), label = "dock insertion $id")
@@ -1828,10 +1842,12 @@ private fun DockAppColumn(
                 )
                 Box(Modifier.offset { animatedOffset }.fillMaxWidth().height(rowHeight.dp).alpha(opacity)
                     .testTag("dock-app-$id"), contentAlignment = Alignment.Center) {
-                    Image(app.icon.asImageBitmap(), null, Modifier.size(iconSize.dp).testTag("dock-icon-$id")
+                    if (app != null) Image(app.icon.asImageBitmap(), null, Modifier.size(iconSize.dp).testTag("dock-icon-$id")
                         .onGloballyPositioned { if (savedIndex >= 0) launchBounds[savedIndex].set(it.boundsInWindow().toAndroidBounds()) }
                         .graphicsLayer { scaleX = slotScales[renderIndex]; scaleY = slotScales[renderIndex] }
                         .clip(RoundedCornerShape(11.dp)))
+                    else if (folder != null) DockFolderIcon(folder, appsById, iconSize, drag,
+                        Modifier.graphicsLayer { scaleX = slotScales[renderIndex]; scaleY = slotScales[renderIndex] })
                 }
             }
         }
@@ -1840,6 +1856,22 @@ private fun DockAppColumn(
 
 private fun <T> List<T>.slicePage(range: IntRange): List<T> =
     if (isEmpty() || range.first >= size) emptyList() else subList(range.first, minOf(range.last + 1, size))
+
+/** A folder in the dock: its first four apps in a glass square, which apps can be dropped onto. */
+@Composable
+private fun DockFolderIcon(folder: FolderEntry, apps: Map<String, AppEntry>, size: Float, drag: HomeDragState, modifier: Modifier = Modifier) {
+    Box(modifier.size(size.dp).clip(RoundedCornerShape((size * .26f).dp))
+        .background(Glass.copy(alpha = .72f)).border(1.dp, Color.White.copy(alpha = .55f), RoundedCornerShape((size * .26f).dp))
+        .dropRegion(drag, DropTarget.Folder(folder.id), folderId = folder.id).testTag("dock-folder-${folder.id}")) {
+        folder.appIds.take(4).forEachIndexed { index, id ->
+            apps[id]?.let { app ->
+                Image(app.icon.asImageBitmap(), null, Modifier.align(when (index) {
+                    0 -> Alignment.TopStart; 1 -> Alignment.TopEnd; 2 -> Alignment.BottomStart; else -> Alignment.BottomEnd
+                }).padding((size * .07f).dp).size((size * .36f).dp).clip(RoundedCornerShape(5.dp)))
+            }
+        }
+    }
+}
 
 @Composable
 private fun FolderTile(folder: FolderEntry, apps: Map<String, AppEntry>, size: Float, labels: Boolean,

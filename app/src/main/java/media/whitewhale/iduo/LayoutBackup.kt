@@ -163,18 +163,19 @@ fun decodeLayoutBackup(raw: String, currentApps: List<AppEntry>, currentProfiles
         val stored = readSlots(array)
         if (version >= 4) stored else upgradeLegacyLeadingSlots(stored, storedRows)
     }
-    val importedFolders = readFolders(root.getJSONArray("folders"), rawSlots + rawLeadingSlots)
     val dockArray = root.getJSONArray("dock")
     require(dockArray.length() in MIN_DOCK_SLOTS..MAX_DOCK_SLOTS)
     val rawDock = readSlots(dockArray)
-    val surfaceApps = (rawSlots + rawLeadingSlots).filterNotNull().filterNot(::isReservedFolderId) + rawDock.filterNotNull() +
+    // Folders may stand on Home or in the dock.
+    val importedFolders = readFolders(root.getJSONArray("folders"), rawSlots + rawLeadingSlots + rawDock)
+    val surfaceApps = (rawSlots + rawLeadingSlots + rawDock).filterNotNull().filterNot(::isReservedFolderId) +
         importedFolders.flatMap(FolderEntry::appIds)
     require(surfaceApps.distinct().size == surfaceApps.size) { "An app shortcut appears more than once" }
     val folderResults = importedFolders.associate { folder -> folder.id to folder.copy(appIds = folder.appIds.mapNotNull(::importedApp)) }
     val folders = folderResults.values.filter { it.appIds.size >= 2 }
     val slots = importCells(rawSlots, folderResults)
     val leadingSlots = importCells(rawLeadingSlots, folderResults)
-    val dock = rawDock.map { value -> value?.also { require(!isReservedFolderId(it)) }?.let(::importedApp) }
+    val dock = importCells(rawDock, folderResults)
     val profileSerials = currentProfiles.mapTo(mutableSetOf(), AppProfile::userSerial)
     val profileIssues = linkedSetOf<ProfileIssue>()
     /** Places [widgetArray]'s widgets on [start]; Android widgets become placeholders to reconnect. */
@@ -237,7 +238,7 @@ fun decodeLayoutBackup(raw: String, currentApps: List<AppEntry>, currentProfiles
         val columns = item.strictInt("homeColumns").also { require(it in DEFAULT_HOME_COLUMNS..GRID_COLUMNS) }
         val coverRows = item.strictInt("homeRows").also { require(it in DEFAULT_HOME_ROWS..GRID_ROWS) }
         val coverFolders = readFolders(item.getJSONArray("folders"), coverCells)
-        val coverApps = coverCells.filterNotNull().filterNot(::isReservedFolderId) + rawDock.filterNotNull() +
+        val coverApps = coverCells.filterNotNull().filterNot(::isReservedFolderId) + rawDock.filterNotNull().filterNot(::isReservedFolderId) +
             coverFolders.flatMap(FolderEntry::appIds)
         require(coverApps.distinct().size == coverApps.size) { "An app shortcut appears more than once" }
         val coverResults = coverFolders.associate { folder -> folder.id to folder.copy(appIds = folder.appIds.mapNotNull(::importedApp)) }

@@ -108,9 +108,14 @@ data class LauncherState(
     /** The layout on screen now. */
     val layout: HomeLayout get() = HomeLayout(homeSlots, dock, widgetPlacements, folders, widgetRestores, leadingSlots, homeRows, homeColumns)
     val homePages get() = layout.pageCount
-    val innerLayout: HomeLayout get() = if (showingCover) otherLayout!!.copy(dock = dock) else layout
-    /** The cover's own layout, when it has one. */
-    val coverLayout: HomeLayout? get() = if (showingCover) layout else otherLayout?.copy(dock = dock)
+    /** Folders in the dock, shared by both screens like the dock itself. */
+    val dockFolderIds: Set<String> get() = dock.filterNotNull().filterTo(mutableSetOf(), ::isReservedFolderId)
+    val innerLayout: HomeLayout get() = if (!showingCover) layout else otherLayout!!.let { inner ->
+        inner.copy(dock = dock, folders = inner.folders.filterNot { it.id in dockFolderIds } + folders.filter { it.id in dockFolderIds })
+    }
+    /** The cover's own layout, when it has one, without the dock's folders (they belong to the dock). */
+    val coverLayout: HomeLayout? get() = (if (showingCover) layout else otherLayout?.copy(dock = dock))
+        ?.let { cover -> cover.copy(folders = cover.folders.filterNot { it.id in dockFolderIds }) }
     /** The layout [cover] or the inner screen shows. */
     fun layoutFor(cover: Boolean): HomeLayout = if (cover && separateCover) coverLayout ?: layout else innerLayout
     /** These fields showing [next], keeping the shared dock. */
@@ -400,6 +405,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         if (statePayloadInvalid) return
         if (slot !in mutable.value.dock.indices) return
         if (id != null && (isReservedFolderId(id) || mutable.value.folders.any { id in it.appIds })) return
+        if (mutable.value.dock[slot]?.let(::isReservedFolderId) == true) return
         mutable.update { old -> old.copy(canUndoEdit = false,
             homeSlots = if (id == null) old.homeSlots else old.homeSlots.map { it?.takeUnless(id::equals) }.dropLastWhile { it == null },
             leadingSlots = if (id == null) old.leadingSlots else old.leadingSlots.map { it?.takeUnless(id::equals) },
@@ -427,7 +433,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         val folder = old.layout.folder(id)
         if (old.apps.none { it.id == id } && folder == null) return false
         if (target is DropTarget.Folder) return folder == null && addAppToFolder(target.id, id)
-        if (folder != null && target !is DropTarget.Home) return false
+        if (folder != null && target !is DropTarget.Home && target !is DropTarget.Dock) return false
         return commitLayout(dropApp(old.layout, id, target))
     }
 
@@ -605,8 +611,11 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         val old = mutable.value
         val next = old.otherLayout ?: return
         undoLayout = null; undoImportSettings = null
-        mutable.value = old.showing(next).copy(otherLayout = old.layout, showingCover = !old.showingCover,
-            canUndoEdit = false, editRevision = old.editRevision + 1)
+        // The dock and its folders stay with the screen being shown.
+        val dockFolders = old.folders.filter { it.id in old.dockFolderIds }
+        val shown = next.copy(folders = next.folders.filterNot { it.id in old.dockFolderIds } + dockFolders)
+        mutable.value = old.showing(shown).copy(otherLayout = old.layout.copy(folders = old.folders.filterNot { it.id in old.dockFolderIds }),
+            showingCover = !old.showingCover, canUndoEdit = false, editRevision = old.editRevision + 1)
     }
 
     /**
@@ -618,7 +627,8 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         if (value) {
             if (mutable.value.coverLayout == null) {
                 val inner = mutable.value.innerLayout
-                mutable.update { it.copy(otherLayout = coverLayoutFrom(inner, ::widgetRestoreFor)) }
+                mutable.update { state -> state.copy(otherLayout = coverLayoutFrom(inner, ::widgetRestoreFor)
+                    .let { cover -> cover.copy(folders = cover.folders.filterNot { it.id in state.dockFolderIds }) }) }
             }
             mutable.update { it.copy(separateCover = true) }
             showDisplay(onCover)
@@ -868,11 +878,10 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
                 }
                 val children = loaded.flatMapTo(mutableSetOf(), FolderEntry::appIds)
                 val folderIds = loaded.mapTo(mutableSetOf(), FolderEntry::id)
-                val rawFolderRefs = (rawSlots + rawLeadingSlots).filterNotNull().filter(::isReservedFolderId)
+                val rawFolderRefs = (rawSlots + rawLeadingSlots + loadedDock).filterNotNull().filter(::isReservedFolderId)
                 require(rawFolderRefs.all(::isFolderId))
                 require(rawFolderRefs.size == folderIds.size && rawFolderRefs.toSet() == folderIds)
-                require((rawSlots + rawLeadingSlots).none { it in children } &&
-                    loadedDock.none { it in children || (it != null && isReservedFolderId(it)) })
+                require((rawSlots + rawLeadingSlots + loadedDock).none { it in children })
             }
         } else emptyList()
         if (schema >= 8) {
@@ -882,7 +891,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             }
             val leadingApps = leadingIds.filterNot(::isReservedFolderId)
             val otherApps = rawSlots.filterNotNull().filterNot(::isReservedFolderId) +
-                loadedDock.filterNotNull() + folders.flatMap(FolderEntry::appIds)
+                loadedDock.filterNotNull().filterNot(::isReservedFolderId) + folders.flatMap(FolderEntry::appIds)
             require(leadingApps.none { it in otherApps }) {
                 "An unfolded-only app shortcut appears on another surface"
             }

@@ -113,8 +113,9 @@ sealed interface DropTarget {
     data object Remove : DropTarget
 }
 
+/** Apps and whole folders fit in the dock; a folder takes one position. */
 fun canPlaceInDock(layout: HomeLayout, id: String): Boolean =
-    id.isNotBlank() && !isReservedFolderId(id) && layout.folders.none { id in it.appIds } &&
+    id.isNotBlank() && (!isReservedFolderId(id) || layout.folder(id) != null) && layout.folders.none { id in it.appIds } &&
         (id in layout.dock || layout.dock.any { it == null })
 
 fun WidgetPlacement.coveredIndices(): Set<Int> {
@@ -319,7 +320,9 @@ fun resizeWidget(layout: HomeLayout, slot: Int, spanX: Int, spanY: Int): HomeLay
 fun removePlacement(layout: HomeLayout, source: DropTarget): HomeLayout = when (source) {
     is DropTarget.Home -> if (layout.slotAt(source.index)?.let(::isFolderId) == true) layout
         else layout.withSlot(source.index, null)
-    is DropTarget.Dock -> layout.copy(dock = layout.dock.mapIndexed { i, id -> if (i == source.index) null else id })
+    // A folder is ungrouped, never removed with its apps.
+    is DropTarget.Dock -> if (layout.dock.getOrNull(source.index)?.let(::isFolderId) == true) layout
+        else layout.copy(dock = layout.dock.mapIndexed { i, id -> if (i == source.index) null else id })
     is DropTarget.Widget -> layout.copy(widgetPlacements = layout.widgetPlacements.filterNot { it.slot == source.index },
         widgetRestores = layout.widgetRestores.filterNot { it.slot == source.index })
     else -> layout

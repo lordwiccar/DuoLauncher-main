@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Put whole folders in the dock: drag a folder there and it takes one position, opens with a tap and takes apps dropped onto it. Dragging it back puts it on Home; the dock's folders are shared by both screens like the dock itself.
 - Long press an app on Home, in the dock or in All apps, and let go without moving it, for a menu beside the icon: the app's own shortcuts (such as New tab or Compose), then Remove, Uninstall, Icon, App info and More for the earlier options. In the dock, Change picks another app. Shortcuts appear while iDuo is the Home app.
 - Give a single app an icon from an installed icon pack under Icon in that menu, with search; Use the app's own icon undoes it.
 - Add a third All apps view, On Home: every app that is not on Home yet is placed on new pages to the right, alphabetically, newly installed apps join the last page, and the All apps page is hidden. Switching back takes the apps it added off Home again, except those moved into a folder or the dock.
