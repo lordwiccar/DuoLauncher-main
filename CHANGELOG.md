@@ -2,24 +2,23 @@
 
 ## Unreleased
 
-- Announce each update from Google Play with a notification that opens the changelog. iDuo asks for notification permission once, right after an update; Settings → Help & information turns the notices off.
-- Redraw the status ring: a thicker battery ring, a cleaner Wi-Fi symbol and signal dots across its open bottom. Above the dock the battery level sits in the ring's top opening. The cover screen can show status at the top or above the dock, under Settings → Home; the inner screen always shows it above the dock.
-- Add a fourth All apps view, Library, like the App Library on iPhone: two columns of large folders that sort apps by purpose (recent, social, productivity, media, photo, finance, shopping, health, travel, utilities, games, news, education, Google, the phone maker's apps, system and other). A large icon opens its app; the small icons or the name open the whole folder. Searching shows the list. On the inner screen the library takes one half, beside the last Home page.
-- Show recently opened apps in empty dock positions, a little smaller so they read as suggestions. Drag one in or choose Keep in its menu to make it stay; Settings → Dock turns them off.
-- Put whole folders in the dock: drag a folder there and it takes one position, opens with a tap and takes apps dropped onto it. Dragging it back puts it on Home; the dock's folders are shared by both screens like the dock itself.
-- Long press an app on Home, in the dock or in All apps, and let go without moving it, for a menu beside the icon: the app's own shortcuts (such as New tab or Compose), then Remove, Uninstall, Icon, App info and More for the earlier options. In the dock, Change picks another app. Shortcuts appear while iDuo is the Home app.
-- Give a single app an icon from an installed icon pack under Icon in that menu, with search; Use the app's own icon undoes it.
-- Add a third All apps view, On Home: every app that is not on Home yet is placed on new pages to the right, alphabetically, newly installed apps join the last page, and the All apps page is hidden. Switching back takes the apps it added off Home again, except those moved into a folder or the dock.
-- Choose how the cover screen's dock appears: always, sliding in from a handle at the right edge (it slides away when you open an app or touch Home), or hidden. The inner screen always shows its dock. Without a dock, the cover's grid spreads across the whole width.
-- Give the cover screen its own Home under Settings → Home → Screen layouts: Mirror keeps one Home for both screens, Separate gives the cover its own pages, apps, folders and widgets, starting from a copy of the inner screen's. Widgets from other apps are copied as placeholders that reconnect with a tap. Mirroring again keeps the cover's layout for later, and layout backups include it.
-- Show five columns on the cover screen when it has its own Home and its dock slides in or is hidden. A sliding dock covers the last column while it is out.
-- Move the cover screen's status to the top: battery, Wi-Fi and signal in the left corner, the date and time in the right one.
-- Blur the wallpaper behind All apps, the news page and open folders, and Home more strongly behind a folder, so labels stay readable on busy wallpapers. The blur follows the swipe as the page slides in. On phones that turn Android's window blur off, such as Samsung's, iDuo draws a blurred copy of a wallpaper it set, or of the wallpaper's colours.
-- Frost the dock: it shows a blur of the wallpaper right behind it, so it stays readable when it slides over icons. This uses a wallpaper set in iDuo (a photo or the dunes); with any other wallpaper the dock frosts the wallpaper's colours.
-- Keep the cover screen upright by default. Rotating it is an experimental choice under Settings → Home → Screen; the inner screen always follows the phone.
-- Apply third-party icon packs from Google Play (the ADW and Nova format) under Settings → Wallpaper & appearance → Icon pack. Apps a pack does not draw keep their own icon, set on the pack's backdrop when it has one.
-- Fix text in dark mode: headings and other text in Settings were black on the dark background.
-- Update the news page help to point to Settings → News page.
+### New features
+- A separate Home for the cover screen: mirror the inner screen or give the cover its own pages, with up to five columns when its dock slides in or hides.
+- Three ways to show the cover screen's dock: always, sliding in from the right edge, or hidden.
+- Two new All apps views: Library sorts apps into folders by purpose, like on iPhone, and On Home places every app on Home pages.
+- A menu on a long-pressed app with its shortcuts, Remove, Uninstall, Icon and App info.
+- Icon packs from Google Play, for all apps or a single one.
+- Folders in the dock, and recently opened apps in its empty places.
+- A notification after each update that opens this changelog.
+
+### Look and feel
+- A redesigned status ring, at the top or above the dock on the cover screen.
+- A blurred wallpaper behind All apps, the news page and folders, and a frosted dock.
+- The cover screen stays upright; rotating it is an experimental option.
+
+### Fixes
+- Text in Settings is readable in dark mode again.
+- The news page help points to Settings → News page.
 
 ## 1.1.0
 
