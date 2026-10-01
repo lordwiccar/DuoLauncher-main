@@ -539,4 +539,9 @@
     <string name="category_system">Systém</string>
     <string name="category_other">Ostatní</string>
     <string name="category_media">Média</string>
+    <string name="cover_status_place">Stav na vnějším displeji</string>
+    <string name="cover_status_top">Nahoře</string>
+    <string name="cover_status_dock">Nad dockem</string>
+    <string name="cover_status_top_detail">Baterie, Wi-Fi a signál v levém rohu, datum a čas v pravém.</string>
+    <string name="cover_status_dock_detail">Čas, datum a kruh stavu nad dockem, procenta baterie v kruhu. Dock si ponechá svůj sloupec.</string>
 </resources>

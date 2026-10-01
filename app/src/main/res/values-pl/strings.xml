@@ -539,4 +539,9 @@
     <string name="category_system">System</string>
     <string name="category_other">Inne</string>
     <string name="category_media">Multimedia</string>
+    <string name="cover_status_place">Stan na ekranie zewnętrznym</string>
+    <string name="cover_status_top">U góry</string>
+    <string name="cover_status_dock">Nad dokiem</string>
+    <string name="cover_status_top_detail">Bateria, Wi-Fi i sygnał w lewym rogu, data i godzina w prawym.</string>
+    <string name="cover_status_dock_detail">Godzina, data i pierścień stanu nad dokiem, poziom baterii w pierścieniu. Dok zachowuje swoją kolumnę.</string>
 </resources>

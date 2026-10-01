@@ -70,6 +70,8 @@ data class LauncherState(
     val expanded: LayoutPreset = LayoutPreset(),
     val labels: Boolean = true,
     val verticalStatus: Boolean = true,
+    /** On the cover screen, status runs across the top rather than above the dock. */
+    val coverStatusAtTop: Boolean = true,
     val homeRows: Int = DEFAULT_HOME_ROWS,
     val homeColumns: Int = DEFAULT_HOME_COLUMNS,
     /** How see-through an open folder's background is, from opaque (0) to [MAX_FOLDER_TRANSPARENCY]. */
@@ -548,6 +550,11 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         return true
     }
     fun setLabels(value: Boolean) { if (statePayloadInvalid) return; undoLayout = null; undoImportSettings = null; mutable.update { it.copy(labels = value, canUndoEdit = false) }; persist() }
+    /** A device-local look setting, like the dock's appearance. */
+    fun setCoverStatusAtTop(value: Boolean) {
+        if (statePayloadInvalid) return
+        mutable.update { it.copy(coverStatusAtTop = value) }; persist()
+    }
     fun setVerticalStatus(value: Boolean) { if (statePayloadInvalid) return; undoLayout = null; undoImportSettings = null; mutable.update { it.copy(verticalStatus = value, canUndoEdit = false) }; persist() }
     /** A device-local look setting, so it is not part of layout backups or layout undo. */
     fun setFolderTransparency(value: Float) {
@@ -781,6 +788,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .put("restores", restores)
             .put("googleSearch", s.googleSearch)
             .put("verticalStatus", s.verticalStatus)
+            .put("coverStatusAtTop", s.coverStatusAtTop)
             .put("homeRows", s.homeRows)
             .put("folderTransparency", s.folderTransparency.toDouble())
             .put("libraryGrid", s.libraryGrid)
@@ -956,6 +964,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             googleSearch = j.optBoolean("googleSearch", true),
             labels = j.optBoolean("labels", true), compact = preset("compact", LayoutPreset()),
             expanded = preset("expanded", LayoutPreset()), verticalStatus = j.optBoolean("verticalStatus", true),
+            coverStatusAtTop = j.optBoolean("coverStatusAtTop", true),
             homeRows = j.optInt("homeRows", DEFAULT_HOME_ROWS).coerceIn(DEFAULT_HOME_ROWS, GRID_ROWS),
             folderTransparency = j.optDouble("folderTransparency", DEFAULT_FOLDER_TRANSPARENCY.toDouble()).toFloat()
                 .takeIf { it.isFinite() }?.coerceIn(0f, MAX_FOLDER_TRANSPARENCY) ?: DEFAULT_FOLDER_TRANSPARENCY,

@@ -472,15 +472,18 @@ fun LauncherScreen(
             val inLibrary = hasLibrary && pager.currentPage == visibleHomePages
             // The inner screen always shows its dock; only the cover's may slide in or hide.
             val dockMode = if (wide) DockMode.SHOWN else state.dockMode
-            val dockColumn = dockMode == DockMode.SHOWN
+            // Status above the dock, always on the inner screen and by choice on the cover, keeps
+            // the right column even while the cover's dock slides in or hides.
+            val statusRail = state.verticalStatus && (wide || !state.coverStatusAtTop)
+            val dockColumn = dockMode == DockMode.SHOWN || statusRail
             // On the cover, status runs across the top: in the camera's band when there is one.
-            val coverStatus = !wide && state.verticalStatus
+            val coverStatus = !wide && state.verticalStatus && state.coverStatusAtTop
             val topInset = with(density) { WindowInsets.safeDrawing.getTop(this).toDp() }
             val coverStatusHeight = maxOf(topInset, 36.dp)
             val topBar = if (coverStatus) (coverStatusHeight - topInset).value else 0f
             var statusHeight by remember { mutableFloatStateOf(0f) }
             val geometry = homeGeometry(maxWidth.value, maxHeight.value, preset, state.labels,
-                statusRailHeight = if (state.verticalStatus && wide) statusHeight + 22f else 0f,
+                statusRailHeight = if (statusRail) statusHeight + 22f else 0f,
                 labelHeight = with(density) { 14.sp.toDp().value } + 6f, inLibrary = inLibrary,
                 homeBottomSpace = if (isDefaultHome) 44f else 88f, dockSlots = state.dock.size, homeRows = state.homeRows,
                 columns = state.homeColumns, dockColumn = dockColumn, topBar = topBar)
@@ -684,7 +687,7 @@ fun LauncherScreen(
             val systemBarShown = sheet.isNotEmpty() || emptyCellIndex != null || selectedId != null
             if (coverStatus && !systemBarShown) CoverStatusBar(deviceStatus, Modifier.align(Alignment.TopStart).offset(y = -topInset)
                 .fillMaxWidth().height(coverStatusHeight).padding(horizontal = 20.dp))
-            if (state.verticalStatus && wide) StatusRail(deviceStatus,
+            if (statusRail) StatusRail(deviceStatus,
                 Modifier.align(Alignment.TopEnd).padding(end = 12.dp).offset(y = geometry.contentTop.dp)
                     .width(preset.dockWidth.dp).onSizeChanged {
                         // The normal rail's 20dp location slot and 3dp gap do not move the dock.

@@ -523,4 +523,9 @@
     <string name="category_system">System</string>
     <string name="category_other">Andere</string>
     <string name="category_media">Medien</string>
+    <string name="cover_status_place">Status auf dem äußeren Display</string>
+    <string name="cover_status_top">Oben</string>
+    <string name="cover_status_dock">Über dem Dock</string>
+    <string name="cover_status_top_detail">Akku, WLAN und Signal in der linken Ecke, Datum und Uhrzeit in der rechten.</string>
+    <string name="cover_status_dock_detail">Uhrzeit, Datum und Statusring über dem Dock, der Akkustand im Ring. Das Dock behält seine Spalte.</string>
 </resources>

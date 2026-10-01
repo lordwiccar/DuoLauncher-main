@@ -743,6 +743,7 @@ private fun HomePage(state: LauncherState, wide: Boolean, onWideScreen: Boolean,
         GroupDivider()
         SwitchRow(stringResource(R.string.show_status), stringResource(R.string.settings_status_detail), state.verticalStatus,
             model::setVerticalStatus, "status-switch")
+        if (!wide && state.verticalStatus) CoverStatusPlace(state, model)
     } else SettingsGroup {
         val pinned = (state.homeSlots + state.leadingSlots).count { it != null }
         ValueRow(stringResource(R.string.choose_home_apps), stringResource(R.string.settings_pinned_count, pinned),
@@ -770,6 +771,7 @@ private fun HomePage(state: LauncherState, wide: Boolean, onWideScreen: Boolean,
         GroupDivider()
         SwitchRow(stringResource(R.string.show_status), stringResource(R.string.settings_status_detail), state.verticalStatus,
             model::setVerticalStatus, "status-switch")
+        if (!wide && state.verticalStatus) CoverStatusPlace(state, model)
     }
     SectionCaption(stringResource(R.string.settings_section_screen))
     SettingsGroup {
@@ -805,6 +807,18 @@ private fun HomePage(state: LauncherState, wide: Boolean, onWideScreen: Boolean,
     }
     TextButton(onClick = { model.setPreset(wide, LayoutPreset()) }, Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
         Text(stringResource(if (wide) R.string.settings_reset_inner else R.string.settings_reset_cover))
+    }
+}
+
+/** Where the cover screen shows status: across the top, or above the dock as on the inner screen. */
+@Composable
+private fun CoverStatusPlace(state: LauncherState, model: LauncherModel) {
+    GroupBody {
+        GroupTitle(stringResource(R.string.cover_status_place))
+        Choice(listOf(stringResource(R.string.cover_status_top) to "cover-status-top",
+            stringResource(R.string.cover_status_dock) to "cover-status-dock"),
+            if (state.coverStatusAtTop) 0 else 1, { model.setCoverStatusAtTop(it == 0) })
+        Detail(stringResource(if (state.coverStatusAtTop) R.string.cover_status_top_detail else R.string.cover_status_dock_detail))
     }
 }
 

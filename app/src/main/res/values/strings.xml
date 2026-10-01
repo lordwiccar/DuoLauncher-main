@@ -524,4 +524,9 @@
     <string name="category_system">System</string>
     <string name="category_other">Other</string>
     <string name="category_media">Media</string>
+    <string name="cover_status_place">Status on the cover screen</string>
+    <string name="cover_status_top">At the top</string>
+    <string name="cover_status_dock">Above the dock</string>
+    <string name="cover_status_top_detail">Battery, Wi-Fi and signal in the left corner, the date and time in the right one.</string>
+    <string name="cover_status_dock_detail">Time, date and the status ring above the dock, with the battery level in the ring. The dock keeps its column.</string>
 </resources>

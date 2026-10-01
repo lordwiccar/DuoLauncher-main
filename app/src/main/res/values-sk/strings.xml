@@ -539,4 +539,9 @@
     <string name="category_system">Systém</string>
     <string name="category_other">Ostatné</string>
     <string name="category_media">Médiá</string>
+    <string name="cover_status_place">Stav na vonkajšom displeji</string>
+    <string name="cover_status_top">Hore</string>
+    <string name="cover_status_dock">Nad dokom</string>
+    <string name="cover_status_top_detail">Batéria, Wi-Fi a signál v ľavom rohu, dátum a čas v pravom.</string>
+    <string name="cover_status_dock_detail">Čas, dátum a kruh stavu nad dokom, percentá batérie v kruhu. Dok si ponechá svoj stĺpec.</string>
 </resources>
