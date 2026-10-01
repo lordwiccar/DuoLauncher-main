@@ -511,8 +511,6 @@
     <string name="category_social">Social</string>
     <string name="category_productivity">Productivity</string>
     <string name="category_utilities">Utilities</string>
-    <string name="category_entertainment">Entertainment</string>
-    <string name="category_music">Music &amp; audio</string>
     <string name="category_photo">Photo &amp; video</string>
     <string name="category_games">Games</string>
     <string name="category_news">News &amp; reading</string>
@@ -525,4 +523,5 @@
     <string name="category_maker">From the maker</string>
     <string name="category_system">System</string>
     <string name="category_other">Other</string>
+    <string name="category_media">Media</string>
 </resources>

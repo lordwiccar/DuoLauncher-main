@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Add a fourth All apps view, Library, like the App Library on iPhone: two columns of large folders that sort apps by purpose (recent, social, productivity, utilities, entertainment, music, photo, games, news, shopping, finance, health, education, travel, Google, the phone maker's apps, system and other). A large icon opens its app; the small icons or the name open the whole folder. Searching shows the list.
+- Add a fourth All apps view, Library, like the App Library on iPhone: two columns of large folders that sort apps by purpose (recent, social, productivity, media, photo, finance, shopping, health, travel, utilities, games, news, education, Google, the phone maker's apps, system and other). A large icon opens its app; the small icons or the name open the whole folder. Searching shows the list. On the inner screen the library takes one half, beside the last Home page.
 - Show recently opened apps in empty dock positions, a little smaller so they read as suggestions. Drag one in or choose Keep in its menu to make it stay; Settings → Dock turns them off.
 - Put whole folders in the dock: drag a folder there and it takes one position, opens with a tap and takes apps dropped onto it. Dragging it back puts it on Home; the dock's folders are shared by both screens like the dock itself.
 - Long press an app on Home, in the dock or in All apps, and let go without moving it, for a menu beside the icon: the app's own shortcuts (such as New tab or Compose), then Remove, Uninstall, Icon, App info and More for the earlier options. In the dock, Change picks another app. Shortcuts appear while iDuo is the Home app.

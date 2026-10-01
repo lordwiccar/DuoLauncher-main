@@ -526,8 +526,6 @@
     <string name="category_social">Komunikacja</string>
     <string name="category_productivity">Produktywność</string>
     <string name="category_utilities">Narzędzia</string>
-    <string name="category_entertainment">Rozrywka</string>
-    <string name="category_music">Muzyka i audio</string>
     <string name="category_photo">Zdjęcia i wideo</string>
     <string name="category_games">Gry</string>
     <string name="category_news">Wiadomości i czytanie</string>
@@ -540,4 +538,5 @@
     <string name="category_maker">Od producenta</string>
     <string name="category_system">System</string>
     <string name="category_other">Inne</string>
+    <string name="category_media">Multimedia</string>
 </resources>

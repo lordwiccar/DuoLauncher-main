@@ -526,8 +526,6 @@
     <string name="category_social">Komunikace</string>
     <string name="category_productivity">Produktivita</string>
     <string name="category_utilities">Nástroje</string>
-    <string name="category_entertainment">Zábava</string>
-    <string name="category_music">Hudba a audio</string>
     <string name="category_photo">Foto a video</string>
     <string name="category_games">Hry</string>
     <string name="category_news">Zprávy a čtení</string>
@@ -540,4 +538,5 @@
     <string name="category_maker">Od výrobce</string>
     <string name="category_system">Systém</string>
     <string name="category_other">Ostatní</string>
+    <string name="category_media">Média</string>
 </resources>

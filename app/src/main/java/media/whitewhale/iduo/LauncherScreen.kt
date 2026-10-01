@@ -527,8 +527,10 @@ fun LauncherScreen(
             val leftColumnOrigin = (maxWidth / 2f - geometry.gridWidth.dp) / 2f - 16.dp
             val homeStride = panelWidth - leftColumnOrigin
             val bottomSpace = if (isDefaultHome) 44.dp else 88.dp
-            val workspaceMotion = if (geometry.expanded) remember(firstHome, visibleHomePages, pagerWidth, homeStride, density) {
-                WorkspacePageMotion(firstHome, visibleHomePages, with(density) { pagerWidth.toPx() }, with(density) { homeStride.toPx() })
+            val workspaceMotion = if (geometry.expanded) remember(firstHome, visibleHomePages, pagerWidth, homeStride, density, state.libraryFolders) {
+                // The library's folders fill one pane beside the last Home page, like another page.
+                WorkspacePageMotion(firstHome, visibleHomePages, with(density) { pagerWidth.toPx() }, with(density) { homeStride.toPx() },
+                    libraryStride = with(density) { (if (state.libraryFolders) homeStride else pagerWidth).toPx() })
             } else null
             val dockScroll = rememberScrollState()
             val dockShown = dockMode == DockMode.SHOWN || (dockMode == DockMode.SLIDE && (dockOpen || drag.active))
@@ -1513,7 +1515,9 @@ private fun ExpandedWorkspace(
 
         if (showLibrary) {
             key("library-pane") {
-                Box(Modifier.place((visibleHomePages - 1) * stride + viewportWidth).fillMaxSize()) {
+                val halfPane = state.libraryFolders
+                Box(Modifier.place(if (halfPane) initialHomeOrigin + visibleHomePages * stride else (visibleHomePages - 1) * stride + viewportWidth)
+                    .then(if (halfPane) Modifier.width((geometry.gridWidth + 16f).dp).fillMaxHeight() else Modifier.fillMaxSize())) {
                     AppLibrary(state, libraryQuery, onLibraryQuery, onLaunch, onPinned,
                         onActions = onActions,
                         modifier = Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, bottom = bottomSpace)
