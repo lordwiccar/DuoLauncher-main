@@ -544,4 +544,9 @@
     <string name="help_all_apps_title">Alle Apps</string>
     <string name="help_all_apps">Wähle, wie Alle Apps aussieht: eine Liste, ein Raster aus Seiten, eine Bibliothek mit Ordnern nach Zweck oder alle Apps direkt auf dem Startbildschirm.</string>
     <string name="help_open_home">Startbildschirm-Einstellungen</string>
+    <string name="wallpaper_crop">Foto verschieben oder zoomen</string>
+    <string name="wallpaper_crop_detail">Wähle, welchen Teil deines Fotos jedes Display zeigt. Android-Hintergründe passt du in Androids eigener Auswahl an.</string>
+    <string name="wallpaper_crop_hint_cover">Ziehen zum Verschieben, spreizen zum Zoomen. Das ist der Ausschnitt des äußeren Displays; das innere hat einen eigenen.</string>
+    <string name="wallpaper_crop_hint_inner">Ziehen zum Verschieben, spreizen zum Zoomen. Das ist der Ausschnitt des inneren Displays; das äußere hat einen eigenen.</string>
+    <string name="wallpaper_crop_reset">Zurücksetzen</string>
 </resources>

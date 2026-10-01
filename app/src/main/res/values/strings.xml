@@ -545,4 +545,9 @@
     <string name="help_all_apps_title">All apps</string>
     <string name="help_all_apps">Choose how All apps looks: a list, a grid of pages, a Library of folders by purpose, or every app placed right on Home.</string>
     <string name="help_open_home">Home settings</string>
+    <string name="wallpaper_crop">Move or zoom the photo</string>
+    <string name="wallpaper_crop_detail">Choose which part of your photo each screen shows. Android wallpapers are adjusted in Android\'s own picker.</string>
+    <string name="wallpaper_crop_hint_cover">Drag to move, pinch to zoom. This is the cover screen\'s part; the inner screen keeps its own.</string>
+    <string name="wallpaper_crop_hint_inner">Drag to move, pinch to zoom. This is the inner screen\'s part; the cover screen keeps its own.</string>
+    <string name="wallpaper_crop_reset">Reset</string>
 </resources>

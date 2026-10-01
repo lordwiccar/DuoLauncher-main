@@ -578,6 +578,15 @@ private fun AppearancePage(model: LauncherModel, state: LauncherState, appearanc
                     Icon(Icons.Rounded.Wallpaper, null, Modifier.size(30.dp), tint = MaterialTheme.colorScheme.primary)
                 }
             }
+            // A photo set in iDuo can be moved and zoomed for each screen.
+            var editingCrop by rememberSaveable { mutableStateOf(false) }
+            if (HomeWallpaper.isPhoto && backgrounds.photoSelected && !backgrounds.previewPending) {
+                OutlinedButton(onClick = { editingCrop = true }, Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("wallpaper-crop")) {
+                    Text(stringResource(R.string.wallpaper_crop))
+                }
+                Detail(stringResource(R.string.wallpaper_crop_detail))
+            }
+            if (editingCrop) WallpaperCropEditor(onDismiss = { editingCrop = false })
             if (backgrounds.loading) LinearProgressIndicator(Modifier.fillMaxWidth().testTag("background-loading"))
             (backgrounds.errorMessage ?: backgrounds.successMessage)?.let { message ->
                 TextButton(onClick = backgrounds::clearMessage, Modifier.fillMaxWidth().testTag("background-message")) { Text(message) }

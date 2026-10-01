@@ -8,12 +8,13 @@
 - Two new All apps views: Library sorts apps into folders by purpose, like on iPhone, and On Home places every app on Home pages.
 - A menu on a long-pressed app with its shortcuts, Remove, Uninstall, Icon and App info.
 - Icon packs from Google Play, for all apps or a single one.
+- Move and zoom your own photo wallpaper, separately for each screen.
 - Folders in the dock, and recently opened apps in its empty places.
 - A notification after each update that opens this changelog.
 
 ### Look and feel
 - A redesigned status ring, at the top or above the dock on the cover screen.
-- A blurred wallpaper behind All apps, the news page and folders, and a frosted dock.
+- A blurred wallpaper behind All apps, the news page and folders, and a frosted dock that blurs exactly the wallpaper behind it.
 - The cover screen stays upright; rotating it is an experimental option.
 
 ### Fixes

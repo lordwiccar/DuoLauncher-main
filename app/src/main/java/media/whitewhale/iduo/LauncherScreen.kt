@@ -432,7 +432,8 @@ fun LauncherScreen(
     val wallpaperBlurPx = with(LocalDensity.current) { WALLPAPER_BACKDROP_BLUR.toPx() }
     LaunchedEffect(windowBlurs, wallpaperBlurPx) {
         var applied = -1
-        snapshotFlow { if (windowBlurs) (wallpaperBlurProgress * wallpaperBlurPx).roundToInt() else 0 }.collect { radius ->
+        // Android's wallpaper is hidden behind one iDuo draws, which blurs itself.
+        snapshotFlow { if (windowBlurs && HomeWallpaper.image == null) (wallpaperBlurProgress * wallpaperBlurPx).roundToInt() else 0 }.collect { radius ->
             // Each change relayouts the window, so small steps mid-swipe are skipped.
             if (radius == 0 || radius >= wallpaperBlurPx.roundToInt() || kotlin.math.abs(radius - applied) >= 4) {
                 if (radius != applied) launcherActivity.window.setWallpaperBlur(radius)
@@ -453,7 +454,9 @@ fun LauncherScreen(
             wallpapers.setWallpaperOffsets(token, xOffset, .5f)
         }
     }
-    FollowWallpaperFrost()
+    FollowHomeWallpaper()
+    // Home draws a wallpaper iDuo set itself, with each screen's crop, and blurs it itself too.
+    val ownWallpaper = HomeWallpaper.image != null
     Box(Modifier.fillMaxSize().testTag("launcher-root").homeDragInput(drag,
         enabled = sheet.isEmpty() && !showFirstRun && selectedId == null && resizeSlot == null && !spotlight && pager.currentPage >= 0,
         page = pager.currentPage, eligiblePages = eligibleDragPages, onStart = {
@@ -465,7 +468,8 @@ fun LauncherScreen(
             }
         },
         onFinish = { cancelled -> finishDrag(cancelled) })) {
-        if (!windowBlurs && wallpaperBlurProgress > 0f) WallpaperStandIn(Modifier.fillMaxSize()
+        HomeWallpaperLayer(wallpaperBlurProgress)
+        if (!ownWallpaper && !windowBlurs && wallpaperBlurProgress > 0f) WallpaperStandIn(Modifier.fillMaxSize()
             .graphicsLayer { alpha = wallpaperBlurProgress }
             .blur(WALLPAPER_BACKDROP_BLUR, androidx.compose.ui.draw.BlurredEdgeTreatment.Rectangle)
             .testTag("wallpaper-blur"))

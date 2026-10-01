@@ -560,4 +560,9 @@
     <string name="help_all_apps_title">Všetky aplikácie</string>
     <string name="help_all_apps">Vyberte, ako Všetky aplikácie vyzerajú: zoznam, mriežka strán, Knižnica priečinkov podľa zamerania alebo všetky aplikácie priamo na plochách.</string>
     <string name="help_open_home">Nastavenia plochy</string>
+    <string name="wallpaper_crop">Posunúť alebo priblížiť fotku</string>
+    <string name="wallpaper_crop_detail">Vyberte, ktorú časť fotky ukazuje každý displej. Tapety Androidu sa upravujú v jeho vlastnom výbere.</string>
+    <string name="wallpaper_crop_hint_cover">Ťahaním posuniete, roztiahnutím prstov priblížite. Toto je výrez vonkajšieho displeja; vnútorný má vlastný.</string>
+    <string name="wallpaper_crop_hint_inner">Ťahaním posuniete, roztiahnutím prstov priblížite. Toto je výrez vnútorného displeja; vonkajší má vlastný.</string>
+    <string name="wallpaper_crop_reset">Obnoviť</string>
 </resources>

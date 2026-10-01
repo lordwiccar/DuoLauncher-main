@@ -560,4 +560,9 @@
     <string name="help_all_apps_title">Wszystkie aplikacje</string>
     <string name="help_all_apps">Wybierz wygląd Wszystkich aplikacji: lista, siatka stron, Biblioteka folderów według przeznaczenia albo wszystkie aplikacje na ekranach głównych.</string>
     <string name="help_open_home">Ustawienia ekranu głównego</string>
+    <string name="wallpaper_crop">Przesuń lub powiększ zdjęcie</string>
+    <string name="wallpaper_crop_detail">Wybierz, którą część zdjęcia pokazuje każdy ekran. Tapety Androida dopasowuje się w jego własnym wyborze.</string>
+    <string name="wallpaper_crop_hint_cover">Przeciągnij, aby przesunąć, rozsuń palce, aby powiększyć. To kadr ekranu zewnętrznego; wewnętrzny ma własny.</string>
+    <string name="wallpaper_crop_hint_inner">Przeciągnij, aby przesunąć, rozsuń palce, aby powiększyć. To kadr ekranu wewnętrznego; zewnętrzny ma własny.</string>
+    <string name="wallpaper_crop_reset">Przywróć</string>
 </resources>

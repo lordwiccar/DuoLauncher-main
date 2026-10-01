@@ -262,6 +262,7 @@ class LauncherBackgroundController(
         runCatching { staged.commit(launcherBackgroundFile(activity)) }
             .onSuccess {
                 releasePreviewGrant(staged.operation)
+                HomeWallpaper.resetCrops(activity)
                 prefs.edit().putBoolean(BACKGROUND_ENABLED, true).putString(BACKGROUND_ID, staged.operation)
                     .putInt(MIRROR_ID, homeId).remove(MIRROR_BUNDLED)
                     .remove(PENDING_URI).remove(PENDING_OPERATION).remove(PREVIEW_PHASE).remove(PREVIEW_FILE).apply()

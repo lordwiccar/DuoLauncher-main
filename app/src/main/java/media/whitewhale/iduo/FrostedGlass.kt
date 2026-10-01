@@ -48,27 +48,17 @@ internal object WallpaperFrost {
         private set
     /** The wallpaper's horizontal position, 0 to 1, as Home last reported it to Android. */
     var xOffset by mutableFloatStateOf(.5f)
+    /** Size of the wallpaper the frost was made from, so it is placed exactly as Home draws it. */
+    var sourceSize by mutableStateOf(androidx.compose.ui.geometry.Size.Zero)
+        private set
     private var source: Bitmap? = null
 
     fun update(from: Bitmap?) {
         if (from === source && (from == null || bitmap != null)) return
         source = from
+        sourceSize = from?.let { androidx.compose.ui.geometry.Size(it.width.toFloat(), it.height.toFloat()) }
+            ?: androidx.compose.ui.geometry.Size.Zero
         bitmap = from?.takeUnless { it.isRecycled }?.let { frost(it).asImageBitmap() }
-    }
-}
-
-/** Keeps [WallpaperFrost] in step with the wallpaper iDuo set, off the main thread. */
-@Composable
-internal fun FollowWallpaperFrost() {
-    val context = LocalContext.current.applicationContext
-    val revision = LauncherBackgroundCache.revision.intValue
-    val bundled = SystemWallpaper.mirrorsBundled
-    val dunes = DefaultWallpaper.bitmap
-    LaunchedEffect(revision, bundled, dunes) {
-        withContext(Dispatchers.Default) {
-            val photo = withContext(Dispatchers.IO) { loadLauncherBackground(context) }
-            WallpaperFrost.update(photo ?: if (bundled) dunes?.asAndroidBitmap() else null)
-        }
     }
 }
 
@@ -111,6 +101,7 @@ private fun boxBlur(pixels: IntArray, width: Int, height: Int, horizontal: Boole
  */
 internal fun Modifier.frostedWallpaper(shape: Shape): Modifier = composed {
     val view = LocalView.current
+    val cover = onCoverScreen()
     val bounds = remember { arrayOf(Rect.Zero) }
     var positioned by remember { mutableStateOf(0) }
     onGloballyPositioned { coordinates ->
@@ -128,14 +119,10 @@ internal fun Modifier.frostedWallpaper(shape: Shape): Modifier = composed {
         }
         clipPath(path) {
             val frost = WallpaperFrost.bitmap
-            if (frost != null) {
-                // Android fills the screen with the wallpaper and pans it across its extra width.
-                val scale = maxOf(window.width.toFloat() / frost.width, window.height.toFloat() / frost.height)
-                val drawn = IntSize((frost.width * scale).roundToInt(), (frost.height * scale).roundToInt())
-                val left = -(drawn.width - window.width) * WallpaperFrost.xOffset
-                val top = -(drawn.height - window.height) / 2f
-                drawImage(frost, dstOffset = IntOffset((left - origin.x).roundToInt(), (top - origin.y).roundToInt()),
-                    dstSize = drawn, filterQuality = FilterQuality.Low)
+            if (frost != null && HomeWallpaper.image != null) {
+                // The part of Home's own wallpaper behind this element, with this screen's crop.
+                drawWallpaper(frost, HomeWallpaper.crop(cover), origin,
+                    androidx.compose.ui.geometry.Size(window.width.toFloat(), window.height.toFloat()), WallpaperFrost.sourceSize)
             } else {
                 val colors = SystemWallpaper.colors
                 val stops = listOfNotNull(colors?.primaryColor, colors?.secondaryColor, colors?.tertiaryColor)
