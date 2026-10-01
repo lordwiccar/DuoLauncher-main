@@ -123,8 +123,9 @@ internal fun Modifier.frostedWallpaper(shape: Shape): Modifier = composed {
                 // The part of Home's own wallpaper behind this element, with this screen's crop.
                 drawWallpaper(frost, HomeWallpaper.crop(cover), origin,
                     androidx.compose.ui.geometry.Size(window.width.toFloat(), window.height.toFloat()), WallpaperFrost.sourceSize)
-            } else {
-                val colors = SystemWallpaper.colors
+            } else if (!SamsungBlur.available) {
+                // Samsung's own blur, a layer inside the element, frosts Android's wallpaper there.
+                val colors = SystemWallpaper.colorsFor(cover)
                 val stops = listOfNotNull(colors?.primaryColor, colors?.secondaryColor, colors?.tertiaryColor)
                     .map { Color(it.toArgb()) }.ifEmpty { listOf(Color(0xFF41687E), Color(0xFF94ADB5), Color(0xFFD8CEB6)) }
                 if (stops.size == 1) drawRect(stops[0])

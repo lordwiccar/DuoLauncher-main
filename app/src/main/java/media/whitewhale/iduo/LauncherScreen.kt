@@ -420,8 +420,8 @@ fun LauncherScreen(
         }
     }
     // Android's wallpaper lies behind this window, so the window blurs it where Android allows
-    // that. Some devices, Samsung's among them, turn cross-window blur off; there Home draws a
-    // blurred stand-in of the wallpaper instead.
+    // that. Samsung turns cross-window blur off but offers its own (SamsungBlur); elsewhere
+    // without it Home draws a blurred stand-in of the wallpaper instead.
     val windowManager = launcherActivity.windowManager
     var windowBlurs by remember { mutableStateOf(windowManager.isCrossWindowBlurEnabled) }
     DisposableEffect(windowManager) {
@@ -469,7 +469,13 @@ fun LauncherScreen(
         },
         onFinish = { cancelled -> finishDrag(cancelled) })) {
         HomeWallpaperLayer(wallpaperBlurProgress)
-        if (!ownWallpaper && !windowBlurs && wallpaperBlurProgress > 0f) WallpaperStandIn(Modifier.fillMaxSize()
+        val samsungBlurs = !ownWallpaper && !windowBlurs && SamsungBlur.available
+        if (samsungBlurs) {
+            // Each change of Samsung's blur redraws the window behind, so it moves in steps.
+            val step by remember { derivedStateOf { (wallpaperBlurProgress * SAMSUNG_BLUR_STEPS).roundToInt() } }
+            if (step > 0) SamsungWallpaperBlur(WALLPAPER_BACKDROP_BLUR * step / SAMSUNG_BLUR_STEPS, 0.dp, Color.Transparent,
+                Modifier.fillMaxSize().testTag("wallpaper-blur"))
+        } else if (!ownWallpaper && !windowBlurs && wallpaperBlurProgress > 0f) WallpaperStandIn(Modifier.fillMaxSize()
             .graphicsLayer { alpha = wallpaperBlurProgress }
             .blur(WALLPAPER_BACKDROP_BLUR, androidx.compose.ui.draw.BlurredEdgeTreatment.Rectangle)
             .testTag("wallpaper-blur"))
@@ -718,6 +724,8 @@ fun LauncherScreen(
                 // Frosted glass covers what lies behind, so icons under a sliding dock do not show through.
                 shape = RoundedCornerShape(30.dp), color = Glass.copy(alpha = .32f),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .3f))) {
+                if (!ownWallpaper && SamsungBlur.available)
+                    SamsungWallpaperBlur(DOCK_SAMSUNG_BLUR, 30.dp, Glass.copy(alpha = .32f), Modifier.fillMaxSize())
                 Column(Modifier.padding(vertical = 8.dp).verticalScroll(dockScroll)) {
                     DockAppColumn(state.dock, previewLayout.dock, appsById, geometry.dockRowHeight,
                         dockIconSize(geometry.iconSize), drag, insertionTarget,
