@@ -38,8 +38,8 @@ private const val FROST_HEIGHT = 240
 private const val FROST_RADIUS = 5
 
 /**
- * A blurred copy of the Home wallpaper for glass panels, drawn where the wallpaper lies behind
- * each panel. Apps cannot read Android's wallpaper, so this exists only for a wallpaper iDuo set
+ * A blurred copy of the Home wallpaper for frosted glass, such as the dock, drawn where the
+ * wallpaper lies behind it. Apps cannot read Android's wallpaper, so this exists only for a wallpaper iDuo set
  * (a photo or the bundled dunes); otherwise panels frost the wallpaper's colours.
  */
 internal object WallpaperFrost {

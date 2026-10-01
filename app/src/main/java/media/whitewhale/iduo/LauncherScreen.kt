@@ -381,9 +381,17 @@ fun LauncherScreen(
     val backdropBlurred = openFolderId != null || spotlight
     val folderBlur by animateDpAsState(if (backdropBlurred) FOLDER_BACKDROP_BLUR else 0.dp, label = "folder blur")
     val behindFolder = if (folderBlur > 0.dp) Modifier.blur(folderBlur) else Modifier
-    // The wallpaper blurs behind an open folder or search. Glass panels frost only the wallpaper
-    // behind themselves; see frostedWallpaper.
-    val wallpaperBlurProgress by remember { derivedStateOf { folderBlur / FOLDER_BACKDROP_BLUR } }
+    // The wallpaper blurs fully behind an open folder or search, and as All apps or the news
+    // page slides in, so their labels stay readable on busy wallpapers. The dock instead frosts
+    // only the wallpaper behind itself; see frostedWallpaper.
+    val wallpaperBlurProgress by remember(nativePager, firstHome, visibleHomePages, hasLibrary) {
+        derivedStateOf {
+            val position = nativePager.currentPage + nativePager.currentPageOffsetFraction - firstHome
+            val panel = maxOf((-position).coerceIn(0f, 1f),
+                if (hasLibrary) (position - (visibleHomePages - 1)).coerceIn(0f, 1f) else 0f)
+            maxOf(panel, folderBlur / FOLDER_BACKDROP_BLUR)
+        }
+    }
     // Android's wallpaper lies behind this window, so the window blurs it where Android allows
     // that. Some devices, Samsung's among them, turn cross-window blur off; there Home draws a
     // blurred stand-in of the wallpaper instead.
@@ -1827,7 +1835,7 @@ private fun AppTile(app: AppEntry, size: Float, labels: Boolean, modifier: Modif
 
 @Composable
 private fun GlassCard(modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
-    Surface(modifier.fillMaxSize().clip(RoundedCornerShape(24.dp)).frostedWallpaper(RoundedCornerShape(24.dp)).clickable(onClick = onClick),
+    Surface(modifier.fillMaxSize().clip(RoundedCornerShape(24.dp)).clickable(onClick = onClick),
         color = Glass.copy(alpha = .24f), shape = RoundedCornerShape(24.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .18f))) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.SpaceBetween, content = content)
     }
