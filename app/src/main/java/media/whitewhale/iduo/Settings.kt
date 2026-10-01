@@ -17,6 +17,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -555,8 +556,16 @@ private fun AppearancePage(model: LauncherModel, state: LauncherState, appearanc
         GroupBody {
             GroupTitle(stringResource(R.string.wallpaper))
             Detail(stringResource(R.string.wallpaper_detail))
+            // A photo can be moved and zoomed for each screen, in its preview and once it is set.
+            var editingCrop by rememberSaveable { mutableStateOf(false) }
+            var editingPreviewCrop by rememberSaveable { mutableStateOf(false) }
             if (backgrounds.previewPending) {
-                MiniHomePreview(backgrounds.previewBitmap, state, state.layout, state.compact, 200.dp)
+                MiniHomePreview(backgrounds.previewBitmap, state, state.layout, state.compact, 200.dp,
+                    onClick = { if (backgrounds.previewBitmap != null) editingPreviewCrop = true })
+                OutlinedButton(onClick = { editingPreviewCrop = true }, Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                    .testTag("wallpaper-preview-crop"), enabled = backgrounds.previewBitmap != null && !backgrounds.loading) {
+                    Text(stringResource(R.string.wallpaper_crop))
+                }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(onClick = backgrounds::cancelPreview, Modifier.weight(1f).heightIn(min = 48.dp)
                         .testTag("background-preview-cancel"), enabled = !backgrounds.loading) { Text(stringResource(R.string.cancel)) }
@@ -578,8 +587,6 @@ private fun AppearancePage(model: LauncherModel, state: LauncherState, appearanc
                     Icon(Icons.Rounded.Wallpaper, null, Modifier.size(30.dp), tint = MaterialTheme.colorScheme.primary)
                 }
             }
-            // A photo set in iDuo can be moved and zoomed for each screen.
-            var editingCrop by rememberSaveable { mutableStateOf(false) }
             if (HomeWallpaper.isPhoto && backgrounds.photoSelected && !backgrounds.previewPending) {
                 OutlinedButton(onClick = { editingCrop = true }, Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("wallpaper-crop")) {
                     Text(stringResource(R.string.wallpaper_crop))
@@ -587,6 +594,12 @@ private fun AppearancePage(model: LauncherModel, state: LauncherState, appearanc
                 Detail(stringResource(R.string.wallpaper_crop_detail))
             }
             if (editingCrop) WallpaperCropEditor(onDismiss = { editingCrop = false })
+            val previewImage = remember(backgrounds.previewBitmap) { backgrounds.previewBitmap?.asImageBitmap() }
+            if (editingPreviewCrop && previewImage != null) {
+                val cover = onCoverScreen()
+                WallpaperCropEditor(previewImage, HomeWallpaper.pendingCrop(cover), cover,
+                    { HomeWallpaper.setPendingCrop(cover, it) }, onDismiss = { editingPreviewCrop = false })
+            }
             if (backgrounds.loading) LinearProgressIndicator(Modifier.fillMaxWidth().testTag("background-loading"))
             (backgrounds.errorMessage ?: backgrounds.successMessage)?.let { message ->
                 TextButton(onClick = backgrounds::clearMessage, Modifier.fillMaxWidth().testTag("background-message")) { Text(message) }
@@ -1153,7 +1166,7 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
 
 /** A small Home: the wallpaper, the first Home icons at [preset]'s size and spacing, and the dock. */
 @Composable private fun MiniHomePreview(stagedBitmap: android.graphics.Bitmap?, state: LauncherState, layout: HomeLayout,
-    preset: LayoutPreset, previewHeight: Dp, dock: Boolean = true) {
+    preset: LayoutPreset, previewHeight: Dp, dock: Boolean = true, onClick: (() -> Unit)? = null) {
     val apps = remember(state.apps) { state.apps.associateBy { it.id } }
     val rows = (layout.rows - 2).coerceAtLeast(1)
     val homeIcons = (0 until rows).map { row -> List(layout.columns) { column ->
@@ -1162,10 +1175,14 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
     val scale = previewHeight.value * .632f / 250f
     fun unit(value: Float) = (value * scale).dp
     val icon = 24f * preset.iconSize / 66f
+    val staged = remember(stagedBitmap) { stagedBitmap?.asImageBitmap() }
+    val cover = onCoverScreen()
     Box(Modifier.height(previewHeight).width(previewHeight * .632f).clip(RoundedCornerShape(unit(24f)))
+        .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
         .testTag("customization-home-preview")) {
         WallpaperStandIn()
-        stagedBitmap?.let { Image(it.asImageBitmap(), null, Modifier.matchParentSize(), contentScale = ContentScale.Crop) }
+        // A photo in preview shows the part chosen for this screen.
+        staged?.let { image -> Canvas(Modifier.matchParentSize()) { drawWallpaper(image, HomeWallpaper.pendingCrop(cover)) } }
         Column(Modifier.fillMaxSize().padding(start = unit(14f), top = unit(18f), end = unit(if (dock) 52f else 14f)),
             verticalArrangement = Arrangement.spacedBy(unit(4f + preset.rowGap * .5f))) {
             Box(Modifier.fillMaxWidth().height(unit(40f)).background(MaterialTheme.colorScheme.surface.copy(alpha = .38f), RoundedCornerShape(unit(12f))))

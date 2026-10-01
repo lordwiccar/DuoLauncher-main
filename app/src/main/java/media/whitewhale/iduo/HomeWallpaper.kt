@@ -82,10 +82,23 @@ internal object HomeWallpaper {
         launcherBackgroundPreferences(context).edit().putString(key(cover), crop.toString()).apply()
     }
 
-    /** A new photo starts filling both screens from its centre. */
-    fun resetCrops(context: Context) {
-        crops = emptyMap()
-        launcherBackgroundPreferences(context).edit().remove(key(true)).remove(key(false)).apply()
+    /** Crops chosen for a photo still in preview; they apply with it. */
+    private var pendingCrops by mutableStateOf<Map<Boolean, WallpaperCrop>>(emptyMap())
+
+    fun pendingCrop(cover: Boolean): WallpaperCrop = pendingCrops[cover] ?: WallpaperCrop()
+    fun setPendingCrop(cover: Boolean, crop: WallpaperCrop) { pendingCrops = pendingCrops + (cover to crop) }
+    fun clearPendingCrops() { pendingCrops = emptyMap() }
+
+    /** A new photo shows the crops chosen in its preview, and otherwise fills each screen from its centre. */
+    fun adoptPendingCrops(context: Context) {
+        crops = pendingCrops
+        pendingCrops = emptyMap()
+        val editor = launcherBackgroundPreferences(context).edit()
+        listOf(true, false).forEach { cover ->
+            val crop = crops[cover]
+            if (crop != null) editor.putString(key(cover), crop.toString()) else editor.remove(key(cover))
+        }
+        editor.apply()
     }
 
     fun update(context: Context, photo: android.graphics.Bitmap?, dunes: ImageBitmap?) {
@@ -148,7 +161,14 @@ internal fun WallpaperCropEditor(onDismiss: () -> Unit) {
     val context = LocalContext.current
     val cover = onCoverScreen()
     val image = HomeWallpaper.image ?: return
-    var crop by remember { mutableStateOf(HomeWallpaper.crop(cover)) }
+    WallpaperCropEditor(image, HomeWallpaper.crop(cover), cover, { HomeWallpaper.setCrop(context, cover, it) }, onDismiss)
+}
+
+/** Moves and zooms [image], starting from [initial], for the cover or inner screen; [onDone] receives the result. */
+@Composable
+internal fun WallpaperCropEditor(image: ImageBitmap, initial: WallpaperCrop, cover: Boolean,
+    onDone: (WallpaperCrop) -> Unit, onDismiss: () -> Unit) {
+    var crop by remember(image) { mutableStateOf(initial) }
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
         Box(Modifier.fillMaxSize().background(Color.Black).testTag("wallpaper-crop-editor")) {
             Canvas(Modifier.fillMaxSize().pointerInput(image) {
@@ -178,7 +198,7 @@ internal fun WallpaperCropEditor(onDismiss: () -> Unit) {
                 FilledTonalButton(onClick = { crop = WallpaperCrop() }, Modifier.heightIn(min = 48.dp).testTag("wallpaper-crop-reset")) {
                     Text(stringResource(R.string.wallpaper_crop_reset))
                 }
-                Button(onClick = { HomeWallpaper.setCrop(context, cover, crop); onDismiss() },
+                Button(onClick = { onDone(crop); onDismiss() },
                     Modifier.heightIn(min = 48.dp).testTag("wallpaper-crop-done")) { Text(stringResource(R.string.done)) }
             }
         }
