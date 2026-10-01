@@ -516,4 +516,8 @@
     <string name="app_icon_choose">Ikona dla %1$s</string>
     <string name="app_icon_reset">Użyj własnej ikony aplikacji</string>
     <string name="app_icon_search">Szukaj ikony</string>
+    <string name="dock_recents">Ostatnie aplikacje w pustych miejscach</string>
+    <string name="dock_recents_detail">Puste miejsca w doku pokazują ostatnio otwarte aplikacje. Przeciągnij je lub wybierz Przypnij, aby zostały.</string>
+    <string name="dock_recent_app">Ostatnia: %1$s</string>
+    <string name="app_menu_pin">Przypnij</string>
 </resources>

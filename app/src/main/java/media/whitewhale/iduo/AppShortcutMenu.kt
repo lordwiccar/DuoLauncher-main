@@ -21,6 +21,7 @@ import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.MoreHoriz
 import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.PushPin
 import androidx.compose.material.icons.rounded.RemoveCircleOutline
 import androidx.compose.material.icons.rounded.SwapHoriz
 import androidx.compose.material3.*
@@ -163,6 +164,7 @@ internal object AppMenuIcons {
     val info = Icons.Rounded.Info
     val more = Icons.Rounded.MoreHoriz
     val replace = Icons.Rounded.SwapHoriz
+    val pin = Icons.Rounded.PushPin
 }
 
 /**

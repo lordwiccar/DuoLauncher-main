@@ -28,6 +28,9 @@ import java.text.Collator
 /** Home's left page: Google News headlines, or the user's own RSS sources. */
 enum class LeftPage { GOOGLE_NEWS, RSS }
 
+/** Recently opened apps remembered for the dock and the library. */
+const val MAX_RECENT_APPS = 12
+
 /** How the dock appears: always, slid in from the right edge on demand, or never. */
 enum class DockMode { SHOWN, SLIDE, HIDDEN }
 
@@ -89,6 +92,10 @@ data class LauncherState(
     val appsOnHome: Boolean = false,
     /** Apps that On Home put on Home, taken off again when it is turned off. */
     val homeAddedApps: Set<String> = emptySet(),
+    /** Apps opened from Home, most recent first; empty dock positions show them. */
+    val recentApps: List<String> = emptyList(),
+    /** Whether empty dock positions show recently opened apps. */
+    val dockRecents: Boolean = true,
     /** How the dock appears on the cover screen; the inner screen always shows it. */
     val dockMode: DockMode = DockMode.SHOWN,
     /** The cover screen has its own Home layout instead of mirroring the inner screen's. */
@@ -559,6 +566,16 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         if (statePayloadInvalid) return
         mutable.update { it.copy(swipeDownShade = value) }; persist()
     }
+    /** Remembers [appId] as the most recently opened app. A device-local record, like the views. */
+    fun noteLaunch(appId: String) {
+        if (statePayloadInvalid) return
+        mutable.update { it.copy(recentApps = (listOf(appId) + it.recentApps.filterNot(appId::equals)).take(MAX_RECENT_APPS)) }
+        persist()
+    }
+    fun setDockRecents(value: Boolean) {
+        if (statePayloadInvalid) return
+        mutable.update { it.copy(dockRecents = value) }; persist()
+    }
     fun setSwipeUpSearch(value: Boolean) {
         if (statePayloadInvalid) return
         mutable.update { it.copy(swipeUpSearch = value) }; persist()
@@ -767,6 +784,8 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .put("appsOnHome", s.appsOnHome)
             .put("homeAddedApps", JSONArray(s.homeAddedApps.toList()))
             .put("dockMode", s.dockMode.name)
+            .put("recentApps", JSONArray(s.recentApps))
+            .put("dockRecents", s.dockRecents)
             .put("separateCover", s.separateCover)
             .put("compact", preset(s.compact)).put("expanded", preset(s.expanded))
         current.coverLayout?.let { data.put("cover", encodeCoverLayout(it)) }
@@ -943,6 +962,9 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             homeAddedApps = j.optJSONArray("homeAddedApps")?.let { array ->
                 (0 until array.length()).mapNotNull { array.optString(it).takeIf(String::isNotBlank) }.toSet() } ?: emptySet(),
             dockMode = DockMode.entries.firstOrNull { it.name == j.optString("dockMode") } ?: DockMode.SHOWN,
+            recentApps = j.optJSONArray("recentApps")?.let { array ->
+                (0 until array.length()).mapNotNull { array.optString(it).takeIf(String::isNotBlank) }.distinct().take(MAX_RECENT_APPS) } ?: emptyList(),
+            dockRecents = j.optBoolean("dockRecents", true),
             separateCover = j.optBoolean("separateCover", false))
             .let { it.copy(homeRows = maxOf(it.homeRows, it.layout.requiredRows())) }
             .let { loaded ->

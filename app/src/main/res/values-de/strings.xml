@@ -500,4 +500,8 @@
     <string name="app_icon_choose">Symbol für %1$s</string>
     <string name="app_icon_reset">Eigenes Symbol der App</string>
     <string name="app_icon_search">Symbole suchen</string>
+    <string name="dock_recents">Zuletzt genutzte Apps in freien Plätzen</string>
+    <string name="dock_recents_detail">Freie Plätze im Dock zeigen die zuletzt geöffneten Apps. Zieh eine hinein oder wähle Behalten, damit sie bleibt.</string>
+    <string name="dock_recent_app">Zuletzt: %1$s</string>
+    <string name="app_menu_pin">Behalten</string>
 </resources>

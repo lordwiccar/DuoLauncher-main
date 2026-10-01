@@ -186,6 +186,13 @@ fun LauncherScreen(
     val launcherActivity = androidx.activity.compose.LocalActivity.current as MainActivity
     val launcherRootView = LocalView.current.rootView
     val appsById = remember(state.apps) { state.apps.associateBy { it.id } }
+    // Empty dock positions show the most recently opened apps that are not in the dock, in order.
+    val dockRecentApps: Map<Int, AppEntry> = remember(state.dockRecents, state.recentApps, state.dock, appsById) {
+        if (!state.dockRecents) emptyMap() else {
+            val candidates = state.recentApps.filter { it !in state.dock }.mapNotNull(appsById::get).filter { it.available }.iterator()
+            buildMap { state.dock.forEachIndexed { index, id -> if (id == null && candidates.hasNext()) put(index, candidates.next()) } }
+        }
+    }
     val drag = remember { HomeDragState() }
     val haptic = LocalHapticFeedback.current
     val homePages = state.homePages
@@ -376,8 +383,11 @@ fun LauncherScreen(
             if (!moved && !cancelled) {
                 if (source.target is DropTarget.Dock) {
                     val docked = model.state.value.dock.getOrNull(source.target.index)
+                    val recent = dockRecentApps[source.target.index]?.id
                     if (docked != null && isFolderId(docked)) openFolderId = docked
-                    else if (docked != null) { selectedId = docked; appMenuAnchor = source.bounds; appMenuDock = source.target.index }
+                    else if (docked != null || recent != null) {
+                        selectedId = docked ?: recent; appMenuAnchor = source.bounds; appMenuDock = source.target.index
+                    }
                     else { dockSlot = source.target.index; sheet = "dock" }
                 }
                 else if (source.target is DropTarget.Widget) { widgetSlot = source.target.index; sheet = "widgetActions" }
@@ -697,7 +707,8 @@ fun LauncherScreen(
                     DockAppColumn(state.dock, previewLayout.dock, appsById, geometry.dockRowHeight,
                         dockIconSize(geometry.iconSize), drag, insertionTarget,
                         onLaunch = onLaunchFrom, onChoose = { dockSlot = it; sheet = "dock" },
-                        folders = state.folders, onFolder = { openFolderId = it })
+                        folders = state.folders, onFolder = { openFolderId = it },
+                        recents = if (drag.active) emptyMap() else dockRecentApps)
                 }
             }
             if (dockMode == DockMode.SLIDE && dockReveal.value < 1f) {
@@ -1209,6 +1220,10 @@ fun LauncherScreen(
             val pinned = state.layout.indexOfShortcut(app.id) != null
             val actions = buildList {
                 when {
+                    // A recent app shown in an empty dock position can be kept there.
+                    dockIndex != null && state.dock.getOrNull(dockIndex) == null ->
+                        add(AppMenuAction(AppMenuIcons.pin, stringResource(R.string.app_menu_pin), "app-menu-pin") {
+                            model.setDock(dockIndex, app.id); closeAppMenu() })
                     dockIndex != null -> {
                         add(AppMenuAction(AppMenuIcons.replace, stringResource(R.string.app_menu_replace), "app-menu-replace") {
                             closeAppMenu(); dockSlot = dockIndex; sheet = "dock" })
@@ -1767,6 +1782,7 @@ private fun DockAppColumn(
     onChoose: (Int) -> Unit,
     folders: List<FolderEntry> = emptyList(),
     onFolder: (String) -> Unit = {},
+    recents: Map<Int, AppEntry> = emptyMap(),
 ) {
     val foldersById = remember(folders) { folders.associateBy(FolderEntry::id) }
     val draggedId = drag.source?.appId
@@ -1796,6 +1812,7 @@ private fun DockAppColumn(
             val cell = DropTarget.Dock(index)
             val savedApp = appsById[savedDock[index]]
             val savedFolder = foldersById[savedDock[index]]
+            val recentApp = recents[index]
             val previewId = previewDock.getOrNull(index)
             val highlighted = drag.active && target == cell
             val gap = hiddenIndex == index
@@ -1806,18 +1823,23 @@ private fun DockAppColumn(
                     gap -> Box(Modifier.size(iconSize.dp).testTag("drag-gap-dock-$index")
                         .background(Glass.copy(alpha = .16f), RoundedCornerShape(14.dp))
                         .border(2.dp, Color.White.copy(alpha = .55f), RoundedCornerShape(14.dp)))
+                    previewId == null && recentApp != null -> Image(recentApp.icon.asImageBitmap(), null,
+                        Modifier.size((iconSize * .9f).dp).alpha(.85f).clip(RoundedCornerShape(10.dp)).testTag("dock-recent-${recentApp.id}"))
                     previewId == null -> Icon(Icons.Rounded.Add, null, tint = Color.White, modifier = Modifier.size(24.dp))
                 }
             }
             Box(Modifier.fillMaxWidth().height(rowHeight.dp).offset(y = (rowHeight * index).dp)
-                .testTag("dock-slot-$index").dropRegion(drag, cell, savedApp?.id ?: savedFolder?.id)
+                .testTag("dock-slot-$index").dropRegion(drag, cell, savedApp?.id ?: savedFolder?.id ?: recentApp?.id)
                 .semantics(mergeDescendants = true) {
-                    contentDescription = savedApp?.label ?: savedFolder?.title ?: resources.getString(R.string.dock_choose_slot, index + 1)
+                    contentDescription = savedApp?.label ?: savedFolder?.title
+                        ?: recentApp?.let { resources.getString(R.string.dock_recent_app, it.label) }
+                        ?: resources.getString(R.string.dock_choose_slot, index + 1)
                 }
                 .combinedClickable(interactionSource = interactions[index], indication = LocalIndication.current, role = Role.Button, onClick = {
                     when {
                         savedApp != null -> onLaunch(savedApp, launchBounds[index])
                         savedFolder != null -> onFolder(savedFolder.id)
+                        recentApp != null -> onLaunch(recentApp, launchBounds[index])
                         else -> onChoose(index)
                     }
                 }, onLongClick = null)

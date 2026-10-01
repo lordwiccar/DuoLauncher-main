@@ -837,6 +837,10 @@ private fun DockPage(state: LauncherState, wide: Boolean, model: LauncherModel) 
         }
     }
     SettingsGroup {
+        SwitchRow(stringResource(R.string.dock_recents), stringResource(R.string.dock_recents_detail), state.dockRecents,
+            model::setDockRecents, "dock-recents-switch")
+    }
+    SettingsGroup {
         SliderRow(stringResource(R.string.dock_width), stringResource(R.string.value_dp, p.dockWidth.toInt()), p.dockWidth, 56f..84f) {
             model.setPreset(wide, p.copy(dockWidth = it)) }
         GroupDivider()

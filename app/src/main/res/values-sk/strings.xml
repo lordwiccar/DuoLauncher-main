@@ -516,4 +516,8 @@
     <string name="app_icon_choose">Ikona pre %1$s</string>
     <string name="app_icon_reset">Použiť vlastnú ikonu aplikácie</string>
     <string name="app_icon_search">Hľadať ikonu</string>
+    <string name="dock_recents">Nedávne aplikácie na prázdnych miestach</string>
+    <string name="dock_recents_detail">Prázdne miesta v doku ukazujú naposledy otvorené aplikácie. Potiahnutím alebo voľbou Pripnúť v ňom zostanú.</string>
+    <string name="dock_recent_app">Nedávna: %1$s</string>
+    <string name="app_menu_pin">Pripnúť</string>
 </resources>
