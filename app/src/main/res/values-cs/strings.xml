@@ -550,4 +550,14 @@
     <string name="update_notice_text">Klepnutím zobrazíte, co je nového.</string>
     <string name="update_notice_setting">Oznamovat nové verze</string>
     <string name="update_notice_setting_detail">Po každé aktualizaci z Obchodu Play upozorní oznámením s odkazem na changelog</string>
+    <string name="help_app_menu_title">Nabídka aplikace</string>
+    <string name="help_app_menu">Podržte aplikaci a pusťte ji bez posunutí: ukážou se její zkratky a volby Odebrat, Odinstalovat, Ikona pro obrázek z balíčku ikon a Informace. Podržením a tažením ji naopak přesunete.</string>
+    <string name="help_dock_title">Dock</string>
+    <string name="help_dock">Do docku přetáhněte aplikace i celé složky. Prázdná místa ukazují naposledy otevřené aplikace; podržte jednu a zvolte Připnout, aby zůstala. Na vnějším displeji může být dock vždy vidět, vysouvat se od pravého okraje, nebo být skrytý.</string>
+    <string name="help_open_dock">Nastavení docku</string>
+    <string name="help_cover_title">Vnější displej</string>
+    <string name="help_cover">Vnější displej může zrcadlit plochu vnitřního, nebo mít vlastní, s až pěti sloupci, když je dock vysouvací nebo skrytý. Stav může být nahoře, nebo nad dockem.</string>
+    <string name="help_all_apps_title">Všechny aplikace</string>
+    <string name="help_all_apps">Vyberte, jak Všechny aplikace vypadají: seznam, mřížka stránek, Knihovna složek podle zaměření, nebo všechny aplikace přímo na plochách.</string>
+    <string name="help_open_home">Nastavení plochy</string>
 </resources>

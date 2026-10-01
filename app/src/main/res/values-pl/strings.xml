@@ -550,4 +550,14 @@
     <string name="update_notice_text">Dotknij, aby zobaczyć nowości.</string>
     <string name="update_notice_setting">Ogłaszaj nowe wersje</string>
     <string name="update_notice_setting_detail">Powiadomienie po każdej aktualizacji ze Sklepu Play z odnośnikiem do listy zmian</string>
+    <string name="help_app_menu_title">Menu aplikacji</string>
+    <string name="help_app_menu">Przytrzymaj aplikację i puść ją bez przesuwania: pojawią się jej skróty oraz Usuń, Odinstaluj, Ikona z pakietu ikon i Informacje. Przytrzymaj i przeciągnij, aby ją przenieść.</string>
+    <string name="help_dock_title">Dok</string>
+    <string name="help_dock">Przeciągaj do doku aplikacje i całe foldery. Puste miejsca pokazują ostatnio otwarte aplikacje; przytrzymaj jedną i wybierz Przypnij, aby została. Na ekranie zewnętrznym dok może być zawsze widoczny, wysuwać się od prawej krawędzi lub być ukryty.</string>
+    <string name="help_open_dock">Ustawienia doku</string>
+    <string name="help_cover_title">Ekran zewnętrzny</string>
+    <string name="help_cover">Ekran zewnętrzny może odbijać ekran główny wewnętrznego albo mieć własny, z maksymalnie pięcioma kolumnami, gdy dok jest wysuwany lub ukryty. Stan może być u góry albo nad dokiem.</string>
+    <string name="help_all_apps_title">Wszystkie aplikacje</string>
+    <string name="help_all_apps">Wybierz wygląd Wszystkich aplikacji: lista, siatka stron, Biblioteka folderów według przeznaczenia albo wszystkie aplikacje na ekranach głównych.</string>
+    <string name="help_open_home">Ustawienia ekranu głównego</string>
 </resources>

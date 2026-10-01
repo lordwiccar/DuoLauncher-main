@@ -550,4 +550,14 @@
     <string name="update_notice_text">Ťuknutím zobrazíte, čo je nové.</string>
     <string name="update_notice_setting">Oznamovať nové verzie</string>
     <string name="update_notice_setting_detail">Po každej aktualizácii z Obchodu Play upozorní oznámením s odkazom na changelog</string>
+    <string name="help_app_menu_title">Ponuka aplikácie</string>
+    <string name="help_app_menu">Podržte aplikáciu a pustite ju bez posunutia: ukážu sa jej skratky a voľby Odobrať, Odinštalovať, Ikona pre obrázok z balíka ikon a Informácie. Podržaním a ťahaním ju naopak presuniete.</string>
+    <string name="help_dock_title">Dok</string>
+    <string name="help_dock">Do doku potiahnite aplikácie aj celé priečinky. Prázdne miesta ukazujú naposledy otvorené aplikácie; podržte jednu a zvoľte Pripnúť, aby zostala. Na vonkajšom displeji môže byť dok vždy viditeľný, vysúvať sa od pravého okraja alebo byť skrytý.</string>
+    <string name="help_open_dock">Nastavenia doku</string>
+    <string name="help_cover_title">Vonkajší displej</string>
+    <string name="help_cover">Vonkajší displej môže zrkadliť plochu vnútorného alebo mať vlastnú, s až piatimi stĺpcami, keď je dok vysúvací alebo skrytý. Stav môže byť hore alebo nad dokom.</string>
+    <string name="help_all_apps_title">Všetky aplikácie</string>
+    <string name="help_all_apps">Vyberte, ako Všetky aplikácie vyzerajú: zoznam, mriežka strán, Knižnica priečinkov podľa zamerania alebo všetky aplikácie priamo na plochách.</string>
+    <string name="help_open_home">Nastavenia plochy</string>
 </resources>

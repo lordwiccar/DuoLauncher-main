@@ -535,4 +535,14 @@
     <string name="update_notice_text">Tap to see what\'s new.</string>
     <string name="update_notice_setting">Announce new versions</string>
     <string name="update_notice_setting_detail">A notification after each update from Google Play, with a link to the changelog</string>
+    <string name="help_app_menu_title">App menu</string>
+    <string name="help_app_menu">Hold an app and let go without moving it: its shortcuts appear with Remove, Uninstall, Icon for a picture from an icon pack, and App info. Hold and drag to move it instead.</string>
+    <string name="help_dock_title">Dock</string>
+    <string name="help_dock">Drag apps or a whole folder into the dock. Empty places show apps you opened recently; hold one and choose Keep to make it stay. On the cover screen the dock can always show, slide in from the right edge, or hide.</string>
+    <string name="help_open_dock">Dock settings</string>
+    <string name="help_cover_title">Cover screen</string>
+    <string name="help_cover">The cover screen can mirror the inner screen\'s Home or have its own, with up to five columns when its dock slides in or hides. Its status can sit at the top or above the dock.</string>
+    <string name="help_all_apps_title">All apps</string>
+    <string name="help_all_apps">Choose how All apps looks: a list, a grid of pages, a Library of folders by purpose, or every app placed right on Home.</string>
+    <string name="help_open_home">Home settings</string>
 </resources>

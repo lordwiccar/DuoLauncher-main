@@ -534,4 +534,14 @@
     <string name="update_notice_text">Tippe, um die Neuerungen zu sehen.</string>
     <string name="update_notice_setting">Neue Versionen ankündigen</string>
     <string name="update_notice_setting_detail">Eine Mitteilung nach jedem Update aus Google Play, mit Link zum Changelog</string>
+    <string name="help_app_menu_title">App-Menü</string>
+    <string name="help_app_menu">Halte eine App und lass sie los, ohne sie zu bewegen: Ihre Verknüpfungen erscheinen mit Entfernen, Deinstallieren, Symbol aus einem Symbolpaket und App-Info. Halten und ziehen verschiebt sie.</string>
+    <string name="help_dock_title">Dock</string>
+    <string name="help_dock">Zieh Apps oder ganze Ordner ins Dock. Freie Plätze zeigen zuletzt geöffnete Apps; halte eine und wähle Behalten, damit sie bleibt. Auf dem äußeren Display kann das Dock immer sichtbar sein, vom rechten Rand einblenden oder ausgeblendet sein.</string>
+    <string name="help_open_dock">Dock-Einstellungen</string>
+    <string name="help_cover_title">Äußeres Display</string>
+    <string name="help_cover">Das äußere Display kann den Startbildschirm des inneren spiegeln oder einen eigenen haben, mit bis zu fünf Spalten, wenn das Dock einblendet oder ausgeblendet ist. Der Status kann oben oder über dem Dock stehen.</string>
+    <string name="help_all_apps_title">Alle Apps</string>
+    <string name="help_all_apps">Wähle, wie Alle Apps aussieht: eine Liste, ein Raster aus Seiten, eine Bibliothek mit Ordnern nach Zweck oder alle Apps direkt auf dem Startbildschirm.</string>
+    <string name="help_open_home">Startbildschirm-Einstellungen</string>
 </resources>

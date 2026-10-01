@@ -175,7 +175,7 @@ internal fun SettingsScreen(state: LauncherState, initiallyWide: Boolean, model:
                             SettingsPage.NEWS -> NewsSettingsPage(state, model)
                             SettingsPage.SYSTEM -> SystemPage(isDefaultHome, onMakeDefault, onExportLayout, onImportLayout)
                             SettingsPage.SUPPORT -> SupportPage(onPage)
-                            SettingsPage.HELP -> LauncherHelp(isDefaultHome, onMakeDefault, { onAddWidget(homePage) }, onShadeSetup)
+                            SettingsPage.HELP -> LauncherHelp(isDefaultHome, onMakeDefault, { onAddWidget(homePage) }, onShadeSetup, onPage)
                             SettingsPage.ABOUT -> AboutPage()
                             SettingsPage.CHANGELOG -> ChangelogPage()
                         }
@@ -1078,7 +1078,8 @@ private fun SupportPage(onPage: (SettingsPage) -> Unit) {
 }
 
 @Composable
-private fun LauncherHelp(isDefaultHome: Boolean, onHomeSettings: () -> Unit, onAddWidget: () -> Unit, onShadeSetup: () -> Unit) {
+private fun LauncherHelp(isDefaultHome: Boolean, onHomeSettings: () -> Unit, onAddWidget: () -> Unit, onShadeSetup: () -> Unit,
+    onPage: (SettingsPage) -> Unit = {}) {
     SettingsGroup {
         GroupBody {
             HelpSection(Icons.Rounded.Home, stringResource(R.string.help_home_title),
@@ -1087,6 +1088,16 @@ private fun LauncherHelp(isDefaultHome: Boolean, onHomeSettings: () -> Unit, onA
                 Text(stringResource(if (isDefaultHome) R.string.change_home_app else R.string.set_duo_as_home))
             }
             HelpSection(Icons.Rounded.TouchApp, stringResource(R.string.help_customize_title), stringResource(R.string.help_customize))
+            HelpSection(Icons.Rounded.Apps, stringResource(R.string.help_app_menu_title), stringResource(R.string.help_app_menu))
+            HelpSection(Icons.Rounded.ViewSidebar, stringResource(R.string.help_dock_title), stringResource(R.string.help_dock))
+            TextButton(onClick = { onPage(SettingsPage.DOCK) }, Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("help-dock")) {
+                Text(stringResource(R.string.help_open_dock))
+            }
+            HelpSection(Icons.Rounded.Smartphone, stringResource(R.string.help_cover_title), stringResource(R.string.help_cover))
+            HelpSection(Icons.Rounded.GridView, stringResource(R.string.help_all_apps_title), stringResource(R.string.help_all_apps))
+            TextButton(onClick = { onPage(SettingsPage.HOME) }, Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("help-home-page")) {
+                Text(stringResource(R.string.help_open_home))
+            }
             HelpSection(Icons.Rounded.Widgets, stringResource(R.string.widgets), stringResource(R.string.help_widgets))
             OutlinedButton(onClick = onAddWidget, Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("help-add-widget")) {
                 Text(stringResource(R.string.add_widget_to_page))
