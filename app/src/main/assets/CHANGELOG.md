@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Announce each update from Google Play with a notification that opens the changelog. iDuo asks for notification permission once, right after an update; Settings → Help & information turns the notices off.
 - Redraw the status ring: a thicker battery ring, a cleaner Wi-Fi symbol and signal dots across its open bottom. Above the dock the battery level sits in the ring's top opening. The cover screen can show status at the top or above the dock, under Settings → Home; the inner screen always shows it above the dock.
 - Add a fourth All apps view, Library, like the App Library on iPhone: two columns of large folders that sort apps by purpose (recent, social, productivity, media, photo, finance, shopping, health, travel, utilities, games, news, education, Google, the phone maker's apps, system and other). A large icon opens its app; the small icons or the name open the whole folder. Searching shows the list. On the inner screen the library takes one half, beside the last Home page.
 - Show recently opened apps in empty dock positions, a little smaller so they read as suggestions. Drag one in or choose Keep in its menu to make it stay; Settings → Dock turns them off.

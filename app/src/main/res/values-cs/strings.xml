@@ -544,4 +544,10 @@
     <string name="cover_status_dock">Nad dockem</string>
     <string name="cover_status_top_detail">Baterie, Wi-Fi a signál v levém rohu, datum a čas v pravém.</string>
     <string name="cover_status_dock_detail">Čas, datum a kruh stavu nad dockem, procenta baterie v kruhu. Dock si ponechá svůj sloupec.</string>
+    <string name="update_notice_channel">Aktualizace aplikace</string>
+    <string name="update_notice_channel_detail">Oznámení, když Obchod Play nainstaluje novou verzi iDuo</string>
+    <string name="update_notice_title">iDuo aktualizováno na verzi %1$s</string>
+    <string name="update_notice_text">Klepnutím zobrazíte, co je nového.</string>
+    <string name="update_notice_setting">Oznamovat nové verze</string>
+    <string name="update_notice_setting_detail">Po každé aktualizaci z Obchodu Play upozorní oznámením s odkazem na changelog</string>
 </resources>

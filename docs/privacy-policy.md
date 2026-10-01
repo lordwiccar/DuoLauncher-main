@@ -54,6 +54,8 @@ The optional "Home gestures" accessibility service lets a downward swipe on Home
 | Bind app widgets | Host Android widgets on Home (Android asks you to allow each one). |
 | Internet | Download news for the news page: Google News, or the RSS sources you add. |
 | Network and Wi-Fi state | Show connection and signal strength in the Home status display. |
+| Notifications | Optional. After an update from Google Play, a notification that links to the changelog. Asked once, after an update, and turned off under Settings → Help & information. |
+| Request to delete packages | Open Android's own uninstall confirmation when you choose Uninstall in an app's menu. iDuo never removes an app itself. |
 | Approximate location | Optional, on request, to calculate sunrise and sunset times on the device. |
 | Set wallpaper | Set a photo or the bundled dunes as your Android wallpaper when you ask. |
 | Accessibility service | Optional, see above. |
@@ -130,6 +132,8 @@ Volitelná služba „gesta plochy“ umožňuje přejetím dolů na ploše otev
 | Vázání widgetů | Zobrazení widgetů Androidu na ploše (Android se na každý widget zeptá). |
 | Internet | Stahování zpráv pro stránku se zprávami: Google News nebo přidané zdroje RSS. |
 | Stav sítě a Wi-Fi | Zobrazení připojení a síly signálu ve stavovém pruhu. |
+| Oznámení | Volitelné. Po aktualizaci z Obchodu Play oznámení s odkazem na changelog. Žádost se zobrazí jednou, po aktualizaci, a vypnout ji lze v Nastavení → Nápověda a informace. |
+| Žádost o odinstalaci balíčků | Otevře vlastní potvrzení odinstalace Androidu, když v nabídce aplikace zvolíte Odinstalovat. iDuo samo žádnou aplikaci neodstraní. |
 | Přibližná poloha | Volitelně, na vyžádání, pro výpočet východu a západu slunce v zařízení. |
 | Nastavení tapety | Nastavení fotky nebo dun jako tapety Androidu, když o to požádáte. |
 | Služba usnadnění | Volitelná, viz výše. |

@@ -45,6 +45,10 @@ class MainActivity : ComponentActivity() {
         private set
     private val homeRequests = mutableIntStateOf(0)
     private val searchRequests = mutableIntStateOf(0)
+    private val changelogRequests = mutableIntStateOf(0)
+    // Asked once, right after an update, so the next update can be announced.
+    private val notificationPermission = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { }
     /** Whether the optional Home gestures accessibility service is on, checked on each resume. */
     internal var homeGesturesEnabled by androidx.compose.runtime.mutableStateOf(false)
         private set
@@ -89,7 +93,10 @@ class MainActivity : ComponentActivity() {
         status = DeviceStatusMonitor(this).also { lifecycle.addObserver(it) }
         updateDefaultHome()
         if (savedInstanceState == null && intent.getStringExtra("duo_destination") == "search") searchRequests.intValue++
+        if (savedInstanceState == null && intent.getStringExtra("duo_destination") == UpdateNotice.DESTINATION) changelogRequests.intValue++
         intent.removeExtra("duo_destination")
+        if (savedInstanceState == null && UpdateNotice.shouldAskAfterUpdate(this))
+            notificationPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         applyCoverRotation(model.state.value.coverRotation, resources.configuration.smallestScreenWidthDp)
         setContent {
             val state = model.state.collectAsStateWithLifecycle().value
@@ -103,6 +110,7 @@ class MainActivity : ComponentActivity() {
                     onLaunch = { launchApp(it) }, onMakeDefault = ::makeDefault, onAppInfo = ::appInfo,
                     isDefaultHome = defaultHome.value, deviceStatus = deviceStatus, onStatusMode = ::setStatusMode, onWallpaperSettings = ::openWallpaperSettings,
                     searchRequests = searchRequests.intValue,
+                    changelogRequests = changelogRequests.intValue,
                     onLaunchFrom = ::launchApp, onGoogleSearch = ::openGoogleSearch, onWebSearch = ::openWebSearch,
                     appearance = appearance.state,
                     onAppearanceMode = { cancelAppearanceLocation(); appearance.setMode(it, systemDark()) },
@@ -211,6 +219,7 @@ class MainActivity : ComponentActivity() {
         setIntent(intent)
         FoldRenderExperiment.onNewIntent(this, intent)
         if (intent.getStringExtra("duo_destination") == "search") searchRequests.intValue++
+        else if (intent.getStringExtra("duo_destination") == UpdateNotice.DESTINATION) changelogRequests.intValue++
         else if (intent.hasCategory(Intent.CATEGORY_HOME) || intent.getStringExtra("duo_destination") == "home") homeRequests.intValue++
         intent.removeExtra("duo_destination")
     }

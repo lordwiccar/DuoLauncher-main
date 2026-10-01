@@ -544,4 +544,10 @@
     <string name="cover_status_dock">Nad dokiem</string>
     <string name="cover_status_top_detail">Bateria, Wi-Fi i sygnał w lewym rogu, data i godzina w prawym.</string>
     <string name="cover_status_dock_detail">Godzina, data i pierścień stanu nad dokiem, poziom baterii w pierścieniu. Dok zachowuje swoją kolumnę.</string>
+    <string name="update_notice_channel">Aktualizacje aplikacji</string>
+    <string name="update_notice_channel_detail">Powiadomienie, gdy Sklep Play zainstaluje nową wersję iDuo</string>
+    <string name="update_notice_title">iDuo zaktualizowano do wersji %1$s</string>
+    <string name="update_notice_text">Dotknij, aby zobaczyć nowości.</string>
+    <string name="update_notice_setting">Ogłaszaj nowe wersje</string>
+    <string name="update_notice_setting_detail">Powiadomienie po każdej aktualizacji ze Sklepu Play z odnośnikiem do listy zmian</string>
 </resources>

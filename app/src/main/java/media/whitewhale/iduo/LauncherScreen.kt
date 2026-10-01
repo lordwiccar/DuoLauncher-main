@@ -130,6 +130,7 @@ fun LauncherScreen(
     onLaunch: (AppEntry) -> Unit, onMakeDefault: () -> Unit, onAppInfo: (AppEntry) -> Unit,
     isDefaultHome: Boolean, deviceStatus: DeviceStatus, onStatusMode: (Boolean) -> Unit, onWallpaperSettings: () -> Unit,
     searchRequests: Int = 0,
+    changelogRequests: Int = 0,
     onLaunchFrom: (AppEntry, android.graphics.Rect?) -> Unit = { app, _ -> onLaunch(app) },
     onGoogleSearch: (android.graphics.Rect?) -> Boolean = { false },
     onWebSearch: (String) -> Unit = {},
@@ -258,6 +259,11 @@ fun LauncherScreen(
     } }
     LaunchedEffect(searchRequests) { if (searchRequests > 0) { drag.clear(); widgetSession = null; resizeSlot = null; sheet = ""; widgetPackage = null; widgetExactTarget = false; selectedId = null
         if (!state.googleSearch || !onGoogleSearch(null)) spotlight = true
+    } }
+    // The update notice opens the changelog in Settings.
+    LaunchedEffect(changelogRequests) { if (changelogRequests > 0) {
+        drag.clear(); selectedId = null; openFolderId = null; spotlight = false
+        customizationPage = SettingsPage.CHANGELOG; sheet = "settings"
     } }
     val widgetPickerBack = {
         if (widgetSession != null) {

@@ -1063,6 +1063,18 @@ private fun SupportPage(onPage: (SettingsPage) -> Unit) {
         ValueRow(stringResource(R.string.customize_feedback), stringResource(R.string.customize_feedback_detail),
             tag = "customization-feedback") { context.openLink(FEEDBACK_URL) }
     }
+    // Turning notices on asks Android for the notification permission when it is missing.
+    var notices by remember { mutableStateOf(UpdateNotice.enabled(context) && UpdateNotice.permitted(context)) }
+    val ask = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { granted ->
+        UpdateNotice.setEnabled(context, granted); notices = granted
+    }
+    SettingsGroup {
+        SwitchRow(stringResource(R.string.update_notice_setting), stringResource(R.string.update_notice_setting_detail), notices, { on ->
+            if (on && !UpdateNotice.permitted(context)) ask.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            else { UpdateNotice.setEnabled(context, on); notices = on }
+        }, "update-notice-switch")
+    }
 }
 
 @Composable
