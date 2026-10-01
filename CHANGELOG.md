@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.1.1
+
+Third release on Google Play (version code 4).
 
 ### New features
 - A separate Home for the cover screen: mirror the inner screen or give the cover its own pages, with up to five columns when its dock slides in or hides.
