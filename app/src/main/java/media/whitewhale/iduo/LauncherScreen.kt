@@ -381,16 +381,9 @@ fun LauncherScreen(
     val backdropBlurred = openFolderId != null || spotlight
     val folderBlur by animateDpAsState(if (backdropBlurred) FOLDER_BACKDROP_BLUR else 0.dp, label = "folder blur")
     val behindFolder = if (folderBlur > 0.dp) Modifier.blur(folderBlur) else Modifier
-    // The wallpaper blurs fully behind an open folder or search, and as All apps or the news
-    // page slides in, so their labels stay readable on busy wallpapers.
-    val wallpaperBlurProgress by remember(nativePager, firstHome, visibleHomePages, hasLibrary) {
-        derivedStateOf {
-            val position = nativePager.currentPage + nativePager.currentPageOffsetFraction - firstHome
-            val panel = maxOf((-position).coerceIn(0f, 1f),
-                if (hasLibrary) (position - (visibleHomePages - 1)).coerceIn(0f, 1f) else 0f)
-            maxOf(panel, folderBlur / FOLDER_BACKDROP_BLUR)
-        }
-    }
+    // The wallpaper blurs behind an open folder or search. Glass panels frost only the wallpaper
+    // behind themselves; see frostedWallpaper.
+    val wallpaperBlurProgress by remember { derivedStateOf { folderBlur / FOLDER_BACKDROP_BLUR } }
     // Android's wallpaper lies behind this window, so the window blurs it where Android allows
     // that. Some devices, Samsung's among them, turn cross-window blur off; there Home draws a
     // blurred stand-in of the wallpaper instead.
@@ -420,9 +413,12 @@ fun LauncherScreen(
         wallpapers.setWallpaperOffsetSteps(1f / span, 1f)
         snapshotFlow { nativePager.currentPage + nativePager.currentPageOffsetFraction - firstHome }.collect { position ->
             val token = launcherActivity.window.decorView.windowToken ?: return@collect
-            wallpapers.setWallpaperOffsets(token, if (homePages > 1) (position / span).coerceIn(0f, 1f) else .5f, .5f)
+            val xOffset = if (homePages > 1) (position / span).coerceIn(0f, 1f) else .5f
+            WallpaperFrost.xOffset = xOffset
+            wallpapers.setWallpaperOffsets(token, xOffset, .5f)
         }
     }
+    FollowWallpaperFrost()
     Box(Modifier.fillMaxSize().testTag("launcher-root").homeDragInput(drag,
         enabled = sheet.isEmpty() && !showFirstRun && selectedId == null && resizeSlot == null && !spotlight && pager.currentPage >= 0,
         page = pager.currentPage, eligiblePages = eligibleDragPages, onStart = {
@@ -670,13 +666,13 @@ fun LauncherScreen(
                     // Composite the stationary dock independently of the shared pager layer.
                     compositingStrategy = androidx.compose.ui.graphics.CompositingStrategy.Offscreen
                     translationX = (1f - dockReveal.value) * dockTravel
-                }.onGloballyPositioned { dockBounds[0] = it.boundsInRoot() }
+                }.onGloballyPositioned { dockBounds[0] = it.boundsInRoot() }.frostedWallpaper(RoundedCornerShape(30.dp))
                 .then(if (dockMode == DockMode.SLIDE) Modifier.pointerInput(Unit) {
                     detectHorizontalDragGestures(onDragStart = dockDragBegin, onDragEnd = dockDragEnd,
                         onDragCancel = dockDragEnd) { change, dx -> if (dx > 0f || dockReveal.value < 1f) { change.consume(); dockDrag(dx) } }
                 } else Modifier).testTag("dock"),
-                // A dock that slides over icons is nearly opaque, so they do not show through it.
-                shape = RoundedCornerShape(30.dp), color = Glass.copy(alpha = if (dockColumn) .32f else .9f),
+                // Frosted glass covers what lies behind, so icons under a sliding dock do not show through.
+                shape = RoundedCornerShape(30.dp), color = Glass.copy(alpha = .32f),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .3f))) {
                 Column(Modifier.padding(vertical = 8.dp).verticalScroll(dockScroll)) {
                     DockAppColumn(state.dock, previewLayout.dock, appsById, geometry.dockRowHeight,
@@ -1831,7 +1827,7 @@ private fun AppTile(app: AppEntry, size: Float, labels: Boolean, modifier: Modif
 
 @Composable
 private fun GlassCard(modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
-    Surface(modifier.fillMaxSize().clip(RoundedCornerShape(24.dp)).clickable(onClick = onClick),
+    Surface(modifier.fillMaxSize().clip(RoundedCornerShape(24.dp)).frostedWallpaper(RoundedCornerShape(24.dp)).clickable(onClick = onClick),
         color = Glass.copy(alpha = .24f), shape = RoundedCornerShape(24.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .18f))) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.SpaceBetween, content = content)
     }

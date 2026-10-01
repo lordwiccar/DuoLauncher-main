@@ -70,7 +70,7 @@ internal fun AppLibrary(
             it.label.firstOrNull()?.takeIf(Char::isLetter)?.uppercaseChar()?.toString() ?: "#"
         }
     }
-    Surface(modifier, shape = RoundedCornerShape(24.dp),
+    Surface(if (glass) modifier.frostedWallpaper(RoundedCornerShape(24.dp)) else modifier, shape = RoundedCornerShape(24.dp),
         color = if (glass) Glass.copy(alpha = .48f) else MaterialTheme.colorScheme.surface,
         contentColor = ink,
         border = if (glass) BorderStroke(1.dp, Color.White.copy(alpha = .38f)) else null) {

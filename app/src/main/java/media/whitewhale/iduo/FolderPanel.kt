@@ -54,7 +54,7 @@ internal const val MAX_FOLDER_ROWS = 6
 internal const val DEFAULT_FOLDER_TRANSPARENCY = .03f
 internal const val MAX_FOLDER_TRANSPARENCY = .9f
 internal val FOLDER_BACKDROP_BLUR = 12.dp
-/** How strongly the wallpaper blurs behind a folder, search, All apps or the news page. */
+/** How strongly the wallpaper blurs behind an open folder or search. */
 internal val WALLPAPER_BACKDROP_BLUR = 28.dp
 /** An opening folder starts at about its Home icon's size and grows to full size. */
 private const val FOLDER_OPEN_START_SCALE = .25f
@@ -157,7 +157,7 @@ internal fun FolderPanel(
                 indication = null,
                 onClick = {},
             )
-            .testTag("folder-panel-content"),
+            .testTag("folder-panel-content").frostedWallpaper(RoundedCornerShape(30.dp)),
             color = Glass.copy(alpha = 1f - transparency.coerceIn(0f, MAX_FOLDER_TRANSPARENCY)), shape = RoundedCornerShape(30.dp),
             border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .6f))) {
             Column(Modifier.padding(FolderPadding), horizontalAlignment = Alignment.CenterHorizontally) {
