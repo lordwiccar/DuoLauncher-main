@@ -467,6 +467,10 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
     }
     fun removeAppFromFolder(folderId: String, appId: String, target: DropTarget) =
         commitLayout(media.whitewhale.iduo.removeAppFromFolder(mutable.value.layout, folderId, appId, target))
+    fun setFolderApps(folderId: String, appIds: List<String>): Boolean {
+        val known = mutable.value.apps.mapTo(HashSet()) { it.id }
+        return commitLayout(media.whitewhale.iduo.setFolderApps(mutable.value.layout, folderId, appIds.filter(known::contains)))
+    }
     fun disbandFolder(folderId: String) = commitLayout(media.whitewhale.iduo.disbandFolder(mutable.value.layout, folderId))
     fun moveFolderApp(folderId: String, appId: String, index: Int) =
         commitLayout(media.whitewhale.iduo.moveFolderApp(mutable.value.layout, folderId, appId, index))
