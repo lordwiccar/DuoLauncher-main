@@ -68,10 +68,13 @@ private fun statusDescription(status: DeviceStatus, now: LocalDateTime, formats:
         "${now.format(formats.spokenDate)}, ${now.format(formats.time)}",
         status.battery?.let { stringResource(if (status.charging) R.string.status_battery_charging else R.string.status_battery, it) }
             ?: stringResource(R.string.status_battery_unavailable),
+        if (status.powerSave) stringResource(R.string.status_battery_saver) else null,
         if (status.wifiConnected) status.wifiLevel?.let { stringResource(R.string.status_wifi_level, it) } ?: stringResource(R.string.status_wifi)
         else stringResource(R.string.status_wifi_off),
         if (status.airplane) stringResource(R.string.status_airplane) else status.cellularLevel?.let { stringResource(R.string.status_cellular, it) }
             ?: stringResource(R.string.status_cellular_unavailable),
+        status.cellularNetwork?.takeIf { status.cellularData && !status.wifiConnected && !status.airplane }
+            ?.let { stringResource(R.string.status_mobile_data, it) },
     ).joinToString(". ")
 
 private val statusTextStyle = TextStyle(shadow = Shadow(Color.Black.copy(alpha = .3f), Offset(0f, 1f), 3f))
@@ -89,7 +92,7 @@ fun CoverStatusBar(status: DeviceStatus, modifier: Modifier = Modifier, ringSize
         verticalAlignment = Alignment.CenterVertically) {
         StatusRing(status, Modifier.size(ringSize))
         Spacer(Modifier.width(6.dp))
-        Text(if (status.airplane) stringResource(R.string.status_airplane_short) else status.battery?.let { "$it%${if (status.charging) " +" else ""}" } ?: "—",
+        Text(if (airplaneOutside(status, ringCentre(status, percent = false))) stringResource(R.string.status_airplane_short) else status.battery?.let { "$it%${if (status.charging) " +" else ""}" } ?: "—",
             color = Color.White.copy(alpha = .94f), fontSize = 13.sp, fontWeight = FontWeight.Medium,
             maxLines = 1, softWrap = false, style = statusTextStyle)
         Spacer(Modifier.weight(1f))
@@ -145,16 +148,25 @@ private const val RING_TOP_GAP = 84f
 private const val RING_BOTTOM_GAP = 112f
 
 /**
- * Battery as a thick ring open at the top and bottom, filling clockwise from its lower left end;
- * Wi-Fi inside it, and cellular signal as dots across the bottom opening. With [percent], the
- * battery level sits in the top opening.
+ * Battery as a thick ring open at the top and bottom, filling clockwise from its lower left end,
+ * green while charging and yellow in battery saver; cellular signal as dots across the bottom
+ * opening. Inside it Wi-Fi, or without Wi-Fi mobile data's generation or airplane mode. With
+ * [percent], the battery level sits in the top opening, or in the middle when nothing else is there.
  */
 @Composable
 private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolean = false) {
     val wifiVisual = wifiSignalVisual(status.wifiConnected, status.wifiLevel)
     val cellularVisual = cellularSignalVisual(status.cellularLevel, status.airplane)
     val measurer = rememberTextMeasurer()
-    val level = if (status.airplane) "✈" else status.battery?.toString() ?: "—"
+    val centre = ringCentre(status, percent)
+    val battery = status.battery?.toString() ?: "—"
+    val level = if (airplaneOutside(status, centre)) AIRPLANE_GLYPH else battery
+    val centreText = when (centre) {
+        RingCentre.CELLULAR -> status.cellularNetwork
+        RingCentre.AIRPLANE -> AIRPLANE_GLYPH
+        RingCentre.BATTERY -> battery
+        else -> null
+    }
     Canvas(modifier) {
         val w = size.width
         val center = Offset(w / 2, w / 2)
@@ -165,7 +177,7 @@ private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolea
         // Canvas angles run clockwise from three o'clock; the ring runs from the bottom opening's
         // left edge, up and over the top opening, down to the bottom opening's right edge.
         // Without the battery level in it, the ring closes at the top.
-        val topGap = if (percent) RING_TOP_GAP else 0f
+        val topGap = if (percent && centre != RingCentre.BATTERY) RING_TOP_GAP else 0f
         val start = 90f + RING_BOTTOM_GAP / 2
         val leftSweep = 270f - topGap / 2 - start
         val rightStart = 270f + topGap / 2
@@ -180,18 +192,18 @@ private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolea
         drawArc(track, rightStart, rightSweep, false, topLeft, arcSize, style = stroke)
         status.battery?.let { battery ->
             val filled = total * battery.coerceIn(0, 100) / 100f
-            val color = if (status.charging) Color(0xFFB9F6CA) else Color.White
+            val color = if (status.charging) Color(0xFFB9F6CA) else if (status.powerSave) Color(0xFFFFE082) else Color.White
             drawArc(color, start, minOf(filled, leftSweep), false, topLeft, arcSize, style = stroke)
             if (filled > leftSweep) drawArc(color, rightStart, filled - leftSweep, false, topLeft, arcSize, style = stroke)
         }
-        if (percent) {
+        if (percent && centre != RingCentre.BATTERY) {
             val text = measurer.measure(level, TextStyle(color = Color.White, fontSize = (w * .2f).toSp(),
                 fontWeight = FontWeight.Bold, shadow = Shadow(Color.Black.copy(alpha = .3f), Offset(0f, 1f), 3f)))
             drawText(text, topLeft = Offset(center.x - text.size.width / 2f, center.y - radius - text.size.height / 2f))
         }
         // Wi-Fi: three rounded arcs over a dot, centred a little low in the ring.
         val wifiBase = Offset(center.x, w * .6f)
-        if (wifiVisual is WifiSignalVisual.Connected) {
+        if (centre == RingCentre.WIFI && wifiVisual is WifiSignalVisual.Connected) {
             val arcStroke = w * .068f
             for (i in 1..3) {
                 val r = w * (.04f + i * .08f)
@@ -199,10 +211,12 @@ private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolea
                     Offset(wifiBase.x - r, wifiBase.y - r), Size(r * 2, r * 2), style = Stroke(arcStroke, cap = StrokeCap.Round))
             }
             drawCircle(Color.White.copy(alpha = signalAlpha(wifiVisual.elements[0])), w * .052f, wifiBase)
-        } else {
-            val d = w * .1f
-            drawLine(Color.White.copy(alpha = .75f), Offset(center.x - d, center.y - d * .6f), Offset(center.x + d, center.y + d * 1.4f),
-                w * .065f, StrokeCap.Round)
+        } else if (centreText != null) {
+            // Text in the middle, a little low like the Wi-Fi symbol; longer labels get smaller.
+            val text = measurer.measure(centreText, TextStyle(color = Color.White,
+                fontSize = (w * if (centreText.length > 2) .22f else .27f).toSp(), fontWeight = FontWeight.Bold,
+                shadow = Shadow(Color.Black.copy(alpha = .3f), Offset(0f, 1f), 3f)))
+            drawText(text, topLeft = Offset(center.x - text.size.width / 2f, center.y + w * .03f - text.size.height / 2f))
         }
         // Cellular signal: five dots across the bottom opening, lit left to right.
         val activeDots = (cellularVisual as? CellularSignalVisual.Available)?.activeDots ?: 0
@@ -215,6 +229,8 @@ private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolea
         }
     }
 }
+
+private const val AIRPLANE_GLYPH = "✈"
 
 private fun signalAlpha(emphasis: SignalElementEmphasis): Float = when (emphasis) {
     SignalElementEmphasis.DIM -> .3f
