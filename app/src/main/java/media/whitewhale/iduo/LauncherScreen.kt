@@ -1,4 +1,4 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.ExperimentalFoundationApi::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 
 package media.whitewhale.iduo
 
@@ -2040,7 +2040,8 @@ private fun WidgetSlot(id: Int, slot: Int, controller: WidgetController, modifie
                         style = MaterialTheme.typography.bodySmall)
                     restoreMessage?.let { Text(it, color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center) }
-                    Row {
+                    // Side by side where they fit, one above the other on a narrow widget.
+                    FlowRow(horizontalArrangement = Arrangement.Center) {
                         TextButton(onClick = {
                             if (!controller.rebindRestoredWidget(slot, contentSize = displayedContentSize))
                                 restoreMessage = restoreUnavailable
@@ -2052,8 +2053,19 @@ private fun WidgetSlot(id: Int, slot: Int, controller: WidgetController, modifie
             }
             return@BoxWithConstraints
         }
-        val info = remember(id) { if (id >= 0) controller.manager.getAppWidgetInfo(id) else null }
-        if (info == null) fallback()
+        val version = controller.providersVersion
+        val info = remember(id, version) { if (id >= 0) controller.info(id) else null }
+        if (info == null) {
+            // A provider being updated returns shortly; one Android has let go is connected again.
+            if (id >= 0) LaunchedEffect(id, version) {
+                controller.recover(slot, id)
+                repeat(40) {
+                    delay(3_000)
+                    if (controller.info(id) != null) { controller.refreshProviders(); return@LaunchedEffect }
+                }
+            }
+            fallback()
+        }
         else {
             key(id) {
                 AndroidView(factory = { context -> controller.host.createView(context, id, info) },

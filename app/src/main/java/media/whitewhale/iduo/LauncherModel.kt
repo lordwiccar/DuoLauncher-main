@@ -756,6 +756,20 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         persist()
     }
 
+    /** Turns the widget [id] in [slot] into a placeholder that reconnects [restore]'s provider. */
+    fun markWidgetNeedsBinding(slot: Int, id: Int, restore: WidgetRestore): Boolean {
+        if (statePayloadInvalid) return false
+        val old = mutable.value
+        if (old.layout.placement(slot)?.id != id) return false
+        mutable.update { it.copy(widgetPlacements = old.widgetPlacements.map { p -> if (p.slot == slot) p.copy(id = NEEDS_BINDING_WIDGET) else p },
+            widgetRestores = old.widgetRestores.filterNot { it.slot == slot } + restore.copy(slot = slot),
+            canUndoEdit = false, editRevision = it.editRevision + 1) }
+        undoLayout = null
+        undoImportSettings = null
+        persist()
+        return true
+    }
+
     internal fun restoreLayout(layout: HomeLayout) {
         if (statePayloadInvalid) return
         val installed = (mutable.value.apps.map { it.id } + layout.folders.map { it.id }).toSet()
