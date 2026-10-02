@@ -146,6 +146,8 @@ fun StatusRail(
 private const val RING_TOP_GAP = 84f
 /** Where the ring opens at the bottom, for the signal dots, in degrees. */
 private const val RING_BOTTOM_GAP = 112f
+/** The wider bottom opening above the dock, room for the network's generation between the dots. */
+private const val RING_BOTTOM_GAP_LABELLED = 156f
 
 /**
  * Battery as a thick ring open at the top and bottom, filling clockwise from its lower left end,
@@ -178,10 +180,11 @@ private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolea
         // left edge, up and over the top opening, down to the bottom opening's right edge.
         // Without the battery level in it, the ring closes at the top.
         val topGap = if (percent && centre != RingCentre.BATTERY) RING_TOP_GAP else 0f
-        val start = 90f + RING_BOTTOM_GAP / 2
+        val bottomGap = if (percent) RING_BOTTOM_GAP_LABELLED else RING_BOTTOM_GAP
+        val start = 90f + bottomGap / 2
         val leftSweep = 270f - topGap / 2 - start
         val rightStart = 270f + topGap / 2
-        val rightSweep = 90f - RING_BOTTOM_GAP / 2 + 360f - rightStart
+        val rightSweep = 90f - bottomGap / 2 + 360f - rightStart
         val total = leftSweep + rightSweep
         val track = Color.White.copy(alpha = .28f)
         val shadow = Stroke(width = ringWidth * 1.2f, cap = StrokeCap.Round)
@@ -223,17 +226,17 @@ private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolea
             // Above the dock: four dots for the signal, two each side of the network's generation.
             val network = status.cellularNetwork?.takeUnless { status.airplane }
             val activeDots = if (cellularVisual is CellularSignalVisual.Available) status.cellularLevel?.coerceIn(0, 4) ?: 0 else 0
-            val spread = RING_BOTTOM_GAP / 2 * .66
-            val places = if (network != null) listOf(-1.0, -.52, .52, 1.0) else listOf(-.75, -.25, .25, .75)
+            val spread = bottomGap / 2 * .8
+            val places = if (network != null) listOf(-1.0, -.6, .6, 1.0) else listOf(-.75, -.25, .25, .75)
             places.forEachIndexed { i, place ->
                 val angle = Math.toRadians(90.0 - place * spread)
                 val dotCenter = Offset(center.x + radius * cos(angle).toFloat(), center.y + radius * sin(angle).toFloat())
                 drawCircle(Color.White.copy(alpha = if (i < activeDots) 1f else .3f), dotRadius, dotCenter)
             }
             if (network != null) {
-                val text = measurer.measure(network, TextStyle(color = Color.White, fontSize = (w * .13f).toSp(),
+                val text = measurer.measure(network, TextStyle(color = Color.White, fontSize = (w * .2f).toSp(),
                     fontWeight = FontWeight.Bold, shadow = Shadow(Color.Black.copy(alpha = .3f), Offset(0f, 1f), 3f)))
-                drawText(text, topLeft = Offset(center.x - text.size.width / 2f, center.y + radius - text.size.height / 2f))
+                drawText(text, topLeft = Offset(center.x - text.size.width / 2f, center.y + radius - w * .04f - text.size.height / 2f))
             }
         } else {
             // Cellular signal: five dots across the bottom opening, lit left to right.
