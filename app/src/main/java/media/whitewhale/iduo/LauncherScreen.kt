@@ -1871,6 +1871,17 @@ private fun DockAppColumn(
                 }, onLongClick = null)
                 .semantics { onLongClick(chooseDockApp) { onChoose(index); true } })
         }
+        // A short line parts the apps kept in the dock from the recent ones filling its empty places.
+        fun recentAt(index: Int) = previewDock.getOrNull(index) == null && recents[index] != null
+        fun keptAt(index: Int) = previewDock.getOrNull(index) != null
+        (1 until savedDock.size).filter { index ->
+            (keptAt(index - 1) && recentAt(index)) || (recentAt(index - 1) && keptAt(index))
+        }.forEach { index ->
+            Box(Modifier.fillMaxWidth().offset(y = (rowHeight * index).dp - .75.dp), contentAlignment = Alignment.Center) {
+                Box(Modifier.fillMaxWidth(.42f).height(1.5.dp).background(Color.White.copy(alpha = .5f), RoundedCornerShape(1.dp))
+                    .testTag("dock-recents-divider-$index"))
+            }
+        }
 
         val ids = (savedDock + previewDock).filterNotNull().distinct()
         ids.forEach { id ->
