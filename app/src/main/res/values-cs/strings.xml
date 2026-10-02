@@ -175,6 +175,14 @@
     <string name="close_folder">Zavřít složku</string>
     <string name="folder_options">Možnosti složky</string>
     <string name="disband_folder">Zrušit složku</string>
+    <string name="folder_add_apps">Přidat aplikace</string>
+    <string name="folder_add_apps_to">Přidat aplikace do složky %1$s</string>
+    <plurals name="folder_add_count">
+        <item quantity="one">Přidat %1$d aplikaci</item>
+        <item quantity="few">Přidat %1$d aplikace</item>
+        <item quantity="many">Přidat %1$d aplikace</item>
+        <item quantity="other">Přidat %1$d aplikací</item>
+    </plurals>
     <string name="folder_choose_apps">Vybrat aplikace</string>
     <string name="folder_app_in">Ve složce %1$s</string>
     <string name="folder_no_apps_match">Žádná aplikace neodpovídá</string>

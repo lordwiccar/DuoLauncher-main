@@ -173,6 +173,12 @@
     <string name="close_folder">Close folder</string>
     <string name="folder_options">Folder options</string>
     <string name="disband_folder">Ungroup folder</string>
+    <string name="folder_add_apps">Add apps</string>
+    <string name="folder_add_apps_to">Add apps to %1$s</string>
+    <plurals name="folder_add_count">
+        <item quantity="one">Add %1$d app</item>
+        <item quantity="other">Add %1$d apps</item>
+    </plurals>
     <string name="folder_choose_apps">Choose apps</string>
     <string name="folder_app_in">In %1$s</string>
     <string name="folder_no_apps_match">No apps match</string>
