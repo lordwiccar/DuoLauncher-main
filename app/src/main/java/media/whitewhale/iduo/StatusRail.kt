@@ -218,14 +218,32 @@ private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolea
                 shadow = Shadow(Color.Black.copy(alpha = .3f), Offset(0f, 1f), 3f)))
             drawText(text, topLeft = Offset(center.x - text.size.width / 2f, center.y + w * .03f - text.size.height / 2f))
         }
-        // Cellular signal: five dots across the bottom opening, lit left to right.
-        val activeDots = (cellularVisual as? CellularSignalVisual.Available)?.activeDots ?: 0
         val dotRadius = w * .042f
-        for (i in 0..4) {
-            // The dots stay clear of the ring's rounded ends.
-            val angle = Math.toRadians((90.0 + RING_BOTTOM_GAP / 2 * .62) - i * (RING_BOTTOM_GAP * .62 / 4))
-            val dotCenter = Offset(center.x + radius * cos(angle).toFloat(), center.y + radius * sin(angle).toFloat())
-            drawCircle(Color.White.copy(alpha = if (i < activeDots) 1f else .3f), dotRadius, dotCenter)
+        if (percent) {
+            // Above the dock: four dots for the signal, two each side of the network's generation.
+            val network = status.cellularNetwork?.takeUnless { status.airplane }
+            val activeDots = if (cellularVisual is CellularSignalVisual.Available) status.cellularLevel?.coerceIn(0, 4) ?: 0 else 0
+            val spread = RING_BOTTOM_GAP / 2 * .66
+            val places = if (network != null) listOf(-1.0, -.52, .52, 1.0) else listOf(-.75, -.25, .25, .75)
+            places.forEachIndexed { i, place ->
+                val angle = Math.toRadians(90.0 - place * spread)
+                val dotCenter = Offset(center.x + radius * cos(angle).toFloat(), center.y + radius * sin(angle).toFloat())
+                drawCircle(Color.White.copy(alpha = if (i < activeDots) 1f else .3f), dotRadius, dotCenter)
+            }
+            if (network != null) {
+                val text = measurer.measure(network, TextStyle(color = Color.White, fontSize = (w * .13f).toSp(),
+                    fontWeight = FontWeight.Bold, shadow = Shadow(Color.Black.copy(alpha = .3f), Offset(0f, 1f), 3f)))
+                drawText(text, topLeft = Offset(center.x - text.size.width / 2f, center.y + radius - text.size.height / 2f))
+            }
+        } else {
+            // Cellular signal: five dots across the bottom opening, lit left to right.
+            val activeDots = (cellularVisual as? CellularSignalVisual.Available)?.activeDots ?: 0
+            for (i in 0..4) {
+                // The dots stay clear of the ring's rounded ends.
+                val angle = Math.toRadians((90.0 + RING_BOTTOM_GAP / 2 * .62) - i * (RING_BOTTOM_GAP * .62 / 4))
+                val dotCenter = Offset(center.x + radius * cos(angle).toFloat(), center.y + radius * sin(angle).toFloat())
+                drawCircle(Color.White.copy(alpha = if (i < activeDots) 1f else .3f), dotRadius, dotCenter)
+            }
         }
     }
 }

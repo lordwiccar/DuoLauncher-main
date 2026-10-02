@@ -54,11 +54,12 @@ internal enum class RingCentre { WIFI, CELLULAR, AIRPLANE, BATTERY, NONE }
 
 /**
  * Wi-Fi while connected; otherwise mobile data's generation, then airplane mode, and in a ring
- * that holds the battery level ([percent]), the level itself.
+ * that holds the battery level ([percent]), the level itself. That ring always shows the network's
+ * generation among its signal dots, so its middle leaves it out.
  */
 internal fun ringCentre(status: DeviceStatus, percent: Boolean): RingCentre = when {
     status.wifiConnected -> RingCentre.WIFI
-    status.cellularData && status.cellularNetwork != null && !status.airplane -> RingCentre.CELLULAR
+    !percent && status.cellularData && status.cellularNetwork != null && !status.airplane -> RingCentre.CELLULAR
     status.airplane -> RingCentre.AIRPLANE
     percent -> RingCentre.BATTERY
     else -> RingCentre.NONE

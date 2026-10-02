@@ -53,7 +53,9 @@ class StatusSignalMappingTest {
         assertEquals(RingCentre.WIFI, ringCentre(wifiAndAirplane, percent = true))
         assertTrue(airplaneOutside(wifiAndAirplane, RingCentre.WIFI))
         val mobile = DeviceStatus(battery = 50, cellularData = true, cellularNetwork = "5G")
-        assertEquals(RingCentre.CELLULAR, ringCentre(mobile, percent = true))
+        assertEquals(RingCentre.CELLULAR, ringCentre(mobile, percent = false))
+        // Above the dock the generation sits among the signal dots instead.
+        assertEquals(RingCentre.BATTERY, ringCentre(mobile, percent = true))
         assertEquals(RingCentre.AIRPLANE, ringCentre(DeviceStatus(battery = 50, airplane = true), percent = true))
         assertEquals(RingCentre.BATTERY, ringCentre(DeviceStatus(battery = 50), percent = true))
         assertEquals(RingCentre.NONE, ringCentre(DeviceStatus(battery = 50), percent = false))
