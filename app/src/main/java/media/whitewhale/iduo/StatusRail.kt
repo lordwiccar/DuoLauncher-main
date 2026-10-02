@@ -192,7 +192,7 @@ private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolea
         drawArc(track, rightStart, rightSweep, false, topLeft, arcSize, style = stroke)
         status.battery?.let { battery ->
             val filled = total * battery.coerceIn(0, 100) / 100f
-            val color = if (status.charging) Color(0xFFB9F6CA) else if (status.powerSave) Color(0xFFFFE082) else Color.White
+            val color = if (status.charging) Color(0xFF34C85B) else if (status.powerSave) Color(0xFFFECC09) else Color.White
             drawArc(color, start, minOf(filled, leftSweep), false, topLeft, arcSize, style = stroke)
             if (filled > leftSweep) drawArc(color, rightStart, filled - leftSweep, false, topLeft, arcSize, style = stroke)
         }
