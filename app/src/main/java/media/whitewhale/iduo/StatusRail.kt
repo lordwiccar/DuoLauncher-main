@@ -158,7 +158,7 @@ private const val RING_BOTTOM_GAP = 112f
  * green while charging and yellow in battery saver; cellular signal as four dots across the bottom
  * opening. Inside it Wi-Fi, or without Wi-Fi mobile data's generation or airplane mode. With
  * [percent], the battery level sits in the top opening, or in the middle when nothing else is there,
- * and a second SIM's signal is a second row of dots below the ring.
+ * and a second SIM's signal is a second row of dots below the ring, in either place.
  */
 @Composable
 private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolean = false) {
@@ -237,7 +237,8 @@ private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolea
                 drawCircle(Color.White.copy(alpha = if (i < lit) 1f else .3f), dotRadius, dotCenter)
             }
         }
-        val dualSim = percent && status.simLevels.size >= 2 && !status.airplane
+        // In the cover's top corner the second row hangs just below the ring, outside its measured size.
+        val dualSim = status.simLevels.size >= 2 && !status.airplane
         val firstLevel = if (dualSim) status.simLevels[0]?.coerceIn(0, 4) ?: 0
             else (cellularVisual as? CellularSignalVisual.Available)?.activeDots ?: 0
         signalDots(firstLevel, 0f)
