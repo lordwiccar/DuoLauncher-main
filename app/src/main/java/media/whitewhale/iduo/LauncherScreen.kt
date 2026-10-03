@@ -87,6 +87,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
@@ -224,6 +225,19 @@ fun LauncherScreen(
     val pageGestures = remember(nativePager) { PageGestureLimits(nativePager) }
     SideEffect { pageGestures.editing = drag.active || widgetSession != null || resizeSlot != null }
     val pageFling = androidx.compose.foundation.pager.PagerDefaults.flingBehavior(nativePager, pagerSnapDistance = pageGestures)
+    // A settle that is cut short, by a window resize restarting the gesture handler or an
+    // animation cancelled while Home pauses, must not leave Home resting between two pages.
+    LaunchedEffect(nativePager) {
+        snapshotFlow { !nativePager.isScrollInProgress && kotlin.math.abs(nativePager.currentPageOffsetFraction) > .0001f }
+            .distinctUntilChanged().collect { stranded ->
+                if (stranded) try {
+                    nativePager.animateScrollToPage(nativePager.currentPage)
+                } catch (interrupted: kotlinx.coroutines.CancellationException) {
+                    // A new swipe took over; it settles on its own.
+                    if (!kotlinx.coroutines.currentCoroutineContext().isActive) throw interrupted
+                }
+            }
+    }
     val scope = rememberCoroutineScope()
     var previousHomePages by remember { mutableIntStateOf(homePages) }
     var previousEditRevision by remember { mutableIntStateOf(state.editRevision) }
