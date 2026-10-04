@@ -115,8 +115,9 @@ class MainActivity : ComponentActivity() {
                 else minOf(window.width, window.height) / androidx.compose.ui.platform.LocalDensity.current.density < 600f
             val foldFrost = rememberFoldFrost(onCover, arrivedByFold, hinge)
             DuoTheme(appearance.state.dark) { androidx.compose.foundation.layout.Box {
-                FoldWallpaperBlur(foldFrost, onCover)
-                androidx.compose.foundation.layout.Box(androidx.compose.ui.Modifier.fillMaxSize().foldFrost(foldFrost, onCover)) {
+                if (state.foldAnimation) FoldWallpaperBlur(foldFrost, onCover)
+                androidx.compose.foundation.layout.Box(androidx.compose.ui.Modifier.fillMaxSize()
+                    .then(if (state.foldAnimation) androidx.compose.ui.Modifier.foldFrost(foldFrost, onCover) else androidx.compose.ui.Modifier)) {
                 LauncherScreen(state, model, widgets, homeRequests.intValue,
                     onLaunch = { launchApp(it) }, onMakeDefault = ::makeDefault, onAppInfo = ::appInfo,
                     isDefaultHome = defaultHome.value, deviceStatus = deviceStatus, onStatusMode = ::setStatusMode, onWallpaperSettings = ::openWallpaperSettings,

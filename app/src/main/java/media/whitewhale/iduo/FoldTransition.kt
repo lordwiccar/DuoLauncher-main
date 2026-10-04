@@ -51,14 +51,12 @@ internal object FoldHandoff {
     fun leave(cover: Boolean) {
         leftCover = cover
         leftAt = SystemClock.uptimeMillis()
-        android.util.Log.i("DuoFold", "leave cover=$cover")
     }
 
     /** Whether this window on the [cover] or the inner screen replaces one on the other screen. */
     fun arrived(cover: Boolean): Boolean {
         val from = leftCover
         leftCover = null
-        android.util.Log.i("DuoFold", "arrive cover=$cover from=$from age=${SystemClock.uptimeMillis() - leftAt}")
         return from != null && from != cover && SystemClock.uptimeMillis() - leftAt < ARRIVAL_WINDOW_MS
     }
 
@@ -89,7 +87,6 @@ internal class HingeMonitor(context: Context) : DefaultLifecycleObserver, Sensor
 
     override fun onSensorChanged(event: SensorEvent) {
         angle = event.values[0].coerceIn(0f, 180f)
-        android.util.Log.i("DuoFold", "hinge $angle")
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
@@ -107,13 +104,7 @@ internal fun rememberFoldFrost(cover: Boolean, arrived: Boolean, hinge: HingeMon
     val frost = remember { Animatable(if (arrived) 1f else 0f) }
     val resumed = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle.currentStateAsState().value
         .isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)
-    val angle = hinge.angle
-    val target = when {
-        !resumed -> frost.value
-        angle == null -> 0f
-        cover -> (angle / HALF_OPEN_DEG).coerceIn(0f, 1f)
-        else -> ((180f - angle) / (180f - HALF_OPEN_DEG)).coerceIn(0f, 1f)
-    }
+    val target = if (resumed) foldFrostTarget(cover, hinge.angle) else frost.value
     // Samsung sometimes moves Home's window to the other screen instead of starting a new one;
     // that is an arrival too.
     val shownOnCover = remember { booleanArrayOf(cover) }
@@ -121,13 +112,23 @@ internal fun rememberFoldFrost(cover: Boolean, arrived: Boolean, hinge: HingeMon
         if (shownOnCover[0] != cover) {
             shownOnCover[0] = cover
             frost.snapTo(1f)
-            android.util.Log.i("DuoFold", "moved cover=$cover")
         }
         // Clearing is the arrival and is given time to be seen; frosting answers the hand at once.
         if (target < frost.value) frost.animateTo(target, tween(CLEAR_MS, easing = LinearOutSlowInEasing))
         else frost.animateTo(target, tween(FROST_MS, easing = FastOutSlowInEasing))
     }
     return frost.asState()
+}
+
+/**
+ * How frosted Home should be at a hinge [angle], 0 sharp to 1 fully frosted: half open is fully
+ * frosted on both screens; the inner screen clears toward flat and the [cover] toward shut. An
+ * unknown angle leaves Home sharp.
+ */
+internal fun foldFrostTarget(cover: Boolean, angle: Float?): Float = when {
+    angle == null -> 0f
+    cover -> (angle / HALF_OPEN_DEG).coerceIn(0f, 1f)
+    else -> ((180f - angle) / (180f - HALF_OPEN_DEG)).coerceIn(0f, 1f)
 }
 
 /**
@@ -200,7 +201,7 @@ private enum class FoldLook(val eyeMm: Float, val eyeHeight: Float, val spread: 
  * The way from the hinge to the swinging half's free edge on screen: to the left of the hinge on
  * the inner screen and to the right of it on the cover, in the screen's natural orientation.
  */
-private fun freeEdgeDirection(cover: Boolean, rotation: Int): Pair<Float, Float> {
+internal fun freeEdgeDirection(cover: Boolean, rotation: Int): Pair<Float, Float> {
     val nx = if (cover) 1f else -1f
     return when (rotation) {
         Surface.ROTATION_90 -> 0f to -nx
