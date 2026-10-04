@@ -117,10 +117,21 @@ fun DuoTheme(dark: Boolean = false, content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalDuoPalette provides palette) {
         MaterialTheme(colorScheme = if (dark) darkColorScheme(primary = Color(0xFF9BC5D7), onPrimary = Color(0xFF12303D),
             surface = Color(0xFF17272E), onSurface = palette.ink, secondary = Color(0xFFD1BE98),
-            secondaryContainer = Color(0xFF314852), onSecondaryContainer = palette.ink)
+            secondaryContainer = Color(0xFF314852), onSecondaryContainer = palette.ink,
+            // Menus and dialogs draw on these; Material's defaults would tint them lilac.
+            surfaceContainerLowest = Color(0xFF101C21), surfaceContainerLow = Color(0xFF1A2B32),
+            surfaceContainer = Color(0xFF1E3038), surfaceContainerHigh = Color(0xFF23363E),
+            surfaceContainerHighest = Color(0xFF283C45))
         else lightColorScheme(primary = Color(0xFF30596D), onPrimary = Color.White,
             surface = Color(0xFFF4F7F8), onSurface = palette.ink, secondary = Color(0xFF84775F),
-            secondaryContainer = Color(0xFFDCE8ED), onSecondaryContainer = palette.ink), content = content)
+            secondaryContainer = Color(0xFFDCE8ED), onSecondaryContainer = palette.ink,
+            surfaceContainerLowest = Color.White, surfaceContainerLow = Color(0xFFF7FAFB),
+            surfaceContainer = Color(0xFFF0F4F5), surfaceContainerHigh = Color(0xFFEBF0F2),
+            surfaceContainerHighest = Color(0xFFE5ECEE)),
+            // Every menu, field and dialog follows the rounded glass of Home.
+            shapes = Shapes(extraSmall = RoundedCornerShape(16.dp), small = RoundedCornerShape(16.dp),
+                medium = RoundedCornerShape(20.dp), large = RoundedCornerShape(24.dp), extraLarge = RoundedCornerShape(28.dp)),
+            content = content)
     }
 }
 
