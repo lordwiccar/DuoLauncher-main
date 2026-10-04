@@ -100,7 +100,7 @@ internal class HingeMonitor(context: Context) : DefaultLifecycleObserver, Sensor
  * How far Home is out of focus because the phone is folding or unfolding, 0 sharp to 1 fully
  * frosted. Half open is fully frosted on both screens. On the inner screen it clears as the
  * phone opens flat; on the [cover] it clears as the phone shuts. A window that [arrived] by a
- * fold starts frosted and clears once the hinge allows and Home is in front, not while the lock
+ * fold, or whose window moved to the other screen, starts frosted and clears once the hinge allows and Home is in front, not while the lock
  * screen still covers it.
  */
 @Composable
@@ -115,7 +115,15 @@ internal fun rememberFoldFrost(cover: Boolean, arrived: Boolean, hinge: HingeMon
         cover -> (angle / HALF_OPEN_DEG).coerceIn(0f, 1f)
         else -> ((180f - angle) / (180f - HALF_OPEN_DEG)).coerceIn(0f, 1f)
     }
-    LaunchedEffect(target) {
+    // Samsung sometimes moves Home's window to the other screen instead of starting a new one;
+    // that is an arrival too.
+    val shownOnCover = remember { booleanArrayOf(cover) }
+    LaunchedEffect(target, cover) {
+        if (shownOnCover[0] != cover) {
+            shownOnCover[0] = cover
+            frost.snapTo(1f)
+            android.util.Log.i("DuoFold", "moved cover=$cover")
+        }
         // Clearing is the arrival and is given time to be seen; frosting answers the hand at once.
         if (target < frost.value) frost.animateTo(target, tween(CLEAR_MS, easing = LinearOutSlowInEasing))
         else frost.animateTo(target, tween(FROST_MS, easing = FastOutSlowInEasing))

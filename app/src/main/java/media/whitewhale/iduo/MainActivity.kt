@@ -74,8 +74,6 @@ class MainActivity : ComponentActivity() {
     })
     private var shadeSetupDialog: android.app.AlertDialog? = null
     private lateinit var hinge: HingeMonitor
-    /** Whether this window is on the cover screen, fixed for its life: folding starts a new one. */
-    private var onCover = false
     private var returningFromShadeSettings = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,8 +94,7 @@ class MainActivity : ComponentActivity() {
         backgrounds = LauncherBackgroundController(this) { }
         status = DeviceStatusMonitor(this).also { lifecycle.addObserver(it) }
         hinge = HingeMonitor(this).also { lifecycle.addObserver(it) }
-        onCover = resources.configuration.smallestScreenWidthDp < 600
-        val arrivedByFold = FoldHandoff.arrived(onCover)
+        val arrivedByFold = FoldHandoff.arrived(onCover())
         updateDefaultHome()
         if (savedInstanceState == null && intent.getStringExtra("duo_destination") == "search") searchRequests.intValue++
         if (savedInstanceState == null && intent.getStringExtra("duo_destination") == UpdateNotice.DESTINATION) changelogRequests.intValue++
@@ -112,6 +109,10 @@ class MainActivity : ComponentActivity() {
                 applyCoverRotation(state.coverRotation, smallestWidth)
             }
             val deviceStatus = status.state.collectAsStateWithLifecycle().value
+            // The window's real size, which follows Samsung moving this window between screens.
+            val window = androidx.compose.ui.platform.LocalWindowInfo.current.containerSize
+            val onCover = if (window.width <= 0) smallestWidth < 600
+                else minOf(window.width, window.height) / androidx.compose.ui.platform.LocalDensity.current.density < 600f
             val foldFrost = rememberFoldFrost(onCover, arrivedByFold, hinge)
             DuoTheme(appearance.state.dark) { androidx.compose.foundation.layout.Box {
                 FoldWallpaperBlur(foldFrost, onCover)
@@ -155,7 +156,7 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         shadeSetupDialog?.dismiss()
         cancelAppearanceLocation()
-        if (isChangingConfigurations) FoldHandoff.leave(onCover)
+        if (isChangingConfigurations) FoldHandoff.leave(onCover())
         super.onDestroy()
     }
     override fun onResume() {
@@ -285,6 +286,9 @@ class MainActivity : ComponentActivity() {
     private fun updateDefaultHome() {
         defaultHome.value = getSystemService(RoleManager::class.java).isRoleHeld(RoleManager.ROLE_HOME)
     }
+
+    /** Whether Home is on the cover screen now; Samsung may move this window between screens. */
+    private fun onCover() = resources.configuration.smallestScreenWidthDp < 600
 
     private fun systemDark() = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
         android.content.res.Configuration.UI_MODE_NIGHT_YES
