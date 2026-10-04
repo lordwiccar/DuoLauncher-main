@@ -33,7 +33,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -132,11 +131,12 @@ internal fun rememberFoldFrost(cover: Boolean, arrived: Boolean, hinge: HingeMon
 }
 
 /**
- * Draws Home as if the half of the phone that swings were turned toward the viewer and seen
- * through frosted glass: it widens away from the hinge and blurs more the further it lies from
- * it. On the inner screen that is the half opposite the dock, the cover's side; the cover
- * frosts from its hinge edge across to its free edge and hazes to white. Nothing happens below
- * Android 13, which has no runtime shaders.
+ * Draws Home as if the half of the phone that swings were glass tilting away from the viewer
+ * about the hinge: the hinge stays sharp, and toward the free edge the picture recedes into a
+ * narrowing wedge, blurs and falls into shadow, with dark corners where it no longer covers the
+ * screen. On the inner screen that is the half opposite the dock, the cover's side; the cover
+ * recedes from its hinge edge across to its free edge. Nothing happens below Android 13, which
+ * has no runtime shaders.
  */
 internal fun Modifier.foldFrost(frost: State<Float>, cover: Boolean): Modifier =
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) this else foldFrostEffect(frost, cover)
@@ -144,12 +144,15 @@ internal fun Modifier.foldFrost(frost: State<Float>, cover: Boolean): Modifier =
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private fun Modifier.foldFrostEffect(frost: State<Float>, cover: Boolean): Modifier =
     composed {
-        val shader = remember { RuntimeShader(FOLD_FROST_SHADER) }
+        // A screen whose graphics driver refuses the shader simply shows Home without the effect.
+        val shader = remember { runCatching { RuntimeShader(FOLD_FROST_SHADER) }.getOrNull() }
         val rotation = LocalView.current.display?.rotation ?: Surface.ROTATION_0
-        val pxPerDp = LocalDensity.current.density
+        val metrics = androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics
+        val pxPerMm = (if (metrics.xdpi > 0f) metrics.xdpi else metrics.densityDpi.toFloat()) / 25.4f
+        val look = if (cover) FoldLook.COVER else FoldLook.INNER
         graphicsLayer {
             val amount = frost.value
-            if (amount <= .001f || size.width <= 0f || size.height <= 0f) {
+            if (shader == null || amount <= .001f || size.width <= 0f || size.height <= 0f) {
                 renderEffect = null
                 return@graphicsLayer
             }
@@ -161,17 +164,37 @@ private fun Modifier.foldFrostEffect(frost: State<Float>, cover: Boolean): Modif
             // The hinge runs through the middle of the inner screen and along the cover's edge.
             val hx = if (cover) cx - dx * across / 2f else cx
             val hy = if (cover) cy - dy * across / 2f else cy
+            // The viewer faces the middle of the swinging half, looking down on it from above
+            // its centre when the hinge is upright.
+            val ex = if (dx != 0f) hx + dx * extent / 2f else size.width / 2f
+            val ey = if (dx != 0f) size.height * look.eyeHeight else hy + dy * extent / 2f
+            // Blur and its shading were set on a 15.9 px/mm screen; keep them the same size in millimetres.
+            val scale = pxPerMm / REFERENCE_PX_PER_MM
             shader.setFloatUniform("size", size.width, size.height)
             shader.setFloatUniform("hinge", hx, hy)
             shader.setFloatUniform("dir", dx, dy)
+            shader.setFloatUniform("eyeAt", ex, ey)
             shader.setFloatUniform("extent", extent)
-            shader.setFloatUniform("turn", amount * MAX_TURN_DEG * PI.toFloat() / 180f)
-            shader.setFloatUniform("eye", extent * EYE_DISTANCE)
-            shader.setFloatUniform("blur", amount * (if (cover) COVER_BLUR_DP else INNER_BLUR_DP) * pxPerDp)
-            shader.setFloatUniform("haze", amount * if (cover) COVER_HAZE else INNER_HAZE)
+            shader.setFloatUniform("tilt", amount * MAX_TILT_DEG * PI.toFloat() / 180f)
+            shader.setFloatUniform("eye", look.eyeMm * pxPerMm)
+            shader.setFloatUniform("spread", look.spread)
+            shader.setFloatUniform("maxBlur", look.maxBlurPx * scale)
+            shader.setFloatUniform("shade", look.edgeShade)
+            shader.setFloatUniform("blurShade", look.blurShade)
+            shader.setFloatUniform("milk", look.milk)
             renderEffect = RenderEffect.createRuntimeShaderEffect(shader, "content").asComposeRenderEffect()
         }
     }
+
+/**
+ * How each screen recedes. The inner screen is held flat and looked down on, so its viewer sits
+ * well above the middle; the cover's a little less so.
+ */
+private enum class FoldLook(val eyeMm: Float, val eyeHeight: Float, val spread: Float, val maxBlurPx: Float,
+    val edgeShade: Float, val blurShade: Float, val milk: Float) {
+    INNER(eyeMm = 260f, eyeHeight = .30f, spread = .088f, maxBlurPx = 52f, edgeShade = .85f, blurShade = .39f, milk = .10f),
+    COVER(eyeMm = 240f, eyeHeight = .38f, spread = .084f, maxBlurPx = 56f, edgeShade = .90f, blurShade = .42f, milk = .10f),
+}
 
 /**
  * The way from the hinge to the swinging half's free edge on screen: to the left of the hinge on
@@ -225,32 +248,33 @@ private val FOLD_WALLPAPER_BLUR = 48.dp
 private const val HALF_OPEN_DEG = 90f
 private const val CLEAR_MS = 650
 private const val FROST_MS = 300
-/** How far the swinging half seems to turn toward the viewer when fully frosted. */
-private const val MAX_TURN_DEG = 38f
-/** Viewer's distance from the screen, in lengths of the swinging half. */
-private const val EYE_DISTANCE = 2.6f
-private const val INNER_BLUR_DP = 22f
-private const val COVER_BLUR_DP = 16f
-/** How far the cover's free edge whitens when fully frosted. */
-private const val COVER_HAZE = .32f
-/** A lighter haze on the inner screen, so the swinging half reads as glass over a bare wallpaper. */
-private const val INNER_HAZE = .14f
+/** How far the swinging half seems to tilt away from the viewer when fully frosted. */
+private const val MAX_TILT_DEG = 60f
+private const val REFERENCE_PX_PER_MM = 15.9f
 
 /**
- * Per pixel: find the point of the turned half seen here, following a ray from a viewer in front
- * of the screen's middle, then average a disc of samples around it, wider the further it lies
- * from the hinge. Pixels on the other side of the hinge pass through untouched.
+ * Per pixel: the swinging half tilts by `tilt` about the hinge, so a point `s` from the hinge
+ * moves to `s cos(tilt)` across the screen and `s sin(tilt)` out of it. A ray from the viewer
+ * through that point, carried on to the screen, finds what shows here: further out the more the
+ * point has left the screen, so the far side shrinks into a wedge. Off the screen is shadow.
+ * Around the point a disc of samples blurs in proportion to its depth, and the free edge darkens
+ * and slightly whitens. Pixels across the hinge pass through. Colours are premultiplied, and the
+ * shading also darkens Android's wallpaper behind wherever Home is see-through.
  */
 private const val FOLD_FROST_SHADER = """
 uniform shader content;
 uniform float2 size;
 uniform float2 hinge;
 uniform float2 dir;
+uniform float2 eyeAt;
 uniform float extent;
-uniform float turn;
+uniform float tilt;
 uniform float eye;
-uniform float blur;
-uniform float haze;
+uniform float spread;
+uniform float maxBlur;
+uniform float shade;
+uniform float blurShade;
+uniform float milk;
 
 half4 main(float2 p) {
     float s = dot(p - hinge, dir);
@@ -258,27 +282,30 @@ half4 main(float2 p) {
         return content.eval(p);
     }
     float2 side = float2(-dir.y, dir.x);
-    float2 mid = size * 0.5;
-    float sn = sin(turn);
-    float cs = cos(turn);
-    // Where along the turned half this pixel lands, and how much nearer the viewer that is.
-    float d = s * eye / (eye * cs + s * sn);
-    float scale = (eye - d * sn) / eye;
-    float u = dot(p - mid, side) * scale;
-    float2 at = mid + side * u + dir * (dot(hinge - mid, dir) + d);
-    float t = clamp(d / extent, 0.0, 1.0);
-    float r = blur * t * t * (3.0 - 2.0 * t);
+    float sn = sin(tilt);
+    float2 turned = hinge + dir * (s * cos(tilt)) + side * dot(p - hinge, side);
+    float depth = s * sn;
+    float2 hit = eyeAt + (turned - eyeAt) * (eye / max(eye - depth, eye * 0.25));
+    float radius = min(spread * depth, maxBlur);
+    if (hit.x < -radius || hit.y < -radius || hit.x > size.x + radius || hit.y > size.y + radius) {
+        return half4(0.02, 0.02, 0.02, 1.0);
+    }
+    float t = clamp(s / extent, 0.0, 1.0);
+    float edge = clamp(pow(t, 1.8) * (tilt / 0.785398) * 1.35, 0.0, 1.0) * shade;
+    float atten = clamp((1.0 - edge) * (1.0 - blurShade * radius / maxBlur), 0.0, 1.0);
+    float white = milk * (radius / maxBlur) * (1.0 - edge);
     // Each pixel turns its disc by a different amount, so too few samples read as frosted grain
     // rather than as ghost copies of the picture.
     float spin = fract(sin(dot(p, float2(12.9898, 78.233))) * 43758.5453) * 6.28318;
     half4 sum = half4(0.0);
-    for (int i = 0; i < 24; i++) {
+    for (int i = 0; i < 16; i++) {
         float k = float(i);
         float a = k * 2.39996 + spin;
-        float rr = r * sqrt((k + 0.5) / 24.0);
-        sum += content.eval(at + float2(cos(a), sin(a)) * rr);
+        float r = radius * sqrt((k + 0.5) / 16.0);
+        sum += content.eval(hit + float2(cos(a), sin(a)) * r);
     }
-    half4 c = sum / 24.0;
-    return mix(c, half4(1.0), half(haze * t));
+    half4 c = sum / 16.0;
+    half4 o = half4(c.rgb * half(atten), 1.0 - (1.0 - c.a) * half(atten));
+    return half4(o.rgb * half(1.0 - white) + half(white), 1.0 - (1.0 - o.a) * half(1.0 - white));
 }
 """
