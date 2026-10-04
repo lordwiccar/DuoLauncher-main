@@ -66,8 +66,11 @@ android {
             if (releaseStoreFile != null) signingConfig = signingConfigs.getByName("release")
         }
         // A debug-signed build that installs beside the Play version, for trying changes on a phone.
+        // Optimized like release: a debuggable Compose build stutters where the Play version does not.
         create("phone") {
-            initWith(getByName("debug"))
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += "release"
             applicationIdSuffix = ".debug"
             manifestPlaceholders["appLabel"] = "iDuo Debug"
         }
