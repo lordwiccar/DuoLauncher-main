@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -72,6 +73,9 @@ class MainActivity : ComponentActivity() {
         else finishAppearanceLocation(getString(R.string.location_denied))
     })
     private var shadeSetupDialog: android.app.AlertDialog? = null
+    private lateinit var hinge: HingeMonitor
+    /** Whether this window is on the cover screen, fixed for its life: folding starts a new one. */
+    private var onCover = false
     private var returningFromShadeSettings = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,6 +95,9 @@ class MainActivity : ComponentActivity() {
         backups = BackupController(this, model, widgets) { }.also { it.restore() }
         backgrounds = LauncherBackgroundController(this) { }
         status = DeviceStatusMonitor(this).also { lifecycle.addObserver(it) }
+        hinge = HingeMonitor(this).also { lifecycle.addObserver(it) }
+        onCover = resources.configuration.smallestScreenWidthDp < 600
+        val arrivedByFold = FoldHandoff.arrived(onCover)
         updateDefaultHome()
         if (savedInstanceState == null && intent.getStringExtra("duo_destination") == "search") searchRequests.intValue++
         if (savedInstanceState == null && intent.getStringExtra("duo_destination") == UpdateNotice.DESTINATION) changelogRequests.intValue++
@@ -105,7 +112,10 @@ class MainActivity : ComponentActivity() {
                 applyCoverRotation(state.coverRotation, smallestWidth)
             }
             val deviceStatus = status.state.collectAsStateWithLifecycle().value
-            DuoTheme(appearance.state.dark) {
+            val foldFrost = rememberFoldFrost(onCover, arrivedByFold, hinge)
+            DuoTheme(appearance.state.dark) { androidx.compose.foundation.layout.Box {
+                FoldWallpaperBlur(foldFrost, onCover)
+                androidx.compose.foundation.layout.Box(androidx.compose.ui.Modifier.fillMaxSize().foldFrost(foldFrost, onCover)) {
                 LauncherScreen(state, model, widgets, homeRequests.intValue,
                     onLaunch = { launchApp(it) }, onMakeDefault = ::makeDefault, onAppInfo = ::appInfo,
                     isDefaultHome = defaultHome.value, deviceStatus = deviceStatus, onStatusMode = ::setStatusMode, onWallpaperSettings = ::openWallpaperSettings,
@@ -120,7 +130,7 @@ class MainActivity : ComponentActivity() {
                     showFirstRun = showFirstRun.value,
                     onFinishFirstRun = ::finishFirstRun,
                     onShadeSetup = ::showShadeSetup)
-            }
+            } } }
         }
         FoldRenderExperiment.attach(this)
         if (restoreShadeDialog) window.decorView.post { if (!isFinishing && !isDestroyed) showShadeSetup() }
@@ -145,6 +155,7 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         shadeSetupDialog?.dismiss()
         cancelAppearanceLocation()
+        if (isChangingConfigurations) FoldHandoff.leave(onCover)
         super.onDestroy()
     }
     override fun onResume() {
