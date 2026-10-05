@@ -111,8 +111,9 @@ class MainActivity : ComponentActivity() {
             val deviceStatus = status.state.collectAsStateWithLifecycle().value
             // The window's real size, which follows Samsung moving this window between screens.
             val window = androidx.compose.ui.platform.LocalWindowInfo.current.containerSize
-            val onCover = if (window.width <= 0) smallestWidth < 600
-                else minOf(window.width, window.height) / androidx.compose.ui.platform.LocalDensity.current.density < 600f
+            val onCover = if (window.width <= 0) onCover()
+                else isCoverWindow(minOf(window.width, window.height), resources.displayMetrics.xdpi,
+                    androidx.compose.ui.platform.LocalDensity.current.density)
             val foldFrost = rememberFoldFrost(onCover, arrivedByFold, hinge)
             DuoTheme(appearance.state.dark) { androidx.compose.foundation.layout.Box {
                 if (state.foldAnimation) FoldWallpaperBlur(foldFrost, onCover)
@@ -289,7 +290,9 @@ class MainActivity : ComponentActivity() {
     }
 
     /** Whether Home is on the cover screen now; Samsung may move this window between screens. */
-    private fun onCover() = resources.configuration.smallestScreenWidthDp < 600
+    private fun onCover() = resources.displayMetrics.let {
+        isCoverWindow(minOf(it.widthPixels, it.heightPixels), it.xdpi, it.density)
+    }
 
     private fun systemDark() = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
         android.content.res.Configuration.UI_MODE_NIGHT_YES
