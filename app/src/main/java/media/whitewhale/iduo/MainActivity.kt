@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT))
         // Pick the cover's or the inner screen's Home before the first frame, so folding never shows the other one.
-        model.showDisplay(resources.configuration.screenWidthDp < 650)
+        model.showDisplay(onCover() || resources.configuration.screenWidthDp < 650)
         widgets = WidgetController(this, model) { }.also { it.restore(savedInstanceState) }
         backups = BackupController(this, model, widgets) { }.also { it.restore() }
         backgrounds = LauncherBackgroundController(this) { }
@@ -101,12 +101,12 @@ class MainActivity : ComponentActivity() {
         intent.removeExtra("duo_destination")
         if (savedInstanceState == null && UpdateNotice.shouldAskAfterUpdate(this))
             notificationPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-        applyCoverRotation(model.state.value.coverRotation, resources.configuration.smallestScreenWidthDp)
+        applyCoverRotation(model.state.value.coverRotation, onCover())
         setContent {
             val state = model.state.collectAsStateWithLifecycle().value
             val smallestWidth = androidx.compose.ui.platform.LocalConfiguration.current.smallestScreenWidthDp
             androidx.compose.runtime.LaunchedEffect(state.coverRotation, smallestWidth) {
-                applyCoverRotation(state.coverRotation, smallestWidth)
+                applyCoverRotation(state.coverRotation, onCover())
             }
             val deviceStatus = status.state.collectAsStateWithLifecycle().value
             // The window's real size, which follows Samsung moving this window between screens.
@@ -169,11 +169,11 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * The cover screen stays upright unless the user allows rotation; the inner screen, 600dp and
-     * wider in every orientation, always follows the device.
+     * The cover screen stays upright unless the user allows rotation; the inner screen always
+     * follows the device.
      */
-    private fun applyCoverRotation(allowed: Boolean, smallestWidthDp: Int) {
-        val wanted = if (smallestWidthDp < 600 && !allowed) android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    private fun applyCoverRotation(allowed: Boolean, cover: Boolean) {
+        val wanted = if (cover && !allowed) android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             else android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         if (requestedOrientation != wanted) requestedOrientation = wanted
     }

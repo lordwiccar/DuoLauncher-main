@@ -182,7 +182,8 @@ fun LauncherScreen(
     var spotlight by rememberSaveable { mutableStateOf(false) }
     // A sliding dock opens from the right edge and closes when Home is touched or left.
     var dockOpen by rememberSaveable { mutableStateOf(false) }
-    val startsWide = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp >= 650
+    val coverScreen = onCoverScreen()
+    val startsWide = !coverScreen
     val dockReveal = remember { androidx.compose.animation.core.Animatable(if (startsWide || state.dockMode == DockMode.SHOWN) 1f else 0f) }
     androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_PAUSE) { dockOpen = false }
     var createFolderFirstId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -505,7 +506,7 @@ fun LauncherScreen(
             .blur(WALLPAPER_BACKDROP_BLUR, androidx.compose.ui.draw.BlurredEdgeTreatment.Rectangle)
             .testTag("wallpaper-blur"))
         BoxWithConstraints(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
-            val wide = maxWidth.value >= 650f
+            val wide = !coverScreen && maxWidth.value >= 650f
             val preset = if (wide) state.expanded else state.compact
             // The activity picks the screen's layout before drawing; this follows window resizes.
             LaunchedEffect(wide) { model.showDisplay(!wide) }
@@ -527,13 +528,13 @@ fun LauncherScreen(
                 statusRailHeight = if (statusRail) statusHeight + 22f else 0f,
                 labelHeight = with(density) { 14.sp.toDp().value } + 6f, inLibrary = inLibrary,
                 homeBottomSpace = if (isDefaultHome) 44f else 88f, dockSlots = state.dock.size, homeRows = state.homeRows,
-                columns = state.homeColumns, dockColumn = dockColumn, topBar = topBar)
+                columns = state.homeColumns, dockColumn = dockColumn, topBar = topBar, cover = !wide)
             // The most Home rows this screen can show in full, measured like the page itself.
             val maxRowsFit = (GRID_ROWS downTo DEFAULT_HOME_ROWS + 1).firstOrNull { rows ->
                 homeGeometry(maxWidth.value, maxHeight.value, preset, state.labels,
                     labelHeight = with(density) { 14.sp.toDp().value } + 6f,
                     homeBottomSpace = if (isDefaultHome) 44f else 88f, homeRows = rows,
-                    columns = state.homeColumns, dockColumn = dockColumn, topBar = topBar).gridFits
+                    columns = state.homeColumns, dockColumn = dockColumn, topBar = topBar, cover = !wide).gridFits
             } ?: DEFAULT_HOME_ROWS
             SideEffect {
                 resizePitchX = with(density) { (geometry.gridWidth / state.homeColumns).dp.toPx() }
