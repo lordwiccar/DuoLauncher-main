@@ -54,7 +54,7 @@ internal enum class RingCentre { WIFI, CELLULAR, AIRPLANE, SIGNAL }
 
 /**
  * Wi-Fi while connected; otherwise mobile data's generation, then airplane mode, and with neither
- * Wi-Fi nor mobile data a mobile signal symbol.
+ * Wi-Fi nor mobile data a cell tower.
  */
 internal fun ringCentre(status: DeviceStatus): RingCentre = when {
     status.wifiConnected -> RingCentre.WIFI

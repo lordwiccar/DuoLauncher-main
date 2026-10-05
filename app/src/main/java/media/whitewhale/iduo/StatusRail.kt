@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -157,7 +158,7 @@ private const val RING_BOTTOM_GAP = 112f
  * Battery as a thick ring open at the top and bottom, filling clockwise from its lower left end,
  * green while charging and yellow in battery saver; cellular signal as four dots across the bottom
  * opening. Inside it Wi-Fi, or without Wi-Fi mobile data's generation, airplane mode or, with
- * neither, a mobile signal symbol. With [percent], the battery level always sits in the top
+ * neither, a cell tower. With [percent], the battery level always sits in the top
  * opening. A second SIM's signal is a smaller second row of dots just below the first, in either
  * place.
  */
@@ -167,6 +168,7 @@ private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolea
     val cellularVisual = cellularSignalVisual(status.cellularLevel, status.airplane)
     val measurer = rememberTextMeasurer()
     val centre = ringCentre(status)
+    val cellTower = androidx.compose.ui.graphics.vector.rememberVectorPainter(CellTowerIcon)
     val battery = status.battery?.toString() ?: "—"
     val level = if (airplaneOutside(status, centre)) AIRPLANE_GLYPH else battery
     val centreText = when (centre) {
@@ -220,17 +222,13 @@ private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolea
             }
             drawCircle(Color.White.copy(alpha = signalAlpha(wifiVisual.elements[0])), w * .052f, wifiBase)
         } else if (centre == RingCentre.SIGNAL) {
-            // Mobile signal: four rising bars, as bright as the first SIM's signal is strong.
-            val lit = (if (status.simLevels.size >= 2) status.simLevels[0] else status.cellularLevel)?.coerceIn(0, 4) ?: 0
-            val bar = w * .062f
-            val gap = w * .03f
-            val left = center.x - (bar * 4 + gap * 3) / 2
-            val bottom = w * .63f
-            for (i in 0..3) {
-                val height = w * (.09f + i * .055f)
-                drawRoundRect(Color.White.copy(alpha = if (i < lit) 1f else .3f),
-                    Offset(left + i * (bar + gap), bottom - height), Size(bar, height),
-                    androidx.compose.ui.geometry.CornerRadius(bar / 2))
+            // A cell tower, faint while there is no mobile signal at all.
+            val side = w * .44f
+            translate(center.x - side / 2, center.y + w * .02f - side / 2) {
+                with(cellTower) {
+                    draw(Size(side, side), alpha = if (cellularVisual is CellularSignalVisual.Available) 1f else .45f,
+                        colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.White))
+                }
             }
         } else if (centreText != null) {
             // Text in the middle, a little low like the Wi-Fi symbol; longer labels get smaller.
@@ -260,6 +258,18 @@ private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolea
 }
 
 private const val AIRPLANE_GLYPH = "✈"
+
+/** Material's cell tower symbol, which the bundled icon set predates. */
+private val CellTowerIcon: androidx.compose.ui.graphics.vector.ImageVector by lazy {
+    androidx.compose.ui.graphics.vector.ImageVector.Builder("CellTower", 24.dp, 24.dp, 24f, 24f).addPath(
+        androidx.compose.ui.graphics.vector.addPathNodes("M7.3,14.7l1.2,-1.2c-1,-1 -1,-2.5 0,-3.5L7.3,8.8c-1.6,1.6 -1.6,4.3 0,5.9z" +
+            "M6.1,6.1L4.9,4.9c-3.9,3.9 -3.9,10.2 0,14.1l1.2,-1.2c-3.2,-3.2 -3.2,-8.4 0,-11.7z" +
+            "M19.1,4.9l-1.2,1.2c3.2,3.2 3.2,8.5 0,11.7l1.2,1.2c3.9,-3.9 3.9,-10.2 0,-14.1z" +
+            "M16.7,8.5l-1.2,1.2c1,1 1,2.5 0,3.5l1.2,1.2c1.6,-1.6 1.6,-4.3 0,-5.9z" +
+            "M14.5,12c0,-1.38 -1.12,-2.5 -2.5,-2.5S9.5,10.62 9.5,12c0,0.76 0.34,1.42 0.87,1.88L7,22h2l0.67,-2h4.67L15,22h2" +
+            "l-3.37,-8.12c0.53,-0.46 0.87,-1.12 0.87,-1.88zM10.33,18L12,13l1.67,5h-3.34z"),
+        fill = androidx.compose.ui.graphics.SolidColor(Color.White)).build()
+}
 /** Signal dot radius, as a share of the ring's width: one SIM, or two rows for two SIMs. */
 private const val SIM_DOT = .042f
 private const val DUAL_SIM_DOT = .034f
