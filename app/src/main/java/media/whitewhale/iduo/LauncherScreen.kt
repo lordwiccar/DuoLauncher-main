@@ -165,6 +165,7 @@ fun LauncherScreen(
     var widgetSession by remember { mutableStateOf<WidgetPickerSession?>(null) }
     var widgetPlacementMessage by remember { mutableStateOf<String?>(null) }
     var emptyCellIndex by rememberSaveable { mutableStateOf<Int?>(null) }
+    var addAppsAt by rememberSaveable { mutableStateOf<Int?>(null) }
     var resizeSlot by remember { mutableStateOf<Int?>(null) }
     var resizeWidth by rememberSaveable { mutableIntStateOf(1) }
     var resizeHeight by rememberSaveable { mutableIntStateOf(1) }
@@ -1336,12 +1337,18 @@ fun LauncherScreen(
         }
         emptyCellIndex?.let { index ->
             ModalBottomSheet(onDismissRequest = { emptyCellIndex = null }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
-                EmptySpaceActionSheet(onWidgets = {
+                EmptySpaceActionSheet(onAddApps = { emptyCellIndex = null; addAppsAt = index }, onWidgets = {
                         widgetTargetIndex = index; widgetExactTarget = true; widgetSlot = model.nextWidgetSlot(); widgetPackage = null; widgetProfileSerial = null
                         emptyCellIndex = null; sheet = "widgets"
                     }, onWallpaper = { emptyCellIndex = null; sheet = "settings:wallpaper" },
                     onCustomize = { emptyCellIndex = null; sheet = "settings" }, onClose = { emptyCellIndex = null })
             }
+        }
+        addAppsAt?.let { from ->
+            HomeAppsDialog(state.layout, state.apps, from, onDismiss = { addAppsAt = null }, onAdd = { ids ->
+                addAppsAt = null
+                model.addAppsToHome(ids, from)
+            })
         }
         createFolderFirstId?.let { firstId ->
             val first = appsById[firstId]

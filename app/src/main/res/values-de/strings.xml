@@ -563,4 +563,11 @@
     <string name="wallpaper_crop_hint_cover">Ziehen zum Verschieben, spreizen zum Zoomen. Das ist der Ausschnitt des äußeren Displays; das innere hat einen eigenen.</string>
     <string name="wallpaper_crop_hint_inner">Ziehen zum Verschieben, spreizen zum Zoomen. Das ist der Ausschnitt des inneren Displays; das äußere hat einen eigenen.</string>
     <string name="wallpaper_crop_reset">Zurücksetzen</string>
+    <string name="home_add_apps">Apps hinzufügen</string>
+    <string name="home_add_apps_title">Apps zum Startbildschirm hinzufügen</string>
+    <string name="home_add_apps_none">Alle Apps sind schon auf dem Startbildschirm, im Dock oder in einem Ordner.</string>
+    <plurals name="home_pages_added">
+        <item quantity="one">+%1$d Seite</item>
+        <item quantity="other">+%1$d Seiten</item>
+    </plurals>
 </resources>

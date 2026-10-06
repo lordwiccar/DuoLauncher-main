@@ -581,4 +581,13 @@
     <string name="wallpaper_crop_hint_cover">Ťahaním posuniete, roztiahnutím prstov priblížite. Toto je výrez vonkajšieho displeja; vnútorný má vlastný.</string>
     <string name="wallpaper_crop_hint_inner">Ťahaním posuniete, roztiahnutím prstov priblížite. Toto je výrez vnútorného displeja; vonkajší má vlastný.</string>
     <string name="wallpaper_crop_reset">Obnoviť</string>
+    <string name="home_add_apps">Pridať aplikácie</string>
+    <string name="home_add_apps_title">Pridať aplikácie na plochu</string>
+    <string name="home_add_apps_none">Všetky aplikácie už sú na ploche, v docku alebo v priečinku.</string>
+    <plurals name="home_pages_added">
+        <item quantity="one">+%1$d plocha</item>
+        <item quantity="few">+%1$d plochy</item>
+        <item quantity="many">+%1$d plochy</item>
+        <item quantity="other">+%1$d plôch</item>
+    </plurals>
 </resources>
