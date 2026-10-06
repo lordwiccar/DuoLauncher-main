@@ -362,7 +362,8 @@ fun LauncherScreen(
     val edge = if (!edgeActive) 0 else dragEdgeDirection(edgePointer, drag.rootBounds, edgeWidth)
     LaunchedEffect(edgeActive, edge) {
         if (edge != 0) while (drag.active || widgetSession?.dragging == true) {
-            delay(650)
+            // Opening the empty page after the last one makes a new page, so it asks for a longer hold.
+            delay(if (edge > 0 && pager.currentPage + 1 >= homePages) NEW_PAGE_HOLD_MS else PAGE_TURN_HOLD_MS)
             val next = (pager.currentPage + edge).coerceIn(0, homePages)
             if ((!drag.active && widgetSession?.dragging != true) || next == pager.currentPage) break
             // Do not key this effect on currentPage: it changes halfway through the
@@ -1603,6 +1604,11 @@ private fun firstEmptyHomeCell(state: LauncherState, page: Int): Int {
         state.layout.slotAt(index) == null && state.layout.cellVisible(index) && state.widgetPlacements.none { index in it.coveredIndices() }
     } ?: pageStart
 }
+
+/** How long a dragged item rests at a screen edge before the page turns. */
+private const val PAGE_TURN_HOLD_MS = 650L
+/** The longer rest before the turn onto the empty page after the last, which adds a page. */
+private const val NEW_PAGE_HOLD_MS = 1_200L
 
 @Composable
 private fun HomePagePane(
