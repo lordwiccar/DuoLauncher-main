@@ -570,4 +570,9 @@
         <item quantity="one">+%1$d Seite</item>
         <item quantity="other">+%1$d Seiten</item>
     </plurals>
+    <string name="notification_badges">Benachrichtigungs-Badges</string>
+    <string name="notification_badges_detail">Ein rotes Badge an jeder App zählt ihre offenen Benachrichtigungen.</string>
+    <string name="notification_badges_needs_access">Benötigt Zugriff auf Benachrichtigungen: iDuo zählt Benachrichtigungen je App und speichert sonst nichts.</string>
+    <string name="notification_badges_allow">Zugriff auf Benachrichtigungen erlauben</string>
+    <string name="notification_badges_service">iDuo Benachrichtigungs-Badges</string>
 </resources>

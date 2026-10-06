@@ -590,4 +590,9 @@
         <item quantity="many">+%1$d plochy</item>
         <item quantity="other">+%1$d plôch</item>
     </plurals>
+    <string name="notification_badges">Odznaky upozornení</string>
+    <string name="notification_badges_detail">Červený odznak pri každej aplikácii ukazuje počet jej nevybavených upozornení.</string>
+    <string name="notification_badges_needs_access">Vyžaduje prístup k upozorneniam: iDuo počíta upozornenia každej aplikácie a nič iné si neukladá.</string>
+    <string name="notification_badges_allow">Povoliť prístup k upozorneniam</string>
+    <string name="notification_badges_service">Odznaky upozornení iDuo</string>
 </resources>

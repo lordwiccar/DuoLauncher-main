@@ -590,4 +590,9 @@
         <item quantity="many">+%1$d stron</item>
         <item quantity="other">+%1$d strony</item>
     </plurals>
+    <string name="notification_badges">Plakietki powiadomień</string>
+    <string name="notification_badges_detail">Czerwona plakietka przy każdej aplikacji pokazuje liczbę jej oczekujących powiadomień.</string>
+    <string name="notification_badges_needs_access">Wymaga dostępu do powiadomień: iDuo liczy powiadomienia każdej aplikacji i niczego więcej nie zachowuje.</string>
+    <string name="notification_badges_allow">Zezwól na dostęp do powiadomień</string>
+    <string name="notification_badges_service">Plakietki powiadomień iDuo</string>
 </resources>

@@ -1952,12 +1952,17 @@ private fun DockAppColumn(
                 )
                 Box(Modifier.offset { animatedOffset }.fillMaxWidth().height(rowHeight.dp).alpha(opacity)
                     .testTag("dock-app-$id"), contentAlignment = Alignment.Center) {
-                    if (app != null) Image(app.icon.asImageBitmap(), null, Modifier.size(iconSize.dp).testTag("dock-icon-$id")
-                        .onGloballyPositioned { if (savedIndex >= 0) launchBounds[savedIndex].set(it.boundsInWindow().toAndroidBounds()) }
-                        .graphicsLayer { scaleX = slotScales[renderIndex]; scaleY = slotScales[renderIndex] }
-                        .clip(RoundedCornerShape(11.dp)))
-                    else if (folder != null) DockFolderIcon(folder, appsById, iconSize, drag,
-                        Modifier.graphicsLayer { scaleX = slotScales[renderIndex]; scaleY = slotScales[renderIndex] })
+                    if (app != null) Box(Modifier.size(iconSize.dp).graphicsLayer { scaleX = slotScales[renderIndex]; scaleY = slotScales[renderIndex] }) {
+                        Image(app.icon.asImageBitmap(), null, Modifier.fillMaxSize().testTag("dock-icon-$id")
+                            .onGloballyPositioned { if (savedIndex >= 0) launchBounds[savedIndex].set(it.boundsInWindow().toAndroidBounds()) }
+                            .clip(RoundedCornerShape(11.dp)))
+                        NotificationBadge(badgeCount(app), iconSize.dp, Modifier.align(Alignment.TopEnd).offset(x = iconSize.dp * .12f, y = -iconSize.dp * .12f))
+                    }
+                    else if (folder != null) Box(Modifier.graphicsLayer { scaleX = slotScales[renderIndex]; scaleY = slotScales[renderIndex] }) {
+                        DockFolderIcon(folder, appsById, iconSize, drag)
+                        NotificationBadge(badgeCount(folder.appIds, appsById), iconSize.dp,
+                            Modifier.align(Alignment.TopEnd).offset(x = iconSize.dp * .12f, y = -iconSize.dp * .12f))
+                    }
                 }
             }
         }
@@ -1990,6 +1995,7 @@ private fun FolderTile(folder: FolderEntry, apps: Map<String, AppEntry>, size: F
     Column(modifier.clickable(onClick = onClick).semantics(mergeDescendants = true) {
         contentDescription = description
     }, horizontalAlignment = Alignment.CenterHorizontally) {
+        Box {
         Box(Modifier.size(size.dp).clip(RoundedCornerShape((size * .24f).dp))
             .background(Glass.copy(alpha = .72f)).border(1.dp, Color.White.copy(alpha = .55f), RoundedCornerShape((size * .24f).dp))
             .dropRegion(drag, DropTarget.Folder(folder.id), page = page, folderId = folder.id)
@@ -2001,6 +2007,9 @@ private fun FolderTile(folder: FolderEntry, apps: Map<String, AppEntry>, size: F
                     }).padding(5.dp).size((size * .38f).dp).clip(RoundedCornerShape(6.dp)))
                 }
             }
+        }
+        NotificationBadge(badgeCount(folder.appIds, apps), size.dp,
+            Modifier.align(Alignment.TopEnd).offset(x = size.dp * .12f, y = -size.dp * .12f))
         }
         if (labels) Text(folder.title, color = Color.White, fontSize = 11.sp, maxLines = 1,
             overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
@@ -2020,8 +2029,11 @@ private fun AppTile(app: AppEntry, size: Float, labels: Boolean, modifier: Modif
             role = Role.Button, onClick = { onClick(bounds) })
         .semantics { onLongClick(appOptions) { onLongClick(); true } }.padding(horizontal = 2.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
-        Image(app.icon.asImageBitmap(), null, Modifier.size(iconSize).onGloballyPositioned { bounds.set(it.boundsInWindow().toAndroidBounds()) }
-            .graphicsLayer { scaleX = scale; scaleY = scale }.clip(RoundedCornerShape((size * .24f).dp)))
+        Box(Modifier.size(iconSize)) {
+            Image(app.icon.asImageBitmap(), null, Modifier.fillMaxSize().onGloballyPositioned { bounds.set(it.boundsInWindow().toAndroidBounds()) }
+                .graphicsLayer { scaleX = scale; scaleY = scale }.clip(RoundedCornerShape((size * .24f).dp)))
+            NotificationBadge(badgeCount(app), iconSize, Modifier.align(Alignment.TopEnd).offset(x = iconSize * .12f, y = -iconSize * .12f))
+        }
         if (labels) Text(app.label, color = Color.White, fontSize = 11.sp, lineHeight = 14.sp, maxLines = 1,
             overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center,
             style = TextStyle(shadow = Shadow(Color.Black.copy(alpha = .55f), Offset(0f, 1f), 3f)), modifier = Modifier.padding(top = 4.dp))

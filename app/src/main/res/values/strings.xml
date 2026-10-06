@@ -571,4 +571,9 @@
         <item quantity="one">+%1$d page</item>
         <item quantity="other">+%1$d pages</item>
     </plurals>
+    <string name="notification_badges">Notification badges</string>
+    <string name="notification_badges_detail">A red badge on each app counts its waiting notifications.</string>
+    <string name="notification_badges_needs_access">Needs notification access: iDuo counts notifications per app and keeps nothing else.</string>
+    <string name="notification_badges_allow">Allow notification access</string>
+    <string name="notification_badges_service">iDuo notification badges</string>
 </resources>

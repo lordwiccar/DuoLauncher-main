@@ -119,6 +119,8 @@ class MainActivity : ComponentActivity() {
                 if (state.foldAnimation) FoldWallpaperBlur(foldFrost, onCover)
                 androidx.compose.foundation.layout.Box(androidx.compose.ui.Modifier.fillMaxSize()
                     .then(if (state.foldAnimation) androidx.compose.ui.Modifier.foldFrost(foldFrost, onCover) else androidx.compose.ui.Modifier)) {
+                androidx.compose.runtime.CompositionLocalProvider(LocalBadgeCounts provides
+                    if (state.notificationBadges && NotificationBadges.accessGranted) NotificationBadges.counts else emptyMap()) {
                 LauncherScreen(state, model, widgets, homeRequests.intValue,
                     onLaunch = { launchApp(it) }, onMakeDefault = ::makeDefault, onAppInfo = ::appInfo,
                     isDefaultHome = defaultHome.value, deviceStatus = deviceStatus, onStatusMode = ::setStatusMode, onWallpaperSettings = ::openWallpaperSettings,
@@ -133,7 +135,7 @@ class MainActivity : ComponentActivity() {
                     showFirstRun = showFirstRun.value,
                     onFinishFirstRun = ::finishFirstRun,
                     onShadeSetup = ::showShadeSetup)
-            } } }
+            } } } }
         }
         FoldRenderExperiment.attach(this)
         if (restoreShadeDialog) window.decorView.post { if (!isFinishing && !isDestroyed) showShadeSetup() }
@@ -166,6 +168,7 @@ class MainActivity : ComponentActivity() {
         returningFromShadeSettings = false
         model.refresh(); appearance.refresh(systemDark()); updateDefaultHome()
         homeGesturesEnabled = SystemShadeAccessibilityService.isEnabled(this)
+        NotificationBadges.refreshAccess(this)
     }
 
     /**
