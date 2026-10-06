@@ -1980,9 +1980,12 @@ private fun DockFolderIcon(folder: FolderEntry, apps: Map<String, AppEntry>, siz
         .dropRegion(drag, DropTarget.Folder(folder.id), folderId = folder.id).testTag("dock-folder-${folder.id}")) {
         folder.appIds.take(4).forEachIndexed { index, id ->
             apps[id]?.let { app ->
-                Image(app.icon.asImageBitmap(), null, Modifier.align(when (index) {
+                Box(Modifier.align(when (index) {
                     0 -> Alignment.TopStart; 1 -> Alignment.TopEnd; 2 -> Alignment.BottomStart; else -> Alignment.BottomEnd
-                }).padding((size * .07f).dp).size((size * .36f).dp).clip(RoundedCornerShape(5.dp)))
+                }).padding((size * .07f).dp).size((size * .36f).dp)) {
+                    Image(app.icon.asImageBitmap(), null, Modifier.fillMaxSize().clip(RoundedCornerShape(5.dp)))
+                    NotificationDot(badgeCount(app), (size * .36f).dp, Modifier.align(Alignment.TopEnd))
+                }
             }
         }
     }
@@ -2002,9 +2005,12 @@ private fun FolderTile(folder: FolderEntry, apps: Map<String, AppEntry>, size: F
             .testTag("folder-drop-${folder.id}")) {
             folder.appIds.take(4).forEachIndexed { index, id ->
                 apps[id]?.let { app ->
-                    Image(app.icon.asImageBitmap(), null, Modifier.align(when (index) {
+                    Box(Modifier.align(when (index) {
                         0 -> Alignment.TopStart; 1 -> Alignment.TopEnd; 2 -> Alignment.BottomStart; else -> Alignment.BottomEnd
-                    }).padding(5.dp).size((size * .38f).dp).clip(RoundedCornerShape(6.dp)))
+                    }).padding(5.dp).size((size * .38f).dp)) {
+                        Image(app.icon.asImageBitmap(), null, Modifier.fillMaxSize().clip(RoundedCornerShape(6.dp)))
+                        NotificationDot(badgeCount(app), (size * .38f).dp, Modifier.align(Alignment.TopEnd))
+                    }
                 }
             }
         }

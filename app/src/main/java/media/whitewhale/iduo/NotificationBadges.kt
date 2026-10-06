@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -108,6 +109,13 @@ internal fun NotificationBadge(count: Int, iconSize: Dp, modifier: Modifier = Mo
         contentAlignment = Alignment.Center) {
         Text(text, color = Color.White, fontSize = fontSize, lineHeight = fontSize, fontWeight = FontWeight.Bold, maxLines = 1)
     }
+}
+
+/** A small red dot for an app with waiting notifications, on a folder's small icons. */
+@Composable
+internal fun NotificationDot(count: Int, iconSize: Dp, modifier: Modifier = Modifier) {
+    if (count <= 0) return
+    Box(modifier.size(maxOf(iconSize * .34f, 6.dp)).background(BadgeRed, androidx.compose.foundation.shape.CircleShape))
 }
 
 private val BadgeRed = Color(0xFFE5332E)
