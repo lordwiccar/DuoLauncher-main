@@ -157,6 +157,15 @@ class MainActivity : ComponentActivity() {
         if (timeReceiverRegistered) { unregisterReceiver(timeReceiver); timeReceiverRegistered = false }
         widgets.host.stopListening(); super.onStop()
     }
+    /**
+     * Folding, rotating and display size changes keep this window rather than start a new one, so
+     * Home's pages carry on where they were instead of coming back from a half-finished swipe.
+     */
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // Pick the screen's Home before the next frame, as a new window would in onCreate.
+        model.showDisplay(onCover() || newConfig.screenWidthDp < 650)
+    }
     override fun onDestroy() {
         shadeSetupDialog?.dismiss()
         cancelAppearanceLocation()

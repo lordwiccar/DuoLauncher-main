@@ -89,6 +89,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -240,16 +241,22 @@ fun LauncherScreen(
     val pageFling = androidx.compose.foundation.pager.PagerDefaults.flingBehavior(nativePager, pagerSnapDistance = pageGestures)
     // A settle that is cut short, by a window resize restarting the gesture handler or an
     // animation cancelled while Home pauses, must not leave Home resting between two pages.
+    // Checked afresh after every attempt: a settle that is itself cut short is retried.
     LaunchedEffect(nativePager) {
-        snapshotFlow { !nativePager.isScrollInProgress && kotlin.math.abs(nativePager.currentPageOffsetFraction) > .0001f }
-            .distinctUntilChanged().collect { stranded ->
-                if (stranded) try {
-                    nativePager.animateScrollToPage(nativePager.currentPage)
-                } catch (interrupted: kotlinx.coroutines.CancellationException) {
-                    // A new swipe took over; it settles on its own.
-                    if (!kotlinx.coroutines.currentCoroutineContext().isActive) throw interrupted
-                }
+        while (true) {
+            snapshotFlow { !nativePager.isScrollInProgress && kotlin.math.abs(nativePager.currentPageOffsetFraction) > .0001f }
+                .first { it }
+            try {
+                nativePager.animateScrollToPage(nativePager.currentPage)
+                // A settle that ends off by a rounding error snaps, so the check cannot spin.
+                if (kotlin.math.abs(nativePager.currentPageOffsetFraction) > .0001f)
+                    nativePager.scrollToPage(nativePager.currentPage)
+            } catch (interrupted: kotlinx.coroutines.CancellationException) {
+                // A new swipe took over; the next check waits for it to finish.
+                if (!kotlinx.coroutines.currentCoroutineContext().isActive) throw interrupted
+                androidx.compose.runtime.withFrameNanos { }
             }
+        }
     }
     val scope = rememberCoroutineScope()
     var previousHomePages by remember { mutableIntStateOf(homePages) }
