@@ -1853,10 +1853,13 @@ private fun SharedHomeGrid(
             val x = cellWidth * (localIndex % GRID_COLUMNS)
             val y = rowTop(row).dp
             if (folder.large) {
-                // As wide as from the left icon's edge to the right one's, and square.
-                val side = minOf(cellWidth.value + iconSize, rowTop(row + 2) - rowTop(row) - (if (labels) 26f else 4f))
+                // Square, at most from the left icon's edge to the right one's and from the top row's
+                // icon top to the bottom row's icon bottom. It sits on the bottom row, so its name
+                // lines up with that row's app names.
+                val iconsBottom = rowTop(row + 1) + iconSize
+                val side = minOf(cellWidth.value + iconSize, iconsBottom - rowTop(row))
                 LargeFolderTile(folder, appsById, side, labels, drag, page,
-                    Modifier.offset(x = x + (cellWidth * 2 - side.dp) / 2, y = y).width(side.dp)
+                    Modifier.offset(x = x + (cellWidth * 2 - side.dp) / 2, y = (iconsBottom - side).dp).width(side.dp)
                         .testTag("home-folder-${folder.id}"), onOpen = { onFolder(folder.id) }, onLaunch = onLaunch)
             } else FolderTile(folder, appsById, iconSize, labels, drag, page,
                 Modifier.offset(x = x, y = y).width(cellWidth).height(rowHeight.dp)
@@ -2082,8 +2085,10 @@ private fun LargeFolderTile(folder: FolderEntry, apps: Map<String, AppEntry>, si
                 }
             }
         }
-        if (labels) Text(folder.title, color = Color.White, fontSize = 11.sp, maxLines = 1,
-            overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
+        // Set like the app names beside it, so they share a line.
+        if (labels) Text(folder.title, color = Color.White, fontSize = 11.sp, lineHeight = 14.sp, maxLines = 1,
+            overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center,
+            style = TextStyle(shadow = Shadow(Color.Black.copy(alpha = .55f), Offset(0f, 1f), 3f)), modifier = Modifier.padding(top = 4.dp))
     }
 }
 
