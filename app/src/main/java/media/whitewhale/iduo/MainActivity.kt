@@ -120,7 +120,8 @@ class MainActivity : ComponentActivity() {
                 androidx.compose.foundation.layout.Box(androidx.compose.ui.Modifier.fillMaxSize()
                     .then(if (state.foldAnimation) androidx.compose.ui.Modifier.foldFrost(foldFrost, onCover) else androidx.compose.ui.Modifier)) {
                 androidx.compose.runtime.CompositionLocalProvider(LocalBadgeCounts provides
-                    if (state.notificationBadges && NotificationBadges.accessGranted) NotificationBadges.counts else emptyMap()) {
+                    if (state.notificationBadges && NotificationBadges.accessGranted) NotificationBadges.counts else emptyMap(),
+                    LocalFolderShape provides state.folderShape) {
                 LauncherScreen(state, model, widgets, homeRequests.intValue,
                     onLaunch = { launchApp(it) }, onMakeDefault = ::makeDefault, onAppInfo = ::appInfo,
                     isDefaultHome = defaultHome.value, deviceStatus = deviceStatus, onStatusMode = ::setStatusMode, onWallpaperSettings = ::openWallpaperSettings,
