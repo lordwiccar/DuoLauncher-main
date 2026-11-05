@@ -29,7 +29,7 @@ A native Android launcher built around a right-side dock and a home screen that 
 - A 4 × 4, 4 × 5 or 4 × 6 Home grid and four to eight dock apps; on the cover screen the dock can slide in from the edge or hide.
 - One Home for both screens, or a separate cover Home with its own apps, folders, widgets and up to five columns.
 - Android's own wallpaper on Home, set from a photo or the bundled dunes; third-party icon packs; light/dark/system or sunrise/sunset appearance; and layout export/import.
-- English, Czech, Slovak, Polish, and German, following the system language or chosen in **Language**.
+- English, Czech, Slovak, Polish, German, Simplified Chinese, Japanese, and Korean, following the system language or chosen in **Language**.
 
 Android still controls the lock screen, notification panels, recents, and system app transitions.
 
@@ -60,7 +60,7 @@ Updates install over the existing app when they are signed with the same key. Un
 | Notifications / Quick Settings | Swipe down from Home's left 70% / right 30%, after enabling optional Home gestures |
 | Lock the screen | Double-tap empty space on Home, after enabling optional Home gestures |
 
-The surrounding status ring shows battery, the inner arcs show Wi-Fi strength, and the lower dots show cellular strength. Unknown readings are not displayed as full signal. This rail applies to Home only.
+The surrounding status ring shows battery. On Wi-Fi the middle shows Wi-Fi strength and the lower dots show cellular strength; on mobile data the middle shows signal bars with the network, such as 5G, below them. Unknown readings are not displayed as full signal. This rail applies to Home only.
 
 ## Optional access and privacy
 

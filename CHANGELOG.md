@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### New features
+- Simplified Chinese, Japanese and Korean, following the system language or chosen in Settings.
+
+### Look and feel
+- The status ring is redrawn: a slimmer ring, a narrower opening with square ends for the battery level, and a new Wi-Fi symbol. Without Wi-Fi it shows four signal bars with the network, such as 5G, in the bottom opening.
+
 ## 1.1.6
 
 First public release on Google Play (version code 9).
