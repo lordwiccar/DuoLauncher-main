@@ -389,7 +389,7 @@ private fun settingsEntries(): List<SettingsEntry> {
     fun entries(page: SettingsPage, vararg titles: Int) = titles.map { page to it }
     val all = entries(SettingsPage.APPEARANCE, R.string.wallpaper, R.string.use_iduo_dunes, R.string.choose_photo,
             R.string.android_wallpaper, R.string.settings_color_mode, R.string.appearance_dark, R.string.appearance_sun,
-            R.string.folder_transparency, R.string.folder_shape, R.string.icon_shape, R.string.icon_style, R.string.settings_icon_pack) +
+            R.string.glass_style, R.string.folder_transparency, R.string.folder_shape, R.string.icon_shape, R.string.icon_style, R.string.settings_icon_pack) +
         entries(SettingsPage.HOME, R.string.grid_layout, R.string.icon_size, R.string.row_spacing, R.string.show_app_names,
             R.string.notification_badges, R.string.settings_fold_animation,
             R.string.choose_home_apps, R.string.widgets, R.string.show_status, R.string.all_apps_view, R.string.reset_layout,
@@ -638,6 +638,15 @@ private fun AppearancePage(model: LauncherModel, state: LauncherState, appearanc
         if (state.iconStyle != IconStyle.ORIGINAL) SwitchRow(stringResource(R.string.icon_style_when_dark),
             stringResource(R.string.icon_style_when_dark_detail), state.iconStyleWhenDark,
             { model.setIconLook(whenDark = it) }, tag = "icon-style-when-dark")
+    }
+    SettingsGroup {
+        GroupBody {
+            GroupTitle(stringResource(R.string.glass_style))
+            val styles = GlassStyle.entries
+            Choice(listOf(stringResource(R.string.glass_frosted) to "glass-frosted", stringResource(R.string.glass_liquid) to "glass-liquid"),
+                styles.indexOf(state.glassStyle), { model.setGlassStyle(styles[it]) })
+            if (state.glassStyle == GlassStyle.LIQUID) Detail(stringResource(R.string.glass_liquid_detail))
+        }
     }
     SettingsGroup {
         GroupBody {

@@ -499,6 +499,7 @@ fun LauncherScreen(
         windowManager.addCrossWindowBlurEnabledListener(listener)
         onDispose { windowManager.removeCrossWindowBlurEnabledListener(listener) }
     }
+    val wallpaperSharp by remember { derivedStateOf { wallpaperBlurProgress <= .02f } }
     val wallpaperBlurPx = with(LocalDensity.current) { WALLPAPER_BACKDROP_BLUR.toPx() }
     LaunchedEffect(windowBlurs, wallpaperBlurPx) {
         var applied = -1
@@ -798,21 +799,28 @@ fun LauncherScreen(
                     },
                 compact = contentHeight < 500.dp, iconSize = dockIconSize(geometry.iconSize).dp)
             val dockGlass = state.dockBackground
+            val dockLiquid = dockGlass && state.glassStyle == GlassStyle.LIQUID
             if (dockMode != DockMode.HIDDEN) Surface(Modifier.align(Alignment.TopEnd).padding(end = 12.dp).offset(y = geometry.dockTop.dp)
                 .width(preset.dockWidth.dp).height(geometry.dockHeight.dp).graphicsLayer {
                     // Composite the stationary dock independently of the shared pager layer.
                     compositingStrategy = androidx.compose.ui.graphics.CompositingStrategy.Offscreen
                     translationX = (1f - dockReveal.value) * dockTravel
                 }.onGloballyPositioned { dockBounds[0] = it.boundsInRoot() }
-                .then(if (dockGlass) Modifier.frostedWallpaper(RoundedCornerShape(30.dp)) else Modifier)
+                // Over a blurred wallpaper a sharp picture in the glass would stand out, so it stays clear.
+                .then(if (dockLiquid) Modifier.liquidGlass(RoundedCornerShape(30.dp), refract = wallpaperSharp)
+                    else if (dockGlass) Modifier.frostedWallpaper(RoundedCornerShape(30.dp)) else Modifier)
                 .then(if (dockMode == DockMode.SLIDE) Modifier.pointerInput(Unit) {
                     detectHorizontalDragGestures(onDragStart = dockDragBegin, onDragEnd = dockDragEnd,
                         onDragCancel = dockDragEnd) { change, dx -> if (dx > 0f || dockReveal.value < 1f) { change.consume(); dockDrag(dx) } }
                 } else Modifier).testTag("dock"),
                 // Frosted glass covers what lies behind, so icons under a sliding dock do not show through.
-                shape = RoundedCornerShape(30.dp), color = if (dockGlass) Glass.copy(alpha = .32f) else Color.Transparent,
-                border = if (dockGlass) androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .3f)) else null) {
-                if (dockGlass && !ownWallpaper && SamsungBlur.available)
+                shape = RoundedCornerShape(30.dp), color = when {
+                    dockLiquid -> Color.White.copy(alpha = LIQUID_DOCK_TINT)
+                    dockGlass -> Glass.copy(alpha = .32f)
+                    else -> Color.Transparent
+                },
+                border = if (dockGlass && !dockLiquid) androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .3f)) else null) {
+                if (dockGlass && !dockLiquid && !ownWallpaper && SamsungBlur.available)
                     SamsungWallpaperBlur(DOCK_SAMSUNG_BLUR, 30.dp, Glass.copy(alpha = .32f), Modifier.fillMaxSize())
                 Column(Modifier.padding(vertical = 8.dp).verticalScroll(dockScroll)) {
                     DockAppColumn(state.dock, previewLayout.dock, appsById, geometry.dockRowHeight,
@@ -2081,7 +2089,7 @@ private fun <T> List<T>.slicePage(range: IntRange): List<T> =
 private fun DockFolderIcon(folder: FolderEntry, apps: Map<String, AppEntry>, size: Float, drag: HomeDragState, modifier: Modifier = Modifier) {
     val outline = LocalFolderShape.current.outline(size.dp)
     Box(modifier.size(size.dp).clip(outline)
-        .background(Glass.copy(alpha = .72f)).border(1.dp, Color.White.copy(alpha = .55f), outline)
+        .folderGlass(outline)
         .dropRegion(drag, DropTarget.Folder(folder.id), folderId = folder.id).testTag("dock-folder-${folder.id}")) {
         FolderPreviewIcons(folder, apps, size)
     }
@@ -2121,7 +2129,7 @@ private fun LargeFolderTile(folder: FolderEntry, apps: Map<String, AppEntry>, si
     val openLabel = stringResource(R.string.folder_open, folder.title)
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Box(Modifier.size(side.dp).clip(outline)
-            .background(Glass.copy(alpha = .72f)).border(1.dp, Color.White.copy(alpha = .55f), outline)
+            .folderGlass(outline, tint = LIQUID_LARGE_FOLDER_TINT, refract = true)
             .clickable(onClickLabel = openLabel, onClick = onOpen)
             .dropRegion(drag, DropTarget.Folder(folder.id), page = page, folderId = folder.id)
             .testTag("folder-drop-${folder.id}")) {
@@ -2163,7 +2171,7 @@ private fun FolderTile(folder: FolderEntry, apps: Map<String, AppEntry>, size: F
         Box {
         val outline = LocalFolderShape.current.outline(size.dp)
         Box(Modifier.size(size.dp).clip(outline)
-            .background(Glass.copy(alpha = .72f)).border(1.dp, Color.White.copy(alpha = .55f), outline)
+            .folderGlass(outline)
             .dropRegion(drag, DropTarget.Folder(folder.id), page = page, folderId = folder.id)
             .testTag("folder-drop-${folder.id}")) {
             FolderPreviewIcons(folder, apps, size)

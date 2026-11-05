@@ -117,6 +117,8 @@ data class LauncherState(
     val dockRecents: Boolean = true,
     /** The glass behind the dock; without it the icons float on the wallpaper. */
     val dockBackground: Boolean = true,
+    /** What the dock, folders, news and All apps are made of. */
+    val glassStyle: GlassStyle = GlassStyle.FROSTED,
     /** How the dock appears on the cover screen; the inner screen always shows it. */
     val dockMode: DockMode = DockMode.SHOWN,
     /** The cover screen has its own Home layout instead of mirroring the inner screen's. */
@@ -645,6 +647,10 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         mutable.update { it.copy(recentApps = (listOf(appId) + it.recentApps.filterNot(appId::equals)).take(MAX_RECENT_APPS)) }
         persist()
     }
+    fun setGlassStyle(value: GlassStyle) {
+        if (statePayloadInvalid) return
+        mutable.update { it.copy(glassStyle = value) }; persist()
+    }
     fun setDockBackground(value: Boolean) {
         if (statePayloadInvalid) return
         mutable.update { it.copy(dockBackground = value) }; persist()
@@ -882,6 +888,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .put("libraryFolders", s.libraryFolders)
             .put("leftPage", s.leftPage.name)
             .put("dockBackground", s.dockBackground)
+            .put("glassStyle", s.glassStyle.name)
             .put("doubleTapLock", s.doubleTapLock)
             .put("swipeDownShade", s.swipeDownShade)
             .put("swipeUpSearch", s.swipeUpSearch)
@@ -1073,6 +1080,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             // Layouts from before Google News chose "DISCOVER", which now falls back to Google News.
             leftPage = LeftPage.entries.firstOrNull { it.name == j.optString("leftPage") } ?: LeftPage.GOOGLE_NEWS,
             dockBackground = j.optBoolean("dockBackground", true),
+            glassStyle = GlassStyle.entries.firstOrNull { it.name == j.optString("glassStyle") } ?: GlassStyle.FROSTED,
             doubleTapLock = j.optBoolean("doubleTapLock", true),
             swipeDownShade = j.optBoolean("swipeDownShade", true),
             swipeUpSearch = j.optBoolean("swipeUpSearch", true),

@@ -125,7 +125,7 @@ class MainActivity : ComponentActivity() {
                     .then(if (state.foldAnimation) androidx.compose.ui.Modifier.foldFrost(foldFrost, onCover) else androidx.compose.ui.Modifier)) {
                 androidx.compose.runtime.CompositionLocalProvider(LocalBadgeCounts provides
                     if (state.notificationBadges && NotificationBadges.accessGranted) NotificationBadges.counts else emptyMap(),
-                    LocalFolderShape provides state.folderShape) {
+                    LocalFolderShape provides state.folderShape, LocalGlassStyle provides state.glassStyle) {
                 LauncherScreen(state, model, widgets, homeRequests.intValue,
                     onLaunch = { launchApp(it) }, onMakeDefault = ::makeDefault, onAppInfo = ::appInfo,
                     isDefaultHome = defaultHome.value, deviceStatus = deviceStatus, onStatusMode = ::setStatusMode, onWallpaperSettings = ::openWallpaperSettings,
