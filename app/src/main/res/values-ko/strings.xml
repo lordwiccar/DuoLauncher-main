@@ -550,4 +550,7 @@
     <string name="notification_badges_needs_access">알림 접근 권한이 필요합니다: iDuo는 앱별 알림 수만 세고 그 외에는 아무것도 보관하지 않습니다.</string>
     <string name="notification_badges_allow">알림 접근 허용</string>
     <string name="notification_badges_service">iDuo 알림 배지</string>
+    <string name="dock_background">독 배경</string>
+    <string name="dock_background_detail">끄면 아이콘이 배경화면 위에 떠 있습니다.</string>
+    <string name="left_widgets_detail">위젯을 길게 누르면 이동, 크기 조정 또는 제거할 수 있습니다.</string>
 </resources>

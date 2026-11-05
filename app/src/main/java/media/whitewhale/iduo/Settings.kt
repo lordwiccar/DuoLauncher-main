@@ -92,7 +92,7 @@ private val CATEGORY_GROUPS = listOf(
         Category(SettingsPage.DOCK, Icons.Rounded.ViewSidebar, R.string.customize_dock, "customization-dock")),
     R.string.settings_group_control to listOf(
         Category(SettingsPage.GESTURES, Icons.Rounded.TouchApp, R.string.customize_gestures, "customization-gestures"),
-        Category(SettingsPage.NEWS, Icons.Rounded.Newspaper, R.string.help_news_title, "customization-news")),
+        Category(SettingsPage.NEWS, Icons.Rounded.Newspaper, R.string.left_page, "customization-news")),
     R.string.settings_group_system to listOf(
         Category(SettingsPage.SYSTEM, Icons.Rounded.Language, R.string.customize_system, "customization-system"),
         Category(SettingsPage.SUPPORT, Icons.Rounded.HelpOutline, R.string.customize_support, "customization-support")),
@@ -353,9 +353,11 @@ private fun categorySummaries(state: LauncherState, appearance: AppearanceState,
         SettingsPage.GESTURES to if (!homeGesturesOn && (state.swipeDownShade || state.doubleTapLock))
             stringResource(R.string.settings_gestures_off_title)
             else gestures.joinToString(" · ").ifEmpty { stringResource(R.string.settings_gestures_none) },
-        SettingsPage.NEWS to if (state.leftPage == LeftPage.GOOGLE_NEWS)
-            "Google News · " + GoogleNewsSettings.edition.label(locale)
-            else stringResource(R.string.settings_rss_summary, NewsFeeds.custom.sources.size),
+        SettingsPage.NEWS to when (state.leftPage) {
+            LeftPage.GOOGLE_NEWS -> "Google News · " + GoogleNewsSettings.edition.label(locale)
+            LeftPage.RSS -> stringResource(R.string.settings_rss_summary, NewsFeeds.custom.sources.size)
+            LeftPage.WIDGETS -> stringResource(R.string.widgets) + " · " + state.leftWidgets.size
+        },
         SettingsPage.SYSTEM to if (languageTag.isEmpty()) stringResource(R.string.language_system) else AppLanguage.nativeName(languageTag),
         SettingsPage.SUPPORT to stringResource(R.string.settings_support_summary),
     )
@@ -374,7 +376,7 @@ private fun pageTitle(page: SettingsPage) = when (page) {
     SettingsPage.HOME -> R.string.customize_home
     SettingsPage.DOCK -> R.string.customize_dock
     SettingsPage.GESTURES -> R.string.customize_gestures
-    SettingsPage.NEWS -> R.string.help_news_title
+    SettingsPage.NEWS -> R.string.left_page
     SettingsPage.SYSTEM -> R.string.customize_system
     SettingsPage.SUPPORT -> R.string.customize_support
     SettingsPage.HELP -> R.string.customize_help
@@ -393,7 +395,7 @@ private fun settingsEntries(): List<SettingsEntry> {
             R.string.choose_home_apps, R.string.widgets, R.string.show_status, R.string.all_apps_view, R.string.reset_layout,
             R.string.settings_cover_rotation, R.string.all_apps_view_home, R.string.all_apps_view_folders, R.string.settings_display_layout,
             R.string.display_layout_separate, R.string.cover_columns) +
-        entries(SettingsPage.DOCK, R.string.settings_dock_mode, R.string.dock_mode_slide, R.string.settings_dock_count, R.string.dock_width, R.string.dock_align, R.string.dock_height) +
+        entries(SettingsPage.DOCK, R.string.dock_background, R.string.settings_dock_mode, R.string.dock_mode_slide, R.string.settings_dock_count, R.string.dock_width, R.string.dock_align, R.string.dock_height) +
         entries(SettingsPage.GESTURES, R.string.gesture_down, R.string.gesture_double, R.string.gesture_up,
             R.string.gesture_side, R.string.settings_search_button, R.string.settings_service_title) +
         entries(SettingsPage.NEWS, R.string.left_page, R.string.news_edition, R.string.news_topics, R.string.rss_sources) +
@@ -925,6 +927,9 @@ private fun DockPage(state: LauncherState, wide: Boolean, model: LauncherModel) 
     SettingsGroup {
         SwitchRow(stringResource(R.string.dock_recents), stringResource(R.string.dock_recents_detail), state.dockRecents,
             model::setDockRecents, "dock-recents-switch")
+        GroupDivider()
+        SwitchRow(stringResource(R.string.dock_background), stringResource(R.string.dock_background_detail), state.dockBackground,
+            model::setDockBackground, "dock-background-switch")
     }
     SettingsGroup {
         SliderRow(stringResource(R.string.dock_width), stringResource(R.string.value_dp, p.dockWidth.toInt()), p.dockWidth, 56f..84f) {
@@ -996,10 +1001,13 @@ private fun NewsSettingsPage(state: LauncherState, model: LauncherModel) {
     SettingsGroup {
         GroupBody {
             GroupTitle(stringResource(R.string.left_page))
+            val leftPages = listOf(LeftPage.GOOGLE_NEWS, LeftPage.RSS, LeftPage.WIDGETS)
             Choice(listOf(stringResource(R.string.left_page_google_news) to "left-page-google-news",
-                stringResource(R.string.left_page_rss) to "left-page-rss"),
-                if (state.leftPage == LeftPage.RSS) 1 else 0, { model.setLeftPage(if (it == 1) LeftPage.RSS else LeftPage.GOOGLE_NEWS) })
+                stringResource(R.string.left_page_rss) to "left-page-rss",
+                stringResource(R.string.widgets) to "left-page-widgets"),
+                leftPages.indexOf(state.leftPage), { model.setLeftPage(leftPages[it]) })
             Detail(stringResource(R.string.settings_news_detail))
+            if (state.leftPage == LeftPage.WIDGETS) Detail(stringResource(R.string.left_widgets_detail))
         }
     }
     if (state.leftPage == LeftPage.GOOGLE_NEWS) {
@@ -1022,7 +1030,7 @@ private fun NewsSettingsPage(state: LauncherState, model: LauncherModel) {
         if (choosingEdition) NewsEditionDialog(locale, onDismiss = { choosingEdition = false }) {
             GoogleNewsSettings.setEdition(context, it); choosingEdition = false
         }
-    } else RssSourcesSettings()
+    } else if (state.leftPage == LeftPage.RSS) RssSourcesSettings()
 }
 
 @Composable
@@ -1239,7 +1247,7 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
             } }
         }
         if (dock) Column(Modifier.align(Alignment.CenterEnd).padding(end = unit(10f)).width(unit(36f * preset.dockWidth / 68f))
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = .42f), RoundedCornerShape(unit(18f)))
+            .background(if (state.dockBackground) MaterialTheme.colorScheme.surface.copy(alpha = .42f) else Color.Transparent, RoundedCornerShape(unit(18f)))
             .padding(vertical = unit(8f)), horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(unit(8f))) {
             dockIcons.forEach { app -> Image(app.icon.asImageBitmap(), null, Modifier.size(unit(22f)).clip(RoundedCornerShape(unit(7f)))) }

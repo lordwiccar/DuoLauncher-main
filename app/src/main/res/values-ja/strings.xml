@@ -550,4 +550,7 @@
     <string name="notification_badges_needs_access">通知へのアクセスが必要です: iDuo はアプリごとの通知数を数えるだけで、それ以外は保持しません。</string>
     <string name="notification_badges_allow">通知へのアクセスを許可</string>
     <string name="notification_badges_service">iDuo の通知バッジ</string>
+    <string name="dock_background">ドックの背景</string>
+    <string name="dock_background_detail">オフにすると、アイコンが壁紙の上に浮かびます。</string>
+    <string name="left_widgets_detail">ウィジェットを長押しすると、移動、サイズ変更、削除ができます。</string>
 </resources>

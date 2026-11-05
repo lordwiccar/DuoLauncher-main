@@ -612,4 +612,7 @@
     <string name="notification_badges_needs_access">Wymaga dostępu do powiadomień: iDuo liczy powiadomienia każdej aplikacji i niczego więcej nie zachowuje.</string>
     <string name="notification_badges_allow">Zezwól na dostęp do powiadomień</string>
     <string name="notification_badges_service">Plakietki powiadomień iDuo</string>
+    <string name="dock_background">Tło doku</string>
+    <string name="dock_background_detail">Po wyłączeniu ikony unoszą się na tapecie.</string>
+    <string name="left_widgets_detail">Przytrzymaj widżet, aby go przenieść, zmienić jego rozmiar lub usunąć.</string>
 </resources>

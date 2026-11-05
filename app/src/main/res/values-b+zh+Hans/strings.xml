@@ -550,4 +550,7 @@
     <string name="notification_badges_needs_access">需要通知访问权限：iDuo 仅统计每个应用的通知数量，不保留其他任何内容。</string>
     <string name="notification_badges_allow">允许通知访问权限</string>
     <string name="notification_badges_service">iDuo 通知角标</string>
+    <string name="dock_background">程序坞背景</string>
+    <string name="dock_background_detail">关闭后，图标将悬浮在壁纸上。</string>
+    <string name="left_widgets_detail">按住小组件可移动、调整大小或移除。</string>
 </resources>

@@ -159,6 +159,10 @@ fun LauncherScreen(
     var sheet by rememberSaveable { mutableStateOf("") }
     var dockSlot by rememberSaveable { mutableIntStateOf(0) }
     var widgetSlot by rememberSaveable { mutableIntStateOf(0) }
+    // The widget picker is choosing for the left page rather than a Home cell.
+    var pickingForLeftPage by rememberSaveable { mutableStateOf(false) }
+    var leftWidgetId by rememberSaveable { mutableStateOf<Int?>(null) }
+    LaunchedEffect(sheet) { if (sheet != "widgets") pickingForLeftPage = false }
     var widgetTargetIndex by rememberSaveable { mutableIntStateOf(Int.MIN_VALUE) }
     var widgetExactTarget by rememberSaveable { mutableStateOf(false) }
     var widgetPackage by rememberSaveable { mutableStateOf<String?>(null) }
@@ -461,10 +465,12 @@ fun LauncherScreen(
     // The wallpaper blurs fully behind an open folder or search, and as All apps or the news
     // page slides in, so their labels stay readable on busy wallpapers. The dock instead frosts
     // only the wallpaper behind itself; see frostedWallpaper.
-    val wallpaperBlurProgress by remember(nativePager, firstHome, visibleHomePages, hasLibrary) {
+    val leftPageOnWallpaper = state.leftPage == LeftPage.WIDGETS
+    val wallpaperBlurProgress by remember(nativePager, firstHome, visibleHomePages, hasLibrary, leftPageOnWallpaper) {
         derivedStateOf {
             val position = nativePager.currentPage + nativePager.currentPageOffsetFraction - firstHome
-            val panel = maxOf((-position).coerceIn(0f, 1f),
+            // Widgets bring their own backgrounds, and that page is there for a clean wallpaper.
+            val panel = maxOf(if (leftPageOnWallpaper) 0f else (-position).coerceIn(0f, 1f),
                 if (hasLibrary) (position - (visibleHomePages - 1)).coerceIn(0f, 1f) else 0f)
             maxOf(panel, folderBlur / FOLDER_BACKDROP_BLUR)
         }
@@ -697,6 +703,8 @@ fun LauncherScreen(
                     onLongPress = { openHomeOptionsAt(it, size.width) }, onDoubleTap = { lockAt(it) })
             }) {
             val leftPageTitle = stringResource(leftPageTitle(state.leftPage))
+            val onAddLeftWidget = { pickingForLeftPage = true; widgetPackage = null; widgetProfileSerial = null; widgetExactTarget = false; sheet = "widgets" }
+            val onLeftWidgetOptions = { id: Int -> leftWidgetId = id; sheet = "leftWidgetActions" }
             val pagerModifier = Modifier.fillMaxHeight().width(pagerWidth).testTag("app-pager")
                 .semantics { stateDescription = if (pager.currentPage == -1) leftPageTitle
                     else if (hasLibrary && pager.currentPage == visibleHomePages) launcherActivity.getString(R.string.all_apps)
@@ -721,6 +729,7 @@ fun LauncherScreen(
                         onFolder = { openFolderId = it },
                         onEmptyWidget = { emptyCellIndex = it },
                         onRefresh = model::refresh,
+                        onAddLeftWidget = onAddLeftWidget, onLeftWidgetOptions = onLeftWidgetOptions,
                     )
                 }
             } else {
@@ -732,7 +741,9 @@ fun LauncherScreen(
                     key = { if (it < firstHome) "left" else if (it - firstHome == visibleHomePages) "library" else "home-${it - firstHome}" }) { physicalPage ->
                     val page = physicalPage - firstHome
                     if (page == -1) {
-                        NewsPage(Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, bottom = bottomSpace),
+                        if (state.leftPage == LeftPage.WIDGETS) LeftWidgetsPage(state.leftWidgets, widgets, onAddLeftWidget, onLeftWidgetOptions,
+                            Modifier.fillMaxSize().padding(start = 16.dp, top = geometry.contentTop.dp, bottom = bottomSpace))
+                        else NewsPage(Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, bottom = bottomSpace),
                             active = pager.currentPage == -1, mode = state.leftPage)
                     } else if (page == visibleHomePages) {
                         AppLibrary(state, libraryQuery, { libraryQuery = it }, onLaunch, model::setPinned,
@@ -763,20 +774,22 @@ fun LauncherScreen(
                             if (contentHeight < 500.dp) 0f else 23f).coerceAtLeast(0f)
                     },
                 compact = contentHeight < 500.dp, iconSize = dockIconSize(geometry.iconSize).dp)
+            val dockGlass = state.dockBackground
             if (dockMode != DockMode.HIDDEN) Surface(Modifier.align(Alignment.TopEnd).padding(end = 12.dp).offset(y = geometry.dockTop.dp)
                 .width(preset.dockWidth.dp).height(geometry.dockHeight.dp).graphicsLayer {
                     // Composite the stationary dock independently of the shared pager layer.
                     compositingStrategy = androidx.compose.ui.graphics.CompositingStrategy.Offscreen
                     translationX = (1f - dockReveal.value) * dockTravel
-                }.onGloballyPositioned { dockBounds[0] = it.boundsInRoot() }.frostedWallpaper(RoundedCornerShape(30.dp))
+                }.onGloballyPositioned { dockBounds[0] = it.boundsInRoot() }
+                .then(if (dockGlass) Modifier.frostedWallpaper(RoundedCornerShape(30.dp)) else Modifier)
                 .then(if (dockMode == DockMode.SLIDE) Modifier.pointerInput(Unit) {
                     detectHorizontalDragGestures(onDragStart = dockDragBegin, onDragEnd = dockDragEnd,
                         onDragCancel = dockDragEnd) { change, dx -> if (dx > 0f || dockReveal.value < 1f) { change.consume(); dockDrag(dx) } }
                 } else Modifier).testTag("dock"),
                 // Frosted glass covers what lies behind, so icons under a sliding dock do not show through.
-                shape = RoundedCornerShape(30.dp), color = Glass.copy(alpha = .32f),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .3f))) {
-                if (!ownWallpaper && SamsungBlur.available)
+                shape = RoundedCornerShape(30.dp), color = if (dockGlass) Glass.copy(alpha = .32f) else Color.Transparent,
+                border = if (dockGlass) androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .3f)) else null) {
+                if (dockGlass && !ownWallpaper && SamsungBlur.available)
                     SamsungWallpaperBlur(DOCK_SAMSUNG_BLUR, 30.dp, Glass.copy(alpha = .32f), Modifier.fillMaxSize())
                 Column(Modifier.padding(vertical = 8.dp).verticalScroll(dockScroll)) {
                     DockAppColumn(state.dock, previewLayout.dock, appsById, geometry.dockRowHeight,
@@ -811,7 +824,11 @@ fun LauncherScreen(
                 }
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
                     if (!drag.active) IconButton(onClick = openLeftPage, Modifier.size(32.dp).testTag("left-page-link")) {
-                        Icon(if (state.leftPage == LeftPage.RSS) Icons.Rounded.RssFeed else Icons.Rounded.Newspaper,
+                        Icon(when (state.leftPage) {
+                                LeftPage.RSS -> Icons.Rounded.RssFeed
+                                LeftPage.WIDGETS -> Icons.Rounded.Widgets
+                                LeftPage.GOOGLE_NEWS -> Icons.Rounded.Newspaper
+                            },
                             leftPageTitle,
                             tint = Color.White.copy(alpha = .65f), modifier = Modifier.size(17.dp))
                     }
@@ -882,6 +899,21 @@ fun LauncherScreen(
                             AppLibrary(state, pinQuery, { pinQuery = it }, onLaunch, model::setPinned,
                                 onActions = { selectedId = it.id; sheet = "" }, editing = true, modifier = Modifier.weight(1f).fillMaxWidth(),
                                 onTurnOnWork = { model.turnOnWork(it) })
+                        }
+                        "leftWidgetActions" -> state.leftWidgets.firstOrNull { it.id == leftWidgetId }?.let { widget ->
+                            LeftWidgetActions(
+                                title = when (widget.id) {
+                                    CLOCK_WIDGET -> stringResource(R.string.widget_clock)
+                                    DATE_WIDGET -> stringResource(R.string.widget_date)
+                                    INFO_WIDGET -> stringResource(R.string.widget_panel)
+                                    else -> remember(widget.id) { widgets.label(widget.id) }
+                                },
+                                index = state.leftWidgets.indexOf(widget), count = state.leftWidgets.size, heightDp = widget.heightDp,
+                                canConfigure = widgets.canReconfigure(widget.id),
+                                onMove = { model.moveLeftWidget(widget.id, it) },
+                                onResize = { model.resizeLeftWidget(widget.id, it) },
+                                onConfigure = { widgets.reconfigure(widget.id); sheet = "" },
+                                onRemove = { widgets.removeFromLeftPage(widget.id); sheet = "" })
                         }
                         "widgetActions" -> model.placement(widgetSlot)?.let { placement ->
                             val topPitch = (geometry.widgetHeight + 18f) / 2f
@@ -966,12 +998,17 @@ fun LauncherScreen(
                 val footprint: (AppWidgetProviderInfo) -> WidgetSpan? = { provider ->
                     widgets.sizing(provider, pickerSizing)?.takeIf { it.minimumFitsGrid }?.preferred
                 }
+                val addToLeftPage = { provider: AppWidgetProviderInfo ->
+                    widgets.addToLeftPage(provider, geometry.gridWidth)
+                    sheet = ""; widgetPackage = null
+                }
                 VisualWidgetPicker(catalog, catalogProfiles.ifEmpty { listOf(selectedProfile) }, selectedProfile,
                     onSelectProfile = { widgetProfileSerial = it.userSerial; widgetPlacementMessage = null },
                     onTurnOnWork = { model.turnOnWork(it) }, hiddenForDrag = widgetSession != null,
                     footprint = footprint,
                     onBack = widgetPickerBack,
-                    onTap = { provider ->
+                    onTap = tap@{ provider ->
+                        if (pickingForLeftPage) { addToLeftPage(provider); return@tap }
                         footprint(provider)?.let { preferredSpan ->
                             val existing = model.placement(widgetSlot)
                             val constraints = widgets.sizing(provider, pickerSizing)
@@ -1009,6 +1046,11 @@ fun LauncherScreen(
                         }
                     },
                     onBuiltin = builtin@{ builtinId ->
+                        if (pickingForLeftPage) {
+                            model.addLeftWidget(builtinId, defaultLeftWidgetHeight(0f, 0))
+                            sheet = ""; widgetPackage = null
+                            return@builtin
+                        }
                         val existing = model.placement(widgetSlot)
                         val special = existing?.takeIf { it.row + it.spanY > GRID_ROWS }
                         val span = existing?.let { WidgetSpan(it.spanX, it.spanY) } ?: WidgetSpan(2, 2)
@@ -1036,7 +1078,8 @@ fun LauncherScreen(
                             launcherActivity.getString(R.string.widget_no_room_card) else null
                         scope.launch { pager.scrollToPage(homeCellPage(free ?: requested).coerceIn(0, homePages)) }
                     },
-                    onDragStart = { provider, point ->
+                    onDragStart = dragStart@{ provider, point ->
+                        if (pickingForLeftPage) { addToLeftPage(provider); return@dragStart }
                         footprint(provider)?.let { span ->
                             widgetSession = WidgetPickerSession(provider, widgetSlot, span, point, dragging = true)
                             widgetPlacementMessage = null
@@ -1505,6 +1548,8 @@ private fun ExpandedWorkspace(
     onFolder: (String) -> Unit,
     onEmptyWidget: (Int) -> Unit,
     onRefresh: () -> Unit,
+    onAddLeftWidget: () -> Unit,
+    onLeftWidgetOptions: (Int) -> Unit,
 ) {
     val density = LocalDensity.current
     val viewportWidth = motion.pageWidth
@@ -1569,7 +1614,9 @@ private fun ExpandedWorkspace(
             key("left-page-pane") {
                 // One pane wide, so the leading Home page stays in view beside it.
                 Box(Modifier.placeFading(-stride).width(with(density) { stride.toDp() }).fillMaxHeight()) {
-                    NewsPage(Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, bottom = bottomSpace),
+                    if (state.leftPage == LeftPage.WIDGETS) LeftWidgetsPage(state.leftWidgets, widgets, onAddLeftWidget, onLeftWidgetOptions,
+                        Modifier.fillMaxSize().padding(start = 16.dp, top = geometry.contentTop.dp, bottom = bottomSpace))
+                    else NewsPage(Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, bottom = bottomSpace),
                         active = nativePager.currentPage < firstHome, mode = state.leftPage)
                 }
             }
@@ -2140,7 +2187,7 @@ private fun AppTile(app: AppEntry, size: Float, labels: Boolean, modifier: Modif
 }
 
 @Composable
-private fun GlassCard(modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+internal fun GlassCard(modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
     Surface(modifier.fillMaxSize().clip(RoundedCornerShape(24.dp)).clickable(onClick = onClick),
         color = Glass.copy(alpha = .24f), shape = RoundedCornerShape(24.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .18f))) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.SpaceBetween, content = content)
@@ -2154,7 +2201,7 @@ private fun currentTime(): LocalDateTime {
 }
 
 @Composable
-private fun ClockCard(onClick: () -> Unit) {
+internal fun ClockCard(onClick: () -> Unit) {
     val time = currentTime()
     val format = if (android.text.format.DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "h:mm"
     GlassCard(onClick = onClick) {
@@ -2165,7 +2212,7 @@ private fun ClockCard(onClick: () -> Unit) {
 }
 
 @Composable
-private fun DateCard(onClick: () -> Unit) {
+internal fun DateCard(onClick: () -> Unit) {
     val date = currentTime()
     val locale = LocalConfiguration.current.locales[0]
     GlassCard(onClick = onClick) {
@@ -2197,7 +2244,7 @@ private fun ExpandedCard(onClick: () -> Unit) {
 }
 
 @Composable
-private fun WidgetSlot(id: Int, slot: Int, controller: WidgetController, modifier: Modifier, onAdd: () -> Unit, fallback: @Composable () -> Unit) {
+internal fun WidgetSlot(id: Int, slot: Int, controller: WidgetController, modifier: Modifier, onAdd: () -> Unit, fallback: @Composable () -> Unit) {
     var restoreMessage by remember(slot) { mutableStateOf<String?>(null) }
     val restoreUnavailable = stringResource(R.string.widget_restore_unavailable)
     BoxWithConstraints(modifier.clip(RoundedCornerShape(24.dp)).testTag("widget-slot-$slot")) {
@@ -2400,4 +2447,5 @@ private fun WidgetActions(
 private fun leftPageTitle(page: LeftPage) = when (page) {
     LeftPage.GOOGLE_NEWS -> R.string.left_page_google_news
     LeftPage.RSS -> R.string.rss_title
+    LeftPage.WIDGETS -> R.string.widgets
 }

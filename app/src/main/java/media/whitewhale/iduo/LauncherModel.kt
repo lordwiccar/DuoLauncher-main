@@ -26,7 +26,7 @@ import org.json.JSONObject
 import java.text.Collator
 
 /** Home's left page: Google News headlines, or the user's own RSS sources. */
-enum class LeftPage { GOOGLE_NEWS, RSS }
+enum class LeftPage { GOOGLE_NEWS, RSS, WIDGETS }
 
 /** Recently opened apps remembered for the dock and the library. */
 const val MAX_RECENT_APPS = 12
@@ -89,6 +89,8 @@ data class LauncherState(
     val libraryFolders: Boolean = false,
     /** What Home's left page shows. */
     val leftPage: LeftPage = LeftPage.GOOGLE_NEWS,
+    /** The widgets on the left page, kept while it shows something else. */
+    val leftWidgets: List<LeftWidget> = emptyList(),
     /** A double tap on empty Home space locks the screen. */
     val doubleTapLock: Boolean = true,
     /** A downward swipe on Home opens notifications or Quick Settings. */
@@ -113,6 +115,8 @@ data class LauncherState(
     val recentApps: List<String> = emptyList(),
     /** Whether empty dock positions show recently opened apps. */
     val dockRecents: Boolean = true,
+    /** The glass behind the dock; without it the icons float on the wallpaper. */
+    val dockBackground: Boolean = true,
     /** How the dock appears on the cover screen; the inner screen always shows it. */
     val dockMode: DockMode = DockMode.SHOWN,
     /** The cover screen has its own Home layout instead of mirroring the inner screen's. */
@@ -622,6 +626,16 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         if (statePayloadInvalid) return
         mutable.update { it.copy(leftPage = value) }; persist()
     }
+    private fun updateLeftWidgets(change: (List<LeftWidget>) -> List<LeftWidget>) {
+        if (statePayloadInvalid) return
+        mutable.update { it.copy(leftWidgets = change(it.leftWidgets)) }; persist()
+    }
+    fun addLeftWidget(id: Int, heightDp: Float) = updateLeftWidgets { it.filterNot { widget -> widget.id == id } + LeftWidget(id, heightDp) }
+    fun removeLeftWidget(id: Int) = updateLeftWidgets { it.filterNot { widget -> widget.id == id } }
+    fun moveLeftWidget(id: Int, by: Int) = updateLeftWidgets { it.movingLeftWidget(id, by) }
+    fun resizeLeftWidget(id: Int, by: Int) = updateLeftWidgets { it.resizingLeftWidget(id, by) }
+    /** Android gave a left page widget a new id when it was connected again. */
+    fun replaceLeftWidget(id: Int, newId: Int) = updateLeftWidgets { list -> list.map { if (it.id == id) it.copy(id = newId) else it } }
     /** A device-local gesture setting. */
     fun setDoubleTapLock(value: Boolean) {
         if (statePayloadInvalid) return
@@ -636,6 +650,10 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         if (statePayloadInvalid) return
         mutable.update { it.copy(recentApps = (listOf(appId) + it.recentApps.filterNot(appId::equals)).take(MAX_RECENT_APPS)) }
         persist()
+    }
+    fun setDockBackground(value: Boolean) {
+        if (statePayloadInvalid) return
+        mutable.update { it.copy(dockBackground = value) }; persist()
     }
     fun setDockRecents(value: Boolean) {
         if (statePayloadInvalid) return
@@ -788,6 +806,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
     }
     val retainedWidgetIds get() = (mutable.value.widgetPlacements.map { it.id } +
         mutable.value.otherLayout?.widgetPlacements.orEmpty().map { it.id } +
+        mutable.value.leftWidgets.map { it.id } +
         (if (mutable.value.canUndoEdit) undoLayout?.first?.widgetPlacements.orEmpty().map { it.id } else emptyList())).filter { it >= 0 }.toSet()
     val canPruneWidgetIds get() = !statePayloadInvalid
     fun setWidget(slot: Int, id: Int) {
@@ -868,6 +887,9 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .put("libraryGrid", s.libraryGrid)
             .put("libraryFolders", s.libraryFolders)
             .put("leftPage", s.leftPage.name)
+            .put("leftWidgets", JSONArray().also { array -> s.leftWidgets.forEach { w ->
+                array.put(JSONObject().put("id", w.id).put("height", w.heightDp.toDouble())) } })
+            .put("dockBackground", s.dockBackground)
             .put("doubleTapLock", s.doubleTapLock)
             .put("swipeDownShade", s.swipeDownShade)
             .put("swipeUpSearch", s.swipeUpSearch)
@@ -1052,6 +1074,10 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             libraryFolders = j.optBoolean("libraryFolders", false),
             // Layouts from before Google News chose "DISCOVER", which now falls back to Google News.
             leftPage = LeftPage.entries.firstOrNull { it.name == j.optString("leftPage") } ?: LeftPage.GOOGLE_NEWS,
+            leftWidgets = j.optJSONArray("leftWidgets")?.let { array -> List(array.length()) { array.optJSONObject(it) }.filterNotNull()
+                .map { LeftWidget(it.optInt("id", EMPTY_WIDGET), it.optDouble("height", 180.0).toFloat().coerceIn(MIN_LEFT_WIDGET_HEIGHT, MAX_LEFT_WIDGET_HEIGHT)) }
+                .filter { it.id != EMPTY_WIDGET }.distinctBy { it.id } }.orEmpty(),
+            dockBackground = j.optBoolean("dockBackground", true),
             doubleTapLock = j.optBoolean("doubleTapLock", true),
             swipeDownShade = j.optBoolean("swipeDownShade", true),
             swipeUpSearch = j.optBoolean("swipeUpSearch", true),

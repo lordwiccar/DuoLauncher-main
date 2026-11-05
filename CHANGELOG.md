@@ -4,6 +4,8 @@
 
 ### New features
 - Simplified Chinese, Japanese and Korean, following the system language or chosen in Settings.
+- The left page can show your widgets instead of news, under Settings → Left page.
+- The dock's background can be turned off, so its icons float on the wallpaper.
 
 ### Look and feel
 - The status ring is redrawn: a slimmer ring, a narrower opening with square ends for the battery level, and a new Wi-Fi symbol. Without Wi-Fi it shows four signal bars with the network, such as 5G, in the bottom opening.

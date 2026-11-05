@@ -592,4 +592,7 @@
     <string name="notification_badges_needs_access">Benötigt Zugriff auf Benachrichtigungen: iDuo zählt Benachrichtigungen je App und speichert sonst nichts.</string>
     <string name="notification_badges_allow">Zugriff auf Benachrichtigungen erlauben</string>
     <string name="notification_badges_service">iDuo Benachrichtigungs-Badges</string>
+    <string name="dock_background">Dock-Hintergrund</string>
+    <string name="dock_background_detail">Schalte ihn aus, damit die Symbole auf dem Hintergrundbild schweben.</string>
+    <string name="left_widgets_detail">Halte ein Widget gedrückt, um es zu verschieben, seine Größe zu ändern oder es zu entfernen.</string>
 </resources>

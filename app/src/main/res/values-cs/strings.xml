@@ -612,4 +612,7 @@
     <string name="notification_badges_needs_access">Vyžaduje přístup k oznámením: iDuo počítá oznámení každé aplikace a nic jiného si neukládá.</string>
     <string name="notification_badges_allow">Povolit přístup k oznámením</string>
     <string name="notification_badges_service">Odznaky oznámení iDuo</string>
+    <string name="dock_background">Pozadí docku</string>
+    <string name="dock_background_detail">Po vypnutí budou ikony volně na tapetě.</string>
+    <string name="left_widgets_detail">Podržením widget přesunete, změníte jeho velikost nebo odeberete.</string>
 </resources>
