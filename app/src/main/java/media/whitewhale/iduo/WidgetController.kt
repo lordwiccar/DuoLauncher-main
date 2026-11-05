@@ -76,10 +76,7 @@ class WidgetController(
             ?: restoredId.takeIf { it >= 0 }?.let(manager::getAppWidgetInfo)?.profile
         val restoredStatus = saved?.getString(PENDING_STATUS)?.let { runCatching { WidgetSetupStatus.valueOf(it) }.getOrNull() }
         val restoredOptions = saved?.getBundle(PENDING_OPTIONS)
-        val alreadyCommitted = restoredPlacement?.let { placement ->
-            if (placement.page == LEFT_PAGE_MARKER) model.state.value.leftWidgets.any { it.id == placement.id }
-            else model.placement(placement.slot) == placement
-        } == true
+        val alreadyCommitted = restoredPlacement?.let { model.placement(it.slot) == it } == true
         val validPending = restoredId >= 0 && restoredPlacement?.id == restoredId &&
             restoredId in host.appWidgetIds && restoredProvider != null && restoredProfile != null &&
             restoredStatus != null && (!hasOriginal || restoredOriginal != null)
@@ -150,9 +147,7 @@ class WidgetController(
         val profile = serial.toLongOrNull()?.let(userManager::getUserForSerialNumber) ?: return
         val provider = runCatching { manager.getInstalledProvidersForProfile(profile) }.getOrNull()
             ?.firstOrNull { it.provider.flattenToString() == component } ?: return
-        val onLeftPage = model.state.value.leftWidgets.any { it.id == id }
-        val placement = model.placement(slot)?.takeIf { it.id == id }
-        if (placement == null && !onLeftPage) return
+        val placement = model.placement(slot)?.takeIf { it.id == id } ?: return
         recovering += id
         android.util.Log.w("iDuo", "Widget $id from $component lost its binding; connecting it again")
         val work = profile != Process.myUserHandle()
@@ -166,11 +161,10 @@ class WidgetController(
             runCatching { manager.bindAppWidgetIdIfAllowed(newId, profile, provider.provider, null) }.getOrDefault(false)
         if (bindsSilently) {
             rememberProvider(newId, provider)
-            if (placement != null) model.setWidget(placement.slot, newId) else model.replaceLeftWidget(id, newId)
+            model.setWidget(placement.slot, newId)
         } else {
             if (newId >= 0) runCatching { host.deleteAppWidgetId(newId) }
-            // The left page has no placeholder to reconnect; its entry stays to be replaced by hand.
-            if (placement != null) model.markWidgetNeedsBinding(placement.slot, id, restore)
+            model.markWidgetNeedsBinding(placement.slot, id, restore)
         }
         knownProviders.edit().remove(id.toString()).apply()
         refreshProviders()
@@ -184,8 +178,7 @@ class WidgetController(
 
     fun canReconfigure(id: Int): Boolean {
         val info = manager.getAppWidgetInfo(id) ?: return false
-        return id >= 0 && (model.state.value.widgetPlacements.any { it.id == id } || model.state.value.leftWidgets.any { it.id == id }) &&
-            info.configure != null &&
+        return id >= 0 && model.state.value.widgetPlacements.any { it.id == id } && info.configure != null &&
             info.widgetFeatures and AppWidgetProviderInfo.WIDGET_FEATURE_RECONFIGURABLE != 0
     }
 
@@ -273,19 +266,6 @@ class WidgetController(
         } catch (_: Exception) { fail() }
     }
 
-    /** Starts adding [provider] to the left page, [widthDp] wide, through the usual binding and setup. */
-    fun addToLeftPage(provider: AppWidgetProviderInfo, widthDp: Float) {
-        val density = activity.resources.displayMetrics.density
-        val height = defaultLeftWidgetHeight(provider.minHeight / density, provider.targetCellHeight)
-        add(WidgetPlacement(LEFT_PAGE_SLOT, EMPTY_WIDGET, LEFT_PAGE_MARKER, 0, 0, widthDp.toInt(), height.toInt()), provider,
-            contentSize = WidgetContentSize(widthDp, height))
-    }
-
-    fun removeFromLeftPage(id: Int) {
-        model.removeLeftWidget(id)
-        reconcileHostIds()
-    }
-
     fun add(slot: Int, provider: AppWidgetProviderInfo) = add(model.placement(slot)
         ?: legacyPlacement(slot, EMPTY_WIDGET), provider)
 
@@ -316,13 +296,6 @@ class WidgetController(
 
     private fun complete() {
         val placement = pendingPlacement ?: return cancel()
-        if (placement.page == LEFT_PAGE_MARKER) {
-            if (pendingId < 0) return cancel()
-            model.addLeftWidget(pendingId, placement.spanY.toFloat())
-            clearPending()
-            reconcileHostIds()
-            return
-        }
         val originalStillPresent = model.placement(placement.slot) == pendingOriginal
         if (pendingId < 0 || !originalStillPresent || !model.placeWidget(placement)) {
             failureMessage = activity.getString(if (!originalStillPresent) R.string.widget_home_changed else R.string.widget_no_room)

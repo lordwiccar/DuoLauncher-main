@@ -552,5 +552,11 @@
     <string name="notification_badges_service">iDuo の通知バッジ</string>
     <string name="dock_background">ドックの背景</string>
     <string name="dock_background_detail">オフにすると、アイコンが壁紙の上に浮かびます。</string>
-    <string name="left_widgets_detail">ウィジェットを長押しすると、移動、サイズ変更、削除ができます。</string>
+    <string name="left_page_home">追加のホームページ</string>
+    <string name="left_page_home_detail">アプリ、フォルダ、ウィジェットを置けるもう 1 つのホームページです。左のページにニュースを表示している間も、ここに置いたものは保存されます。</string>
+    <string name="move_to_left_page">左のページへ移動</string>
+    <string name="glass_style">ガラスのスタイル</string>
+    <string name="glass_frosted">フロスト</string>
+    <string name="glass_liquid">リキッド</string>
+    <string name="glass_liquid_detail">ドック、フォルダ、ニュース、「すべてのアプリ」に、縁が明るい透明なガラスを使います。縁で画像が屈折するのは iDuo で設定した壁紙の上だけです。Android ではアプリが他の壁紙を読み取れないためです。</string>
 </resources>

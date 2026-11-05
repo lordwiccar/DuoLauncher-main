@@ -552,5 +552,11 @@
     <string name="notification_badges_service">iDuo 通知角标</string>
     <string name="dock_background">程序坞背景</string>
     <string name="dock_background_detail">关闭后，图标将悬浮在壁纸上。</string>
-    <string name="left_widgets_detail">按住小组件可移动、调整大小或移除。</string>
+    <string name="left_page_home">额外主屏幕</string>
+    <string name="left_page_home_detail">另一个用于放置应用、文件夹和小组件的主屏幕。当左侧页面显示新闻时，您放在这里的内容仍会保留。</string>
+    <string name="move_to_left_page">移到左侧页面</string>
+    <string name="glass_style">玻璃样式</string>
+    <string name="glass_frosted">磨砂</string>
+    <string name="glass_liquid">液态</string>
+    <string name="glass_liquid_detail">程序坞、文件夹、新闻和“所有应用”使用边缘明亮的透明玻璃。只有在 iDuo 中设置的壁纸上，边缘才会折射画面，因为 Android 不允许应用读取其他壁纸。</string>
 </resources>

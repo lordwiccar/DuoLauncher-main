@@ -614,5 +614,11 @@
     <string name="notification_badges_service">Odznaky oznámení iDuo</string>
     <string name="dock_background">Pozadí docku</string>
     <string name="dock_background_detail">Po vypnutí budou ikony volně na tapetě.</string>
-    <string name="left_widgets_detail">Podržením widget přesunete, změníte jeho velikost nebo odeberete.</string>
+    <string name="left_page_home">Další plocha</string>
+    <string name="left_page_home_detail">Další plocha pro aplikace, složky a widgety. Co sem umístíte, zůstane uložené i ve chvíli, kdy levá stránka ukazuje novinky.</string>
+    <string name="move_to_left_page">Přesunout na levou stránku</string>
+    <string name="glass_style">Styl skla</string>
+    <string name="glass_frosted">Matné</string>
+    <string name="glass_liquid">Tekuté</string>
+    <string name="glass_liquid_detail">Čiré sklo s jasnými okraji na docku, složkách, novinkách a v seznamu aplikací. Okraje ohýbají obraz jen nad tapetou nastavenou v iDuo, protože Android aplikacím nedovoluje číst jiné tapety.</string>
 </resources>

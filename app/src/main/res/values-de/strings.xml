@@ -594,5 +594,11 @@
     <string name="notification_badges_service">iDuo Benachrichtigungs-Badges</string>
     <string name="dock_background">Dock-Hintergrund</string>
     <string name="dock_background_detail">Schalte ihn aus, damit die Symbole auf dem Hintergrundbild schweben.</string>
-    <string name="left_widgets_detail">Halte ein Widget gedrückt, um es zu verschieben, seine Größe zu ändern oder es zu entfernen.</string>
+    <string name="left_page_home">Weitere Startseite</string>
+    <string name="left_page_home_detail">Eine weitere Startseite für Apps, Ordner und Widgets. Was du hier ablegst, bleibt gespeichert, während die linke Seite Nachrichten zeigt.</string>
+    <string name="move_to_left_page">Auf die linke Seite verschieben</string>
+    <string name="glass_style">Glasstil</string>
+    <string name="glass_frosted">Matt</string>
+    <string name="glass_liquid">Flüssig</string>
+    <string name="glass_liquid_detail">Klares Glas mit hellen Rändern auf Dock, Ordnern, Nachrichten und Alle Apps. Die Ränder brechen das Bild nur über einem in iDuo festgelegten Hintergrund, weil Android Apps andere Hintergründe nicht lesen lässt.</string>
 </resources>

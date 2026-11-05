@@ -4,7 +4,7 @@
 
 ### New features
 - Simplified Chinese, Japanese and Korean, following the system language or chosen in Settings.
-- The left page can show your widgets instead of news, under Settings → Left page.
+- The left page can be an extra Home page for apps, folders and widgets instead of news, under Settings → Left page.
 - The dock's background can be turned off, so its icons float on the wallpaper.
 
 ### Look and feel

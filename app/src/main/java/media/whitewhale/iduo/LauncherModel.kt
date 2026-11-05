@@ -26,7 +26,7 @@ import org.json.JSONObject
 import java.text.Collator
 
 /** Home's left page: Google News headlines, or the user's own RSS sources. */
-enum class LeftPage { GOOGLE_NEWS, RSS, WIDGETS }
+enum class LeftPage { GOOGLE_NEWS, RSS, HOME }
 
 /** Recently opened apps remembered for the dock and the library. */
 const val MAX_RECENT_APPS = 12
@@ -60,6 +60,8 @@ data class LauncherState(
     val folders: List<FolderEntry> = emptyList(),
     val homeSlots: List<String?> = emptyList(),
     val leadingSlots: List<String?> = List(HOME_CELLS) { null },
+    /** The extra Home page on the left, in use when [leftPage] is [LeftPage.HOME]. */
+    val leftSlots: List<String?> = List(HOME_CELLS) { null },
     val editRevision: Int = 0,
     val canUndoEdit: Boolean = false,
     val dock: List<String?> = List(4) { null },
@@ -89,8 +91,6 @@ data class LauncherState(
     val libraryFolders: Boolean = false,
     /** What Home's left page shows. */
     val leftPage: LeftPage = LeftPage.GOOGLE_NEWS,
-    /** The widgets on the left page, kept while it shows something else. */
-    val leftWidgets: List<LeftWidget> = emptyList(),
     /** A double tap on empty Home space locks the screen. */
     val doubleTapLock: Boolean = true,
     /** A downward swipe on Home opens notifications or Quick Settings. */
@@ -134,7 +134,7 @@ data class LauncherState(
     val order: List<String> get() = homeSlots.filterNotNull()
     val widgets: List<Int> get() = layout.widgets
     /** The layout on screen now. */
-    val layout: HomeLayout get() = HomeLayout(homeSlots, dock, widgetPlacements, folders, widgetRestores, leadingSlots, homeRows, homeColumns)
+    val layout: HomeLayout get() = HomeLayout(homeSlots, dock, widgetPlacements, folders, widgetRestores, leadingSlots, homeRows, homeColumns, leftSlots)
     val homePages get() = layout.pageCount
     /** Folders in the dock, shared by both screens like the dock itself. */
     val dockFolderIds: Set<String> get() = dock.filterNotNull().filterTo(mutableSetOf(), ::isReservedFolderId)
@@ -147,7 +147,7 @@ data class LauncherState(
     /** The layout [cover] or the inner screen shows. */
     fun layoutFor(cover: Boolean): HomeLayout = if (cover && separateCover) coverLayout ?: layout else innerLayout
     /** These fields showing [next], keeping the shared dock. */
-    fun showing(next: HomeLayout) = copy(homeSlots = next.slots, leadingSlots = next.leadingSlots,
+    fun showing(next: HomeLayout) = copy(homeSlots = next.slots, leadingSlots = next.leadingSlots, leftSlots = next.leftSlots,
         widgetPlacements = next.widgetPlacements, folders = next.folders, widgetRestores = next.widgetRestores,
         homeRows = next.rows, homeColumns = next.columns)
 }
@@ -308,21 +308,22 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
                     val authoritative = apps.authoritativeProfiles
                     val personalSerial = userManager.getSerialNumberForUser(Process.myUserHandle())
                     // An app that swapped its launch activity (e.g. to change its icon) keeps its places.
-                    val renamed = renamedActivityIds(pins.filterNotNull() + old.leadingSlots.filterNotNull() +
+                    val renamed = renamedActivityIds(pins.filterNotNull() + old.leadingSlots.filterNotNull() + old.leftSlots.filterNotNull() +
                         dock.filterNotNull() + old.folders.flatMap { it.appIds }, entries.map(AppEntry::id), personalSerial)
                     fun follow(id: String?) = id?.let { renamed[it] ?: it }
                     val followedPins = pins.map(::follow)
                     val followedLeading = old.leadingSlots.map(::follow)
+                    val followedLeft = old.leftSlots.map(::follow)
                     val followedDock = dock.map(::follow)
                     val followedFolders = old.folders.map { folder -> folder.copy(appIds = folder.appIds.map { renamed[it] ?: it }) }
-                    val removedIds = removedAppIds(followedPins.filterNotNull() + followedLeading.filterNotNull() +
+                    val removedIds = removedAppIds(followedPins.filterNotNull() + followedLeading.filterNotNull() + followedLeft.filterNotNull() +
                         followedDock.filterNotNull() + followedFolders.flatMap { it.appIds }, availableIds,
                         authoritative, temporarilyUnavailable, removed, personalSerial,
                         apps.removedProfiles)
                     val validPins = followedPins.map { it?.takeUnless(removedIds::contains) }
                     val validDock = followedDock.map { it?.takeUnless(removedIds::contains) }
                     val reconciledHome = reconcileFolders(HomeLayout(validPins, validDock, old.widgetPlacements, followedFolders,
-                        old.widgetRestores, followedLeading, old.homeRows, old.homeColumns), removedIds)
+                        old.widgetRestores, followedLeading, old.homeRows, old.homeColumns, followedLeft), removedIds)
                     // With apps on Home, a newly installed app joins the end of the last page. Apps
                     // already known stay where the user left them, including off Home.
                     val known = apps.knownBefore + old.apps.map(AppEntry::id) + renamed.values
@@ -332,14 +333,14 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
                         else appendHomeApps(reconciledHome, installedNow, onNewPage = false)
                     // The layout not on screen loses removed apps too, and gains new ones when it is in use.
                     val other = old.otherLayout?.let { stored ->
-                        val followed = stored.copy(slots = stored.slots.map(::follow),
+                        val followed = stored.copy(slots = stored.slots.map(::follow), leftSlots = stored.leftSlots.map(::follow),
                             folders = stored.folders.map { folder -> folder.copy(appIds = folder.appIds.map { renamed[it] ?: it }) })
                         val cleaned = reconcileFolders(followed.copy(slots = followed.slots.map { it?.takeUnless(removedIds::contains) }),
                             removedIds).copy(dock = reconciled.dock)
                         if (installedNow.isEmpty() || !old.separateCover) cleaned
                             else appendHomeApps(cleaned, installedNow, onNewPage = false)
                     }
-                    old.copy(apps = entries, profiles = profiles, homeSlots = reconciled.slots, leadingSlots = reconciled.leadingSlots,
+                    old.copy(apps = entries, profiles = profiles, homeSlots = reconciled.slots, leadingSlots = reconciled.leadingSlots, leftSlots = reconciled.leftSlots,
                         dock = reconciled.dock, folders = reconciled.folders, otherLayout = other,
                         homeAddedApps = (old.homeAddedApps.map { renamed[it] ?: it } + installedNow).toSet() - removedIds,
                         canUndoEdit = old.canUndoEdit && old.layout == reconciled, loading = false,
@@ -422,9 +423,10 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         if (mutable.value.folders.any { id in it.appIds }) return
         mutable.update { old ->
             val enable = pinned && old.apps.any { it.id == id }
-            old.copy(homeSlots = if (enable && id in old.leadingSlots) old.homeSlots else pinHomeApp(old.homeSlots, id,
+            old.copy(homeSlots = if (enable && (id in old.leadingSlots || id in old.leftSlots)) old.homeSlots else pinHomeApp(old.homeSlots, id,
                 enable, old.layout.unavailableCells().filterTo(mutableSetOf()) { it >= 0 }),
                 leadingSlots = if (enable) old.leadingSlots else old.leadingSlots.map { it?.takeUnless(id::equals) },
+                leftSlots = if (enable) old.leftSlots else old.leftSlots.map { it?.takeUnless(id::equals) },
                 canUndoEdit = false)
         }
         persist()
@@ -444,6 +446,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         mutable.update { old -> old.copy(canUndoEdit = false,
             homeSlots = if (id == null) old.homeSlots else old.homeSlots.map { it?.takeUnless(id::equals) }.dropLastWhile { it == null },
             leadingSlots = if (id == null) old.leadingSlots else old.leadingSlots.map { it?.takeUnless(id::equals) },
+            leftSlots = if (id == null) old.leftSlots else old.leftSlots.map { it?.takeUnless(id::equals) },
             dock = old.dock.mapIndexed { index, value ->
                 when { index == slot -> id; value == id && id != null -> null; else -> value }
             }) }
@@ -527,7 +530,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             old.labels == preview.labels && old.googleSearch == preview.googleSearch && old.verticalStatus == preview.verticalStatus) return false
         undoLayout = old.layout to preview.layout
         undoImportSettings = UndoImportSettings(old.compact, old.expanded, old.labels, old.googleSearch, old.verticalStatus)
-        mutable.value = old.copy(homeSlots = preview.layout.slots, leadingSlots = preview.layout.leadingSlots, dock = preview.layout.dock, homeRows = preview.layout.rows, homeColumns = preview.layout.columns,
+        mutable.value = old.copy(homeSlots = preview.layout.slots, leadingSlots = preview.layout.leadingSlots, leftSlots = preview.layout.leftSlots, dock = preview.layout.dock, homeRows = preview.layout.rows, homeColumns = preview.layout.columns,
             widgetPlacements = preview.layout.widgetPlacements, folders = preview.layout.folders,
             widgetRestores = preview.layout.widgetRestores, compact = preview.compact, expanded = preview.expanded,
             labels = preview.labels, googleSearch = preview.googleSearch, verticalStatus = preview.verticalStatus,
@@ -554,7 +557,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         if (old.layout == next) return false
         undoLayout = old.layout to next
         undoImportSettings = null
-        mutable.value = old.copy(homeSlots = next.slots, leadingSlots = next.leadingSlots, dock = next.dock, homeRows = next.rows, homeColumns = next.columns,
+        mutable.value = old.copy(homeSlots = next.slots, leadingSlots = next.leadingSlots, leftSlots = next.leftSlots, dock = next.dock, homeRows = next.rows, homeColumns = next.columns,
             widgetPlacements = next.widgetPlacements, folders = next.folders,
             widgetRestores = next.widgetRestores,
             editRevision = old.editRevision + 1, canUndoEdit = true)
@@ -570,6 +573,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         val settings = undoImportSettings
         mutable.value = old.copy(homeSlots = reconcileHomeSlots(before.slots, installed),
             leadingSlots = before.leadingSlots.map { it?.takeIf(installed::contains) },
+            leftSlots = before.leftSlots.map { it?.takeIf(installed::contains) },
             dock = before.dock.map { it?.takeIf(installed::contains) }, widgetPlacements = before.widgetPlacements, folders = before.folders, homeRows = before.rows, homeColumns = before.columns,
             widgetRestores = before.widgetRestores, compact = settings?.compact ?: old.compact,
             expanded = settings?.expanded ?: old.expanded, labels = settings?.labels ?: old.labels,
@@ -626,16 +630,6 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         if (statePayloadInvalid) return
         mutable.update { it.copy(leftPage = value) }; persist()
     }
-    private fun updateLeftWidgets(change: (List<LeftWidget>) -> List<LeftWidget>) {
-        if (statePayloadInvalid) return
-        mutable.update { it.copy(leftWidgets = change(it.leftWidgets)) }; persist()
-    }
-    fun addLeftWidget(id: Int, heightDp: Float) = updateLeftWidgets { it.filterNot { widget -> widget.id == id } + LeftWidget(id, heightDp) }
-    fun removeLeftWidget(id: Int) = updateLeftWidgets { it.filterNot { widget -> widget.id == id } }
-    fun moveLeftWidget(id: Int, by: Int) = updateLeftWidgets { it.movingLeftWidget(id, by) }
-    fun resizeLeftWidget(id: Int, by: Int) = updateLeftWidgets { it.resizingLeftWidget(id, by) }
-    /** Android gave a left page widget a new id when it was connected again. */
-    fun replaceLeftWidget(id: Int, newId: Int) = updateLeftWidgets { list -> list.map { if (it.id == id) it.copy(id = newId) else it } }
     /** A device-local gesture setting. */
     fun setDoubleTapLock(value: Boolean) {
         if (statePayloadInvalid) return
@@ -674,7 +668,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         val otherIsCover = !mutable.value.showingCover
         if (value) {
             val ids = mutable.value.apps.filter { it.available }.map(AppEntry::id)
-            fun placed(layout: HomeLayout) = (layout.slots + layout.leadingSlots + layout.dock).filterNotNull().toSet() +
+            fun placed(layout: HomeLayout) = (layout.slots + layout.leadingSlots + layout.leftSlots + layout.dock).filterNotNull().toSet() +
                 layout.folders.flatMap { it.appIds }
             val added = ids.filter { it !in placed(mutable.value.layout) }.toMutableSet()
             if (separate) mutable.value.layoutFor(cover = otherIsCover).let { other -> added += ids.filter { it !in placed(other) } }
@@ -806,7 +800,6 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
     }
     val retainedWidgetIds get() = (mutable.value.widgetPlacements.map { it.id } +
         mutable.value.otherLayout?.widgetPlacements.orEmpty().map { it.id } +
-        mutable.value.leftWidgets.map { it.id } +
         (if (mutable.value.canUndoEdit) undoLayout?.first?.widgetPlacements.orEmpty().map { it.id } else emptyList())).filter { it >= 0 }.toSet()
     val canPruneWidgetIds get() = !statePayloadInvalid
     fun setWidget(slot: Int, id: Int) {
@@ -845,6 +838,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         val installed = (mutable.value.apps.map { it.id } + layout.folders.map { it.id }).toSet()
         mutable.update { it.copy(homeSlots = reconcileHomeSlots(layout.slots, installed),
             leadingSlots = layout.slotsForPage(-1).map { id -> id?.takeIf { it in installed || isFolderId(it) } },
+            leftSlots = layout.slotsForPage(LEFT_HOME_PAGE).map { id -> id?.takeIf { it in installed || isFolderId(it) } },
             dock = layout.dock.map { id -> id?.takeIf { it in installed || isFolderId(it) } }, widgetPlacements = layout.widgetPlacements, homeRows = layout.rows, homeColumns = layout.columns,
             folders = layout.folders, widgetRestores = layout.widgetRestores,
             canUndoEdit = false, editRevision = it.editRevision + 1) }
@@ -871,7 +865,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .put("title", restore.title).put("profileLabel", restore.profileLabel).put("work", restore.isWork)
             .put("sourceScope", restore.sourceScope)) } }
         val data = JSONObject().put("schema", 10).put("pinned", JSONArray(s.order)).put("homeSlots", JSONArray(s.homeSlots))
-            .put("leadingSlots", JSONArray(s.leadingSlots)).put("dock", JSONArray(s.dock))
+            .put("leadingSlots", JSONArray(s.leadingSlots)).put("leftSlots", JSONArray(s.leftSlots)).put("dock", JSONArray(s.dock))
             .put("widgets", widgets).put("labels", s.labels)
             .put("folders", folders)
             .put("restores", restores)
@@ -887,8 +881,6 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             .put("libraryGrid", s.libraryGrid)
             .put("libraryFolders", s.libraryFolders)
             .put("leftPage", s.leftPage.name)
-            .put("leftWidgets", JSONArray().also { array -> s.leftWidgets.forEach { w ->
-                array.put(JSONObject().put("id", w.id).put("height", w.heightDp.toDouble())) } })
             .put("dockBackground", s.dockBackground)
             .put("doubleTapLock", s.doubleTapLock)
             .put("swipeDownShade", s.swipeDownShade)
@@ -959,6 +951,11 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             val stored = List(storedCells) { leading.optString(it).takeIf { id -> id.isNotBlank() && id != "null" } }
             if (schema >= 10) stored else upgradeLegacyLeadingSlots(stored, if (schema == 9) GRID_ROWS else LEGACY_GRID_ROWS)
         } else List(HOME_CELLS) { null }
+        // Saved states from before the extra left page have no such array.
+        val rawLeftSlots = j.optJSONArray("leftSlots")?.let { left ->
+            require(left.length() == HOME_CELLS)
+            List(HOME_CELLS) { left.optString(it).takeIf { id -> id.isNotBlank() && id != "null" } }
+        } ?: List(HOME_CELLS) { null }
         val dockArray = j.optJSONArray("dock")
         val loadedDock = List((dockArray?.length() ?: 0).coerceIn(MIN_DOCK_SLOTS, MAX_DOCK_SLOTS)) {
             dockArray?.optString(it)?.takeIf { it.isNotBlank() && it != "null" }
@@ -983,7 +980,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
                 val storedRows = if (schema <= 8) LEGACY_GRID_ROWS else GRID_ROWS
                 require(loaded.map { it.slot }.distinct().size == loaded.size) { "Widget placement slots must be unique" }
                 loaded.forEach { placement ->
-                    val baseGeometry = placement.slot >= 0 && placement.id != EMPTY_WIDGET && placement.page >= -1 &&
+                    val baseGeometry = placement.slot >= 0 && placement.id != EMPTY_WIDGET && placement.page >= LEFT_HOME_PAGE &&
                         placement.column >= 0 && placement.row >= 0 && placement.spanX in 1..DEFAULT_HOME_COLUMNS &&
                         placement.spanY in 1..storedRows && placement.column + placement.spanX <= DEFAULT_HOME_COLUMNS
                     val insideGrid = placement.row + placement.spanY <= storedRows
@@ -1015,10 +1012,10 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
                 }
                 val children = loaded.flatMapTo(mutableSetOf(), FolderEntry::appIds)
                 val folderIds = loaded.mapTo(mutableSetOf(), FolderEntry::id)
-                val rawFolderRefs = (rawSlots + rawLeadingSlots + loadedDock).filterNotNull().filter(::isReservedFolderId)
+                val rawFolderRefs = (rawSlots + rawLeadingSlots + rawLeftSlots + loadedDock).filterNotNull().filter(::isReservedFolderId)
                 require(rawFolderRefs.all(::isFolderId))
                 require(rawFolderRefs.size == folderIds.size && rawFolderRefs.toSet() == folderIds)
-                require((rawSlots + rawLeadingSlots + loadedDock).none { it in children })
+                require((rawSlots + rawLeadingSlots + rawLeftSlots + loadedDock).none { it in children })
             }
         } else emptyList()
         if (schema >= 8) {
@@ -1057,6 +1054,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
         } else emptyList()
         LauncherState(homeSlots = if (schema in 2..5) migrateSchema5Apps(legacySlots) else legacySlots,
             leadingSlots = rawLeadingSlots,
+            leftSlots = rawLeftSlots,
             dock = loadedDock,
             widgetPlacements = placements, folders = folders, widgetRestores = restores,
             googleSearch = j.optBoolean("googleSearch", true),
@@ -1074,9 +1072,6 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             libraryFolders = j.optBoolean("libraryFolders", false),
             // Layouts from before Google News chose "DISCOVER", which now falls back to Google News.
             leftPage = LeftPage.entries.firstOrNull { it.name == j.optString("leftPage") } ?: LeftPage.GOOGLE_NEWS,
-            leftWidgets = j.optJSONArray("leftWidgets")?.let { array -> List(array.length()) { array.optJSONObject(it) }.filterNotNull()
-                .map { LeftWidget(it.optInt("id", EMPTY_WIDGET), it.optDouble("height", 180.0).toFloat().coerceIn(MIN_LEFT_WIDGET_HEIGHT, MAX_LEFT_WIDGET_HEIGHT)) }
-                .filter { it.id != EMPTY_WIDGET }.distinctBy { it.id } }.orEmpty(),
             dockBackground = j.optBoolean("dockBackground", true),
             doubleTapLock = j.optBoolean("doubleTapLock", true),
             swipeDownShade = j.optBoolean("swipeDownShade", true),

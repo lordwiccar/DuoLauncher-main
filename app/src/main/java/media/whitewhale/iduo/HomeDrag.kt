@@ -166,7 +166,7 @@ internal fun adjustedWidgetDropIndex(
  * Initial pass and arbitrates intent from geometry instead: jitter keeps waiting, while a real
  * move, release/cancel, or second pointer yields the stream to the provider.
  */
-internal suspend fun AwaitPointerEventScope.awaitWidgetLongPressOrCancellation(
+private suspend fun AwaitPointerEventScope.awaitWidgetLongPressOrCancellation(
     down: PointerInputChange,
 ): PointerInputChange? {
     var current = down

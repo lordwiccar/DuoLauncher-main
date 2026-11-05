@@ -595,5 +595,11 @@
     <string name="notification_badges_service">iDuo notification badges</string>
     <string name="dock_background">Dock background</string>
     <string name="dock_background_detail">Turn it off to let the icons float on the wallpaper.</string>
-    <string name="left_widgets_detail">Hold a widget to move, resize or remove it.</string>
+    <string name="left_page_home">Extra Home page</string>
+    <string name="left_page_home_detail">Another Home page for apps, folders and widgets. What you place here stays saved while the left page shows news.</string>
+    <string name="move_to_left_page">Move to the left page</string>
+    <string name="glass_style">Glass style</string>
+    <string name="glass_frosted">Frosted</string>
+    <string name="glass_liquid">Liquid</string>
+    <string name="glass_liquid_detail">Clear glass with bright edges on the dock, folders, news and All apps. The edges bend the picture only over a wallpaper set in iDuo, because Android does not let apps read other wallpapers.</string>
 </resources>

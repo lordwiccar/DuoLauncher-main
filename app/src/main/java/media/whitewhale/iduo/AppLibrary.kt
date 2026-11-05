@@ -58,8 +58,8 @@ internal fun AppLibrary(
     val glass = !editing
     val palette = LocalDuoPalette.current
     val ink = if (glass) Ink else MaterialTheme.colorScheme.onSurface
-    val pinned = remember(state.homeSlots, state.leadingSlots) {
-        (state.homeSlots.asSequence() + state.leadingSlots.asSequence()).filterNotNull().toSet()
+    val pinned = remember(state.homeSlots, state.leadingSlots, state.leftSlots) {
+        (state.homeSlots.asSequence() + state.leadingSlots.asSequence() + state.leftSlots.asSequence()).filterNotNull().toSet()
     }
     val hasWork = state.profiles.any { it.isWork } || state.apps.any { it.isWork }
     var showWork by remember { mutableStateOf(false) }

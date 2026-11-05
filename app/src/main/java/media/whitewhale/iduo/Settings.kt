@@ -356,7 +356,7 @@ private fun categorySummaries(state: LauncherState, appearance: AppearanceState,
         SettingsPage.NEWS to when (state.leftPage) {
             LeftPage.GOOGLE_NEWS -> "Google News · " + GoogleNewsSettings.edition.label(locale)
             LeftPage.RSS -> stringResource(R.string.settings_rss_summary, NewsFeeds.custom.sources.size)
-            LeftPage.WIDGETS -> stringResource(R.string.widgets) + " · " + state.leftWidgets.size
+            LeftPage.HOME -> stringResource(R.string.left_page_home)
         },
         SettingsPage.SYSTEM to if (languageTag.isEmpty()) stringResource(R.string.language_system) else AppLanguage.nativeName(languageTag),
         SettingsPage.SUPPORT to stringResource(R.string.settings_support_summary),
@@ -808,7 +808,7 @@ private fun HomePage(state: LauncherState, wide: Boolean, onWideScreen: Boolean,
             model::setVerticalStatus, "status-switch")
         if (!wide && state.verticalStatus) CoverStatusPlace(state, model)
     } else SettingsGroup {
-        val pinned = (state.homeSlots + state.leadingSlots).count { it != null }
+        val pinned = (state.homeSlots + state.leadingSlots + state.leftSlots).count { it != null }
         ValueRow(stringResource(R.string.choose_home_apps), stringResource(R.string.settings_pinned_count, pinned),
             tag = "choose-home-apps", onClick = onEditPins)
         GroupDivider()
@@ -816,9 +816,11 @@ private fun HomePage(state: LauncherState, wide: Boolean, onWideScreen: Boolean,
             Text(stringResource(R.string.widgets_on_page, homePage + 1), style = MaterialTheme.typography.titleMedium)
             val removeWidget = stringResource(R.string.remove_widget)
             val removeLeadingWidget = stringResource(R.string.remove_widget_leading)
-            state.widgetPlacements.filter { it.page == homePage || (wide && it.page == -1) }.forEach { placement ->
+            state.widgetPlacements.filter { it.page == homePage || (wide && it.page == -1) ||
+                (state.leftPage == LeftPage.HOME && it.page == LEFT_HOME_PAGE) }.forEach { placement ->
                 Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(if (placement.page == -1) stringResource(R.string.unfolded_only_page)
+                    Text(if (placement.page == LEFT_HOME_PAGE) stringResource(R.string.left_page_home)
+                        else if (placement.page == -1) stringResource(R.string.unfolded_only_page)
                         else stringResource(R.string.widget_size_row, placement.spanX, placement.spanY, placement.row + 1),
                         Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
                     IconButton(onClick = { onRemoveWidget(placement.slot) }, modifier = Modifier.semantics {
@@ -1001,13 +1003,13 @@ private fun NewsSettingsPage(state: LauncherState, model: LauncherModel) {
     SettingsGroup {
         GroupBody {
             GroupTitle(stringResource(R.string.left_page))
-            val leftPages = listOf(LeftPage.GOOGLE_NEWS, LeftPage.RSS, LeftPage.WIDGETS)
+            val leftPages = listOf(LeftPage.GOOGLE_NEWS, LeftPage.RSS, LeftPage.HOME)
             Choice(listOf(stringResource(R.string.left_page_google_news) to "left-page-google-news",
                 stringResource(R.string.left_page_rss) to "left-page-rss",
-                stringResource(R.string.widgets) to "left-page-widgets"),
+                stringResource(R.string.customize_home) to "left-page-home"),
                 leftPages.indexOf(state.leftPage), { model.setLeftPage(leftPages[it]) })
             Detail(stringResource(R.string.settings_news_detail))
-            if (state.leftPage == LeftPage.WIDGETS) Detail(stringResource(R.string.left_widgets_detail))
+            if (state.leftPage == LeftPage.HOME) Detail(stringResource(R.string.left_page_home_detail))
         }
     }
     if (state.leftPage == LeftPage.GOOGLE_NEWS) {

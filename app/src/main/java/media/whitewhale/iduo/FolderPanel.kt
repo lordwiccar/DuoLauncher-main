@@ -305,7 +305,8 @@ private fun FolderMenu(destinations: List<Int>, onMove: (Int) -> Unit, onDisband
                 onClick = { open = false; onToggleLarge() }, modifier = Modifier.testTag("folder-size"))
             destinations.distinctBy(::homeCellPage).forEach { destination ->
                 val destinationPage = homeCellPage(destination)
-                DropdownMenuItem(text = { Text(if (destinationPage == -1) stringResource(R.string.move_to_leading_page)
+                DropdownMenuItem(text = { Text(if (destinationPage == LEFT_HOME_PAGE) stringResource(R.string.move_to_left_page)
+                    else if (destinationPage == -1) stringResource(R.string.move_to_leading_page)
                     else stringResource(R.string.move_to_page, destinationPage + 1)) },
                     onClick = { open = false; onMove(destination) },
                     modifier = Modifier.testTag("folder-move-page-$destinationPage"))
