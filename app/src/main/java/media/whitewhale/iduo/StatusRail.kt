@@ -223,11 +223,11 @@ private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolea
         val firstLevel = if (dualSim) status.simLevels[0]?.coerceIn(0, 4) ?: 0
             else (cellularVisual as? CellularSignalVisual.Available)?.activeDots ?: 0
         // Four dots along a curve, lit left to right.
-        fun signalDots(lit: Int, along: Float, dot: Float) {
+        fun signalDots(lit: Int, along: Float, dot: Float, dim: Float = .3f) {
             for (i in 0..3) {
                 val angle = Math.toRadians((90.0 + RING_BOTTOM_GAP / 2 * DOTS_SPREAD) - i * (RING_BOTTOM_GAP * DOTS_SPREAD / 3))
                 val dotCenter = Offset(center.x + along * cos(angle).toFloat(), center.y + along * sin(angle).toFloat())
-                drawCircle(Color.White.copy(alpha = if (i < lit) 1f else .3f), dot, dotCenter)
+                drawCircle(Color.White.copy(alpha = if (i < lit) 1f else dim), dot, dotCenter)
             }
         }
         when (centre) {
@@ -250,7 +250,7 @@ private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolea
                     drawRoundRect(Color.White.copy(alpha = if (index < firstLevel) 1f else .3f),
                         Offset(x - barWidth / 2, bottom - w * share), Size(barWidth, w * share),
                         CornerRadius(barWidth / 2))
-                    if (dualSim) drawCircle(Color.White.copy(alpha = if (index < secondLevel) 1f else .3f), w * SECOND_SIM_DOT,
+                    if (dualSim) drawCircle(Color.White.copy(alpha = if (index < secondLevel) 1f else SECOND_SIM_DIM), w * SECOND_SIM_DOT,
                         Offset(x, bottom + w * .09f))
                 }
             }
@@ -270,7 +270,7 @@ private fun StatusRing(status: DeviceStatus, modifier: Modifier, percent: Boolea
         if (generation != null) label(generation, w * if (generation.length > 2) .21f else .254f, center.y + w * .35f)
         else {
             signalDots(firstLevel, radius * 1.05f, w * SIM_DOT)
-            if (dualSim) signalDots(secondLevel, radius * SECOND_SIM_CURVE, w * SECOND_SIM_DOT)
+            if (dualSim) signalDots(secondLevel, radius * SECOND_SIM_CURVE, w * SECOND_SIM_DOT, SECOND_SIM_DIM)
         }
     }
 }
@@ -312,7 +312,9 @@ private val CellTowerIcon: androidx.compose.ui.graphics.vector.ImageVector by la
 }
 /** Signal dot radius, as a share of the ring's width: the first SIM's, and the smaller second SIM's. */
 private const val SIM_DOT = .047f
-private const val SECOND_SIM_DOT = .028f
+private const val SECOND_SIM_DOT = .032f
+/** The second SIM's unlit dots are stronger, so all four stay visible at their smaller size. */
+private const val SECOND_SIM_DIM = .55f
 /** How much of the bottom opening the dots span. */
 private const val DOTS_SPREAD = .56
 /** The signal bars' heights and spacing, as shares of the ring's width. */
