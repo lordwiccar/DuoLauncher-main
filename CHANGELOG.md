@@ -11,7 +11,7 @@
 - The status ring is redrawn: a slimmer ring, a narrower opening with square ends for the battery level, and a new Wi-Fi symbol. Without Wi-Fi it shows four signal bars with the network, such as 5G, in the bottom opening.
 
 ### Fixes
-- Galaxy Z Fold 8: opening the phone no longer leaves Home stuck in a narrow, blurred strip in the middle of the inner screen.
+- Galaxy Z Fold 8: opening the phone no longer leaves Home stuck in a narrow strip in the middle of the inner screen.
 - The folding animation no longer stays blurred while the phone is left half open.
 
 ## 1.1.6

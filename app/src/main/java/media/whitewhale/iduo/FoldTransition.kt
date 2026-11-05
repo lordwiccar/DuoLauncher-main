@@ -75,6 +75,10 @@ internal fun isCoverScreen(shortSidePx: Int, xdpi: Float, density: Float): Boole
 
 private const val COVER_MAX_INCHES = 4f
 
+/** Whether a window on the inner panel is still as narrow as one on the cover. */
+internal fun isWindowStuckNarrow(panelIsCover: Boolean, windowShortSidePx: Int, xdpi: Float, density: Float): Boolean =
+    !panelIsCover && isCoverScreen(windowShortSidePx, xdpi, density)
+
 /**
  * The hinge angle in degrees, 0 shut to 180 flat, or null until Android reports it. Samsung's
  * public hinge sensor only ever reports 0, 90 and 180, so on a Galaxy Fold this says shut, half

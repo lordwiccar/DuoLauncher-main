@@ -40,6 +40,15 @@ class FoldTransitionTest {
     }
 
     @Test
+    fun onlyANarrowWindowOnTheInnerPanelIsStuck() {
+        // Galaxy Z Fold 8: the cover's 1248 px scaled onto the inner screen, then the whole 1848.
+        assertEquals(true, isWindowStuckNarrow(panelIsCover = false, 1248, 383f, 2.24f))
+        assertEquals(false, isWindowStuckNarrow(panelIsCover = false, 1848, 383f, 2.24f))
+        // On the cover itself a narrow window is simply right.
+        assertEquals(false, isWindowStuckNarrow(panelIsCover = true, 1248, 359f, 2.24f))
+    }
+
+    @Test
     fun freeEdgeFollowsTheScreenRotation() {
         // Upright, the inner screen's swinging half is on the left and the cover's free edge on the right.
         assertEquals(-1f to 0f, freeEdgeDirection(cover = false, Surface.ROTATION_0))

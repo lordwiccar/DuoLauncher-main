@@ -33,6 +33,8 @@ import android.content.IntentFilter
 /** The current Home activity; Home is a single task, so at most one is live at a time. */
 internal object LauncherHost {
     var activity = java.lang.ref.WeakReference<MainActivity>(null)
+    /** When Home last restarted to leave a window stuck at the cover's size; this outlives the restart. */
+    var narrowWindowRestartAt = 0L
 }
 
 class MainActivity : ComponentActivity() {
@@ -160,6 +162,7 @@ class MainActivity : ComponentActivity() {
         SystemWallpaper.verify(this)
     }
     override fun onStop() {
+        window.decorView.removeCallbacks(restartNarrowWindow)
         getSystemService(android.hardware.display.DisplayManager::class.java).unregisterDisplayListener(displayListener)
         if (timeReceiverRegistered) { unregisterReceiver(timeReceiver); timeReceiverRegistered = false }
         widgets.host.stopListening(); super.onStop()
@@ -326,6 +329,29 @@ class MainActivity : ComponentActivity() {
         val cover = onCover()
         onCoverScreen.value = cover
         applyCoverRotation(model.state.value.coverRotation, cover)
+        window.decorView.removeCallbacks(restartNarrowWindow)
+        if (windowStuckNarrow()) window.decorView.postDelayed(restartNarrowWindow, NARROW_WINDOW_GRACE_MS)
+    }
+
+    private fun windowStuckNarrow(): Boolean {
+        val bounds = windowManager.currentWindowMetrics.bounds
+        val metrics = resources.displayMetrics
+        return isWindowStuckNarrow(onCover(), minOf(bounds.width(), bounds.height()), metrics.xdpi, metrics.density)
+    }
+
+    /**
+     * Android can keep a window scaled to the cover's size on the inner screen even once it may
+     * rotate freely, until the activity restarts. Once only, so a window that is narrow for some
+     * other reason, such as a user's aspect ratio setting, cannot restart over and over.
+     */
+    private val restartNarrowWindow = Runnable {
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (!isFinishing && !isDestroyed && windowStuckNarrow() &&
+            (LauncherHost.narrowWindowRestartAt == 0L || now - LauncherHost.narrowWindowRestartAt > NARROW_WINDOW_RETRY_MS)) {
+            LauncherHost.narrowWindowRestartAt = now
+            android.util.Log.w("iDuo", "Window stuck at the cover's size on the inner screen; restarting Home")
+            recreate()
+        }
     }
 
     private fun systemDark() = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
@@ -417,5 +443,8 @@ class MainActivity : ComponentActivity() {
     private companion object {
         const val SHADE_DIALOG_VISIBLE = "duo.shade.dialog_visible"
         const val SHADE_SETTINGS_PENDING = "duo.shade.settings_pending"
+        /** Time for Android to resize the window by itself after the orientation is released. */
+        const val NARROW_WINDOW_GRACE_MS = 1_500L
+        const val NARROW_WINDOW_RETRY_MS = 60_000L
     }
 }
