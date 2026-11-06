@@ -558,5 +558,6 @@
     <string name="glass_style">玻璃样式</string>
     <string name="glass_frosted">磨砂</string>
     <string name="glass_liquid">液态</string>
-    <string name="glass_liquid_detail">程序坞、文件夹、新闻和“所有应用”使用边缘明亮的透明玻璃。只有在 iDuo 中设置的壁纸上，边缘才会折射画面，因为 Android 不允许应用读取其他壁纸。</string>
+    <string name="glass_liquid_detail">程序坞、文件夹、新闻和“所有应用”使用边缘明亮的透明玻璃。如果壁纸是在 iDuo 中设置的，边缘会折射壁纸。</string>
+    <string name="glass_liquid_android_wallpaper">这张壁纸是在 Android 中设置的，而 Android 不允许应用读取它，因此玻璃保持透明。在此处选择同一张图片后，边缘就会折射它。</string>
 </resources>

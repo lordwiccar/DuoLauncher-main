@@ -558,5 +558,6 @@
     <string name="glass_style">ガラスのスタイル</string>
     <string name="glass_frosted">フロスト</string>
     <string name="glass_liquid">リキッド</string>
-    <string name="glass_liquid_detail">ドック、フォルダ、ニュース、「すべてのアプリ」に、縁が明るい透明なガラスを使います。縁で画像が屈折するのは iDuo で設定した壁紙の上だけです。Android ではアプリが他の壁紙を読み取れないためです。</string>
+    <string name="glass_liquid_detail">ドック、フォルダ、ニュース、「すべてのアプリ」に、縁が明るい透明なガラスを使います。iDuo で設定した壁紙は、縁で屈折します。</string>
+    <string name="glass_liquid_android_wallpaper">この壁紙は Android で設定されています。Android ではアプリが壁紙を読み取れないため、ガラスは透明のままです。ここで同じ画像を選択すると、縁で屈折するようになります。</string>
 </resources>

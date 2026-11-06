@@ -2,13 +2,18 @@ package media.whitewhale.iduo
 
 import android.graphics.BitmapShader
 import android.graphics.Matrix
+import android.graphics.Paint
+import android.graphics.RenderEffect
+import android.graphics.RenderNode
 import android.graphics.RuntimeShader
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -24,19 +29,30 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
+import kotlin.math.ceil
 
 /** How Home's panels are made: frosted, or clear glass with bright edges. */
 enum class GlassStyle { FROSTED, LIQUID }
 
 internal val LocalGlassStyle = staticCompositionLocalOf { GlassStyle.FROSTED }
+
+/**
+ * How blurred Home's own wallpaper is, 0 to 1, as it blurs behind All apps, news or a folder. Glass
+ * reads it while drawing, so a wallpaper bent through glass blurs in step without recomposing.
+ */
+internal object WallpaperBlurState {
+    var source by mutableStateOf<State<Float>?>(null)
+}
 
 /** How strongly panels with text are tinted under Liquid, for legibility on the blurred wallpaper. */
 internal const val LIQUID_PANEL_TINT = .26f
@@ -77,7 +93,8 @@ internal fun Modifier.liquidGlass(shape: Shape, refract: Boolean = false): Modif
             val window = Size(view.rootView.width.coerceAtLeast(1).toFloat(), view.rootView.height.coerceAtLeast(1).toFloat())
             val source = Size(image.width.toFloat(), image.height.toFloat())
             val (offset, drawn) = HomeWallpaper.crop(cover).placement(source, window)
-            drawPath(path, lens.brush(size, radius, 14.dp.toPx(), 16.dp.toPx(), offset - bounds[0].topLeft, drawn, source))
+            val blur = (WallpaperBlurState.source?.value ?: 0f) * WALLPAPER_BACKDROP_BLUR.toPx()
+            lens.draw(this, path, radius, 14.dp.toPx(), 16.dp.toPx(), offset - bounds[0].topLeft, drawn, source, blur)
         }
         drawContent()
         clipPath(path) {
@@ -100,24 +117,51 @@ internal fun Modifier.folderGlass(shape: Shape, tint: Float = LIQUID_FOLDER_TINT
     else background(Glass.copy(alpha = .72f)).border(1.dp, Color.White.copy(alpha = .55f), shape)
 }
 
-/** Draws the wallpaper through an element, bent towards its middle in a band along its edges. */
+/**
+ * Draws the wallpaper through an element, bent towards its middle in a band along its edges, and
+ * blurred as much as the wallpaper around it. The blur covers a margin beyond the element, so its
+ * colours run on into the glass as they do outside it.
+ */
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private class WallpaperLens(image: ImageBitmap) {
     private val picture = BitmapShader(image.asAndroidBitmap(), android.graphics.Shader.TileMode.CLAMP, android.graphics.Shader.TileMode.CLAMP)
         .apply { filterMode = BitmapShader.FILTER_MODE_LINEAR }
     private val shader = RuntimeShader(LENS_SHADER)
     private val matrix = Matrix()
+    private val paint = Paint().apply { shader = this@WallpaperLens.shader }
+    private val blurred = RenderNode("liquid-glass")
 
-    fun brush(size: Size, radius: Float, band: Float, strength: Float, origin: Offset, drawn: Size, source: Size): Brush {
+    fun draw(scope: DrawScope, path: Path, radius: Float, band: Float, strength: Float, origin: Offset, drawn: Size, source: Size, blur: Float) {
+        val width = scope.size.width
+        val height = scope.size.height
         matrix.setScale(drawn.width / source.width, drawn.height / source.height)
         matrix.postTranslate(origin.x, origin.y)
         picture.setLocalMatrix(matrix)
         shader.setInputShader("picture", picture)
-        shader.setFloatUniform("size", size.width, size.height)
+        shader.setFloatUniform("size", width, height)
         shader.setFloatUniform("radius", radius)
         shader.setFloatUniform("band", band)
         shader.setFloatUniform("strength", strength)
-        return ShaderBrush(shader)
+        paint.shader = shader
+        scope.clipPath(path) {
+            drawIntoCanvas { composeCanvas ->
+                val canvas = composeCanvas.nativeCanvas
+                if (blur < .5f || !canvas.isHardwareAccelerated) canvas.drawRect(0f, 0f, width, height, paint)
+                else {
+                    val margin = ceil(blur * 3f)
+                    blurred.setPosition(0, 0, (width + 2 * margin).toInt(), (height + 2 * margin).toInt())
+                    blurred.setRenderEffect(RenderEffect.createBlurEffect(blur, blur, android.graphics.Shader.TileMode.CLAMP))
+                    val recording = blurred.beginRecording()
+                    recording.translate(margin, margin)
+                    recording.drawRect(-margin, -margin, width + margin, height + margin, paint)
+                    blurred.endRecording()
+                    canvas.save()
+                    canvas.translate(-margin, -margin)
+                    canvas.drawRenderNode(blurred)
+                    canvas.restore()
+                }
+            }
+        }
     }
 }
 
@@ -139,8 +183,10 @@ float edge(float2 p) {
 }
 
 half4 main(float2 p) {
-    float depth = clamp(1.0 + edge(p) / band, 0.0, 1.0);
-    if (depth <= 0.0) return picture.eval(p);
+    float distance = edge(p);
+    // Outside the glass, in the margin the blur reads, and well inside it, the picture lies straight.
+    if (distance >= 0.0 || distance <= -band) return picture.eval(p);
+    float depth = 1.0 + distance / band;
     float2 facing = normalize(float2(edge(p + float2(1.0, 0.0)) - edge(p - float2(1.0, 0.0)),
         edge(p + float2(0.0, 1.0)) - edge(p - float2(0.0, 1.0))) + float2(0.0001));
     float2 bend = facing * depth * depth * strength;

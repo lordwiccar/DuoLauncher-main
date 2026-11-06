@@ -600,5 +600,6 @@
     <string name="glass_style">Glasstil</string>
     <string name="glass_frosted">Matt</string>
     <string name="glass_liquid">Flüssig</string>
-    <string name="glass_liquid_detail">Klares Glas mit hellen Rändern auf Dock, Ordnern, Nachrichten und Alle Apps. Die Ränder brechen das Bild nur über einem in iDuo festgelegten Hintergrund, weil Android Apps andere Hintergründe nicht lesen lässt.</string>
+    <string name="glass_liquid_detail">Klares Glas mit hellen Rändern auf Dock, Ordnern, Nachrichten und Alle Apps. Die Ränder brechen das Hintergrundbild, wenn es in iDuo festgelegt wurde.</string>
+    <string name="glass_liquid_android_wallpaper">Dieses Hintergrundbild wurde in Android festgelegt, und Android lässt Apps es nicht lesen, daher bleibt das Glas klar. Wähle hier dasselbe Bild aus, dann brechen es die Ränder.</string>
 </resources>

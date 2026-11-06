@@ -22,6 +22,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
@@ -555,8 +556,12 @@ private fun AppearancePage(model: LauncherModel, state: LauncherState, appearanc
         BitmapFactory.decodeResource(context.resources, R.drawable.default_wallpaper,
             BitmapFactory.Options().apply { inSampleSize = 8 })?.asImageBitmap()
     }
+    // A chosen photo waits for Apply at the top of the page, wherever it was chosen from.
+    val wallpaperGroupTop = remember { androidx.compose.foundation.relocation.BringIntoViewRequester() }
+    LaunchedEffect(backgrounds.previewPending) { if (backgrounds.previewPending) wallpaperGroupTop.bringIntoView() }
     SettingsGroup {
         GroupBody {
+            Spacer(Modifier.height(0.dp).bringIntoViewRequester(wallpaperGroupTop))
             GroupTitle(stringResource(R.string.wallpaper))
             Detail(stringResource(R.string.wallpaper_detail))
             // A photo can be moved and zoomed for each screen, in its preview and once it is set.
@@ -612,6 +617,23 @@ private fun AppearancePage(model: LauncherModel, state: LauncherState, appearanc
     backgrounds.targetRequest?.let { WallpaperTargetDialog(backgrounds::applyTo, backgrounds::dismissTargetRequest) }
     SettingsGroup {
         GroupBody {
+            GroupTitle(stringResource(R.string.glass_style))
+            val styles = GlassStyle.entries
+            Choice(listOf(stringResource(R.string.glass_frosted) to "glass-frosted", stringResource(R.string.glass_liquid) to "glass-liquid"),
+                styles.indexOf(state.glassStyle), { model.setGlassStyle(styles[it]) })
+            if (state.glassStyle == GlassStyle.LIQUID) {
+                Detail(stringResource(R.string.glass_liquid_detail))
+                // Without a wallpaper's pixels the glass cannot bend it; a photo set here gives them.
+                if (HomeWallpaper.image == null && !backgrounds.previewPending) {
+                    Detail(stringResource(R.string.glass_liquid_android_wallpaper))
+                    OutlinedButton(onClick = backgrounds::choosePhoto, Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                        .testTag("glass-choose-photo"), enabled = !backgrounds.loading) { Text(stringResource(R.string.choose_photo)) }
+                }
+            }
+        }
+    }
+    SettingsGroup {
+        GroupBody {
             GroupTitle(stringResource(R.string.settings_color_mode))
             val modes = AppearanceMode.entries
             Choice(modes.map { stringResource(appearanceLabel(it)) to "appearance-${it.name.lowercase()}" },
@@ -638,15 +660,6 @@ private fun AppearancePage(model: LauncherModel, state: LauncherState, appearanc
         if (state.iconStyle != IconStyle.ORIGINAL) SwitchRow(stringResource(R.string.icon_style_when_dark),
             stringResource(R.string.icon_style_when_dark_detail), state.iconStyleWhenDark,
             { model.setIconLook(whenDark = it) }, tag = "icon-style-when-dark")
-    }
-    SettingsGroup {
-        GroupBody {
-            GroupTitle(stringResource(R.string.glass_style))
-            val styles = GlassStyle.entries
-            Choice(listOf(stringResource(R.string.glass_frosted) to "glass-frosted", stringResource(R.string.glass_liquid) to "glass-liquid"),
-                styles.indexOf(state.glassStyle), { model.setGlassStyle(styles[it]) })
-            if (state.glassStyle == GlassStyle.LIQUID) Detail(stringResource(R.string.glass_liquid_detail))
-        }
     }
     SettingsGroup {
         GroupBody {

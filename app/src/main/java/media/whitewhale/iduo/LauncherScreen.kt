@@ -480,7 +480,7 @@ fun LauncherScreen(
     // page slides in, so their labels stay readable on busy wallpapers. The dock instead frosts
     // only the wallpaper behind itself; see frostedWallpaper.
     val leftPageOnWallpaper = leftHome
-    val wallpaperBlurProgress by remember(nativePager, firstHome, visibleHomePages, hasLibrary, leftPageOnWallpaper) {
+    val wallpaperBlurState = remember(nativePager, firstHome, visibleHomePages, hasLibrary, leftPageOnWallpaper) {
         derivedStateOf {
             val position = nativePager.currentPage + nativePager.currentPageOffsetFraction - firstHome
             // The extra Home page is Home like any other, on the wallpaper as it is.
@@ -489,6 +489,8 @@ fun LauncherScreen(
             maxOf(panel, folderBlur / FOLDER_BACKDROP_BLUR)
         }
     }
+    val wallpaperBlurProgress by wallpaperBlurState
+    SideEffect { WallpaperBlurState.source = wallpaperBlurState }
     // Android's wallpaper lies behind this window, so the window blurs it where Android allows
     // that. Samsung turns cross-window blur off but offers its own (SamsungBlur); elsewhere
     // without it Home draws a blurred stand-in of the wallpaper instead.
@@ -499,7 +501,6 @@ fun LauncherScreen(
         windowManager.addCrossWindowBlurEnabledListener(listener)
         onDispose { windowManager.removeCrossWindowBlurEnabledListener(listener) }
     }
-    val wallpaperSharp by remember { derivedStateOf { wallpaperBlurProgress <= .02f } }
     val wallpaperBlurPx = with(LocalDensity.current) { WALLPAPER_BACKDROP_BLUR.toPx() }
     LaunchedEffect(windowBlurs, wallpaperBlurPx) {
         var applied = -1
@@ -806,8 +807,7 @@ fun LauncherScreen(
                     compositingStrategy = androidx.compose.ui.graphics.CompositingStrategy.Offscreen
                     translationX = (1f - dockReveal.value) * dockTravel
                 }.onGloballyPositioned { dockBounds[0] = it.boundsInRoot() }
-                // Over a blurred wallpaper a sharp picture in the glass would stand out, so it stays clear.
-                .then(if (dockLiquid) Modifier.liquidGlass(RoundedCornerShape(30.dp), refract = wallpaperSharp)
+                .then(if (dockLiquid) Modifier.liquidGlass(RoundedCornerShape(30.dp), refract = true)
                     else if (dockGlass) Modifier.frostedWallpaper(RoundedCornerShape(30.dp)) else Modifier)
                 .then(if (dockMode == DockMode.SLIDE) Modifier.pointerInput(Unit) {
                     detectHorizontalDragGestures(onDragStart = dockDragBegin, onDragEnd = dockDragEnd,

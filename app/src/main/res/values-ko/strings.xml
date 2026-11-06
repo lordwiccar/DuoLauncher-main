@@ -558,5 +558,6 @@
     <string name="glass_style">유리 스타일</string>
     <string name="glass_frosted">프로스트</string>
     <string name="glass_liquid">리퀴드</string>
-    <string name="glass_liquid_detail">독, 폴더, 뉴스, ‘모든 앱’에 가장자리가 밝은 투명 유리를 사용합니다. Android에서는 앱이 다른 배경화면을 읽을 수 없으므로, 가장자리는 iDuo에서 설정한 배경화면 위에서만 화면을 굴절시킵니다.</string>
+    <string name="glass_liquid_detail">독, 폴더, 뉴스, ‘모든 앱’에 가장자리가 밝은 투명 유리를 사용합니다. iDuo에서 설정한 배경화면은 가장자리에서 굴절됩니다.</string>
+    <string name="glass_liquid_android_wallpaper">이 배경화면은 Android에서 설정되었으며, Android에서는 앱이 배경화면을 읽을 수 없어 유리가 투명하게 유지됩니다. 여기서 같은 이미지를 선택하면 가장자리에서 굴절됩니다.</string>
 </resources>
