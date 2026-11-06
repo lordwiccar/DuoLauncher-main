@@ -318,7 +318,6 @@
         <item quantity="many">%1$d řádku</item>
         <item quantity="other">%1$d řádků</item>
     </plurals>
-    <string name="resize_overlap_note">Velikosti, které by překryly jiný prvek, se ignorují.</string>
     <string name="resize_invalid">Tato velikost překrývá jiný prvek nebo přesahuje stránku.</string>
     <string name="apply_size">Použít velikost</string>
     <string name="widget_no_room">Pro tento widget tu není místo.</string>
@@ -622,4 +621,8 @@
     <string name="glass_liquid">Tekuté</string>
     <string name="glass_liquid_detail">Čiré sklo s jasnými okraji na docku, složkách, novinkách a v seznamu aplikací. Okraje ohýbají tapetu, pokud byla nastavená v iDuo.</string>
     <string name="glass_liquid_android_wallpaper">Tato tapeta je nastavená v Androidu a ten aplikacím nedovoluje ji číst, takže sklo zůstává čiré. Vyberte tady stejný obrázek a okraje ho začnou ohýbat.</string>
+    <string name="status_menu_battery">Baterie</string>
+    <string name="status_menu_wifi">Wi-Fi</string>
+    <string name="status_menu_mobile">Mobilní síť</string>
+    <string name="status_open_settings">Otevřít nastavení baterie, Wi-Fi a sítě</string>
 </resources>

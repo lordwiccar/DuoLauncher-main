@@ -282,7 +282,6 @@
     <plurals name="rows">
         <item quantity="other">%1$d 行</item>
     </plurals>
-    <string name="resize_overlap_note">他のアイテムと重なるサイズは無視されます。</string>
     <string name="resize_invalid">そのサイズは他のアイテムと重なるか、ページからはみ出します。</string>
     <string name="apply_size">サイズを適用</string>
     <string name="widget_no_room">ここにはこのウィジェットを置くスペースがありません。</string>
@@ -560,4 +559,8 @@
     <string name="glass_liquid">リキッド</string>
     <string name="glass_liquid_detail">ドック、フォルダ、ニュース、「すべてのアプリ」に、縁が明るい透明なガラスを使います。iDuo で設定した壁紙は、縁で屈折します。</string>
     <string name="glass_liquid_android_wallpaper">この壁紙は Android で設定されています。Android ではアプリが壁紙を読み取れないため、ガラスは透明のままです。ここで同じ画像を選択すると、縁で屈折するようになります。</string>
+    <string name="status_menu_battery">バッテリー</string>
+    <string name="status_menu_wifi">Wi-Fi</string>
+    <string name="status_menu_mobile">モバイルネットワーク</string>
+    <string name="status_open_settings">バッテリー、Wi-Fi、ネットワークの設定を開く</string>
 </resources>

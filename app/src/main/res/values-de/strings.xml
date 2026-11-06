@@ -308,7 +308,6 @@
         <item quantity="one">%1$d Zeile</item>
         <item quantity="other">%1$d Zeilen</item>
     </plurals>
-    <string name="resize_overlap_note">Größen, die ein anderes Element überdecken, werden ignoriert.</string>
     <string name="resize_invalid">Diese Größe überdeckt ein anderes Element oder ragt über die Seite hinaus.</string>
     <string name="apply_size">Größe übernehmen</string>
     <string name="widget_no_room">Für dieses Widget ist hier kein Platz.</string>
@@ -602,4 +601,8 @@
     <string name="glass_liquid">Flüssig</string>
     <string name="glass_liquid_detail">Klares Glas mit hellen Rändern auf Dock, Ordnern, Nachrichten und Alle Apps. Die Ränder brechen das Hintergrundbild, wenn es in iDuo festgelegt wurde.</string>
     <string name="glass_liquid_android_wallpaper">Dieses Hintergrundbild wurde in Android festgelegt, und Android lässt Apps es nicht lesen, daher bleibt das Glas klar. Wähle hier dasselbe Bild aus, dann brechen es die Ränder.</string>
+    <string name="status_menu_battery">Akku</string>
+    <string name="status_menu_wifi">WLAN</string>
+    <string name="status_menu_mobile">Mobilfunknetz</string>
+    <string name="status_open_settings">Akku-, WLAN- und Netzwerkeinstellungen öffnen</string>
 </resources>

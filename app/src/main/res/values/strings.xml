@@ -309,7 +309,6 @@
         <item quantity="one">%1$d row</item>
         <item quantity="other">%1$d rows</item>
     </plurals>
-    <string name="resize_overlap_note">Sizes that overlap another item are ignored.</string>
     <string name="resize_invalid">That size overlaps another item or extends beyond the page.</string>
     <string name="apply_size">Apply size</string>
     <string name="widget_no_room">There isn’t room for this widget here.</string>
@@ -603,4 +602,8 @@
     <string name="glass_liquid">Liquid</string>
     <string name="glass_liquid_detail">Clear glass with bright edges on the dock, folders, news and All apps. Its edges bend the wallpaper when the wallpaper was set in iDuo.</string>
     <string name="glass_liquid_android_wallpaper">This wallpaper was set in Android, and Android does not let apps read it, so the glass stays clear. Choose the same picture here and its edges will bend it.</string>
+    <string name="status_menu_wifi">Wi-Fi</string>
+    <string name="status_menu_battery">Battery</string>
+    <string name="status_menu_mobile">Mobile network</string>
+    <string name="status_open_settings">Open battery, Wi-Fi and network settings</string>
 </resources>

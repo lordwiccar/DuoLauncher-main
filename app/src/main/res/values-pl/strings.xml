@@ -318,7 +318,6 @@
         <item quantity="many">%1$d wierszy</item>
         <item quantity="other">%1$d wiersza</item>
     </plurals>
-    <string name="resize_overlap_note">Rozmiary nachodzące na inny element są pomijane.</string>
     <string name="resize_invalid">Ten rozmiar nachodzi na inny element lub wykracza poza stronę.</string>
     <string name="apply_size">Zastosuj rozmiar</string>
     <string name="widget_no_room">Brak miejsca na ten widżet.</string>
@@ -622,4 +621,8 @@
     <string name="glass_liquid">Płynne</string>
     <string name="glass_liquid_detail">Przezroczyste szkło z jasnymi krawędziami na doku, folderach, aktualnościach i liście aplikacji. Krawędzie załamują tapetę, jeśli została ustawiona w iDuo.</string>
     <string name="glass_liquid_android_wallpaper">Ta tapeta została ustawiona w Androidzie, a Android nie pozwala aplikacjom jej odczytać, więc szkło pozostaje przezroczyste. Wybierz tutaj ten sam obraz, a krawędzie zaczną go załamywać.</string>
+    <string name="status_menu_battery">Bateria</string>
+    <string name="status_menu_wifi">Wi-Fi</string>
+    <string name="status_menu_mobile">Sieć komórkowa</string>
+    <string name="status_open_settings">Otwórz ustawienia baterii, Wi-Fi i sieci</string>
 </resources>

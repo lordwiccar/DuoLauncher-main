@@ -282,7 +282,6 @@
     <plurals name="rows">
         <item quantity="other">%1$d 行</item>
     </plurals>
-    <string name="resize_overlap_note">与其他项目重叠的尺寸将被忽略。</string>
     <string name="resize_invalid">该尺寸与其他项目重叠或超出页面范围。</string>
     <string name="apply_size">应用尺寸</string>
     <string name="widget_no_room">此处没有足够空间放置此小组件。</string>
@@ -560,4 +559,8 @@
     <string name="glass_liquid">液态</string>
     <string name="glass_liquid_detail">程序坞、文件夹、新闻和“所有应用”使用边缘明亮的透明玻璃。如果壁纸是在 iDuo 中设置的，边缘会折射壁纸。</string>
     <string name="glass_liquid_android_wallpaper">这张壁纸是在 Android 中设置的，而 Android 不允许应用读取它，因此玻璃保持透明。在此处选择同一张图片后，边缘就会折射它。</string>
+    <string name="status_menu_battery">电池</string>
+    <string name="status_menu_wifi">Wi-Fi</string>
+    <string name="status_menu_mobile">移动网络</string>
+    <string name="status_open_settings">打开电池、Wi-Fi 和网络设置</string>
 </resources>

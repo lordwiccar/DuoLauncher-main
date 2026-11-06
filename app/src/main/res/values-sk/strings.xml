@@ -318,7 +318,6 @@
         <item quantity="many">%1$d riadka</item>
         <item quantity="other">%1$d riadkov</item>
     </plurals>
-    <string name="resize_overlap_note">Veľkosti, ktoré by prekryli iný prvok, sa ignorujú.</string>
     <string name="resize_invalid">Táto veľkosť prekrýva iný prvok alebo presahuje stranu.</string>
     <string name="apply_size">Použiť veľkosť</string>
     <string name="widget_no_room">Pre túto miniaplikáciu tu nie je miesto.</string>
@@ -622,4 +621,8 @@
     <string name="glass_liquid">Tekuté</string>
     <string name="glass_liquid_detail">Číre sklo s jasnými okrajmi na doku, priečinkoch, novinkách a v zozname aplikácií. Okraje ohýbajú tapetu, ak bola nastavená v iDuo.</string>
     <string name="glass_liquid_android_wallpaper">Táto tapeta je nastavená v Androide a ten aplikáciám nedovoľuje ju čítať, takže sklo zostáva číre. Vyberte tu rovnaký obrázok a okraje ho začnú ohýbať.</string>
+    <string name="status_menu_battery">Batéria</string>
+    <string name="status_menu_wifi">Wi-Fi</string>
+    <string name="status_menu_mobile">Mobilná sieť</string>
+    <string name="status_open_settings">Otvoriť nastavenia batérie, Wi-Fi a siete</string>
 </resources>
