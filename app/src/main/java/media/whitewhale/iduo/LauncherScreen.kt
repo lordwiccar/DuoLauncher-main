@@ -167,6 +167,7 @@ fun LauncherScreen(
     var widgetSession by remember { mutableStateOf<WidgetPickerSession?>(null) }
     var widgetPlacementMessage by remember { mutableStateOf<String?>(null) }
     var emptyCellIndex by rememberSaveable { mutableStateOf<Int?>(null) }
+    var emptyMenuAnchor by remember { mutableStateOf<androidx.compose.ui.geometry.Rect?>(null) }
     var addAppsAt by rememberSaveable { mutableStateOf<Int?>(null) }
     var resizeSlot by remember { mutableStateOf<Int?>(null) }
     // A widget just added opens for resizing as soon as it stands on Home.
@@ -683,6 +684,10 @@ fun LauncherScreen(
                 if (model.placement(slot)?.id == CLOCK_WIDGET || model.placement(slot)?.id == DATE_WIDGET) resizeSlot = slot
                 else sheet = "widgetActions"
             }
+            val emptyCellPressed: (Int) -> Unit = { index ->
+                emptyMenuAnchor = drag.regions[DropTarget.Home(index)]?.bounds
+                emptyCellIndex = index
+            }
             val openHomeOptionsAt by rememberUpdatedState { point: Offset, width: Int ->
                 val page = pager.currentPage
                 val leftHalf = geometry.expanded && point.x < width / 2f
@@ -693,6 +698,8 @@ fun LauncherScreen(
                 }
                 val overItem = drag.hit(point + gestureOriginInRoot, setOf(page - 1, page))?.movable == true
                 if (pagerInputEnabled && page in firstHomePosition until visibleHomePages && !overItem) {
+                    val pressed = point + gestureOriginInRoot
+                    emptyMenuAnchor = androidx.compose.ui.geometry.Rect(pressed.x, pressed.y, pressed.x, pressed.y)
                     emptyCellIndex = firstEmptyHomeCell(state, targetPage)
                 }
             }
@@ -761,7 +768,7 @@ fun LauncherScreen(
                         onTurnOnWork = { model.turnOnWork(it) },
                         onActions = { selectedId = it.id }, onWidget = widgetPressed,
                         onFolder = { openFolderId = it },
-                        onEmptyWidget = { emptyCellIndex = it },
+                        onEmptyWidget = emptyCellPressed,
                         onRefresh = model::refresh,
                     )
                 }
@@ -780,7 +787,7 @@ fun LauncherScreen(
                                 onLaunch = onLaunchFrom, onActions = { selectedId = it.id },
                                 onWidget = widgetPressed,
                                 onFolder = { openFolderId = it },
-                                onEmptyWidget = { emptyCellIndex = it },
+                                onEmptyWidget = emptyCellPressed,
                                 onRefresh = model::refresh, previewLeftSlots = previewLayout.leftSlots)
                         }
                         else NewsPage(Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, bottom = bottomSpace),
@@ -796,14 +803,14 @@ fun LauncherScreen(
                                 onLaunch = onLaunchFrom, onActions = { selectedId = it.id },
                                 onWidget = widgetPressed,
                                 onFolder = { openFolderId = it },
-                                onEmptyWidget = { emptyCellIndex = it },
+                                onEmptyWidget = emptyCellPressed,
                                 onRefresh = model::refresh, previewLeftSlots = previewLayout.leftSlots)
                         }
                     }
                 }
             }
             // Sheets bring back Android's own status bar in the same band, so this one steps aside.
-            val systemBarShown = sheet.isNotEmpty() || emptyCellIndex != null || selectedId != null
+            val systemBarShown = (sheet.isNotEmpty() && sheet != "widgetActions") || selectedId != null
             if (coverStatus && !systemBarShown) CoverStatusBar(deviceStatus, Modifier.align(Alignment.TopStart).offset(y = -topInset)
                 .fillMaxWidth().height(coverStatusHeight).padding(horizontal = 20.dp))
             if (statusRail) StatusRail(deviceStatus,
@@ -922,7 +929,7 @@ fun LauncherScreen(
                 homeGesturesOn = launcherActivity.homeGesturesEnabled,
                 backgrounds = launcherActivity.backgrounds,
                 onWallpaperSettings = { sheet = ""; onWallpaperSettings() }, homePage = pager.currentPage.coerceIn(0, homePages - 1))
-            if (sheet.isNotEmpty() && sheet != "widgets" && !sheet.startsWith("settings")) {
+            if (sheet.isNotEmpty() && sheet != "widgets" && sheet != "widgetActions" && !sheet.startsWith("settings")) {
                 ModalBottomSheet(onDismissRequest = {
                     sheet = ""; widgetPackage = null; widgetExactTarget = false
                 }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -947,30 +954,6 @@ fun LauncherScreen(
                             AppLibrary(state, pinQuery, { pinQuery = it }, onLaunch, model::setPinned,
                                 onActions = { selectedId = it.id; sheet = "" }, editing = true, modifier = Modifier.weight(1f).fillMaxWidth(),
                                 onTurnOnWork = { model.turnOnWork(it) })
-                        }
-                        "widgetActions" -> model.placement(widgetSlot)?.let { placement ->
-                            WidgetActions(placement, rows = state.homeRows, columns = state.homeColumns,
-                                canConfigure = widgets.canReconfigure(placement.id),
-                                onConfigure = { widgets.reconfigure(placement.id); sheet = "" },
-                                isValid = { x, y -> (x == placement.spanX && y == placement.spanY) ||
-                                    setWidgetFootprint(state.layout, widgetSlot, WidgetFootprint(placement.column, placement.row, x, y)) != state.layout },
-                                onResize = { x, y -> model.setWidgetFootprint(widgetSlot, WidgetFootprint(placement.column, placement.row, x, y)) },
-                                onStartResize = { resizeSlot = widgetSlot; sheet = "" },
-                                onMoveToPage = { page ->
-                                    (0 until HOME_CELLS).firstOrNull { local ->
-                                        widgetCandidate(state.layout, placement.slot, page * HOME_CELLS + local,
-                                            placement.spanX, placement.spanY) != null
-                                    }?.let { model.moveWidgetTo(placement.slot, page * HOME_CELLS + it) } == true
-                                }, homePages = homePages,
-                                onReplace = {
-                                    widgetPackage = null
-                                    widgetProfileSerial = widgets.manager.getAppWidgetInfo(placement.id)?.profile?.let {
-                                        launcherActivity.getSystemService(UserManager::class.java).getSerialNumberForUser(it)
-                                    }?.takeIf { it >= 0 }
-                                    widgetExactTarget = false; sheet = "widgets"
-                                },
-                                onRemove = { widgets.remove(widgetSlot); sheet = "" },
-                                onClose = { sheet = "" })
                         }
                     }
                 }
@@ -1323,6 +1306,36 @@ fun LauncherScreen(
                 onOptions = { resizeSlot = null; widgetSlot = slot; sheet = "widgetActions" },
                 onDone = { resizeSlot = null })
         }
+        if (sheet == "widgetActions") {
+            val placement = model.placement(widgetSlot)
+            if (placement == null) LaunchedEffect(Unit) { sheet = "" }
+            else {
+                fun freeCell(page: Int) = (0 until HOME_CELLS).firstOrNull { local ->
+                    widgetCandidate(state.layout, placement.slot, page * HOME_CELLS + local, placement.spanX, placement.spanY) != null
+                }
+                WidgetActions(placement, widgetLabel(placement.id, widgets), drag.regions[DropTarget.Widget(placement.slot)]?.bounds,
+                    rows = state.homeRows, columns = state.homeColumns,
+                    canConfigure = widgets.canReconfigure(placement.id),
+                    onConfigure = { widgets.reconfigure(placement.id); sheet = "" },
+                    isValid = { x, y -> setWidgetFootprint(state.layout, widgetSlot, WidgetFootprint(placement.column, placement.row, x, y)) != state.layout },
+                    onResize = { x, y -> model.setWidgetFootprint(widgetSlot, WidgetFootprint(placement.column, placement.row, x, y)) },
+                    onStartResize = { resizeSlot = widgetSlot; sheet = "" },
+                    canMoveToPage = { freeCell(it) != null },
+                    onMoveToPage = { page ->
+                        freeCell(page)?.let { model.moveWidgetTo(placement.slot, page * HOME_CELLS + it) }
+                        sheet = ""
+                    }, homePages = homePages,
+                    onReplace = {
+                        widgetPackage = null
+                        widgetProfileSerial = widgets.manager.getAppWidgetInfo(placement.id)?.profile?.let {
+                            launcherActivity.getSystemService(UserManager::class.java).getSerialNumberForUser(it)
+                        }?.takeIf { it >= 0 }
+                        widgetExactTarget = false; sheet = "widgets"
+                    },
+                    onRemove = { widgets.remove(widgetSlot); sheet = "" },
+                    onClose = { sheet = "" })
+            }
+        }
         val menuAnchor = appMenuAnchor
         val closeAppMenu = { selectedId = null; appMenuAnchor = null; appMenuDock = null }
         if (menuAnchor != null) appsById[selectedId]?.let { app ->
@@ -1397,13 +1410,11 @@ fun LauncherScreen(
             }
         }
         emptyCellIndex?.let { index ->
-            ModalBottomSheet(onDismissRequest = { emptyCellIndex = null }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
-                EmptySpaceActionSheet(onAddApps = { emptyCellIndex = null; addAppsAt = index }, onWidgets = {
-                        widgetTargetIndex = index; widgetExactTarget = true; widgetSlot = model.nextWidgetSlot(); widgetPackage = null; widgetProfileSerial = null
-                        emptyCellIndex = null; sheet = "widgets"
-                    }, onWallpaper = { emptyCellIndex = null; sheet = "settings:wallpaper" },
-                    onCustomize = { emptyCellIndex = null; sheet = "settings" }, onClose = { emptyCellIndex = null })
-            }
+            EmptySpaceMenu(emptyMenuAnchor, onAddApps = { emptyCellIndex = null; addAppsAt = index }, onWidgets = {
+                    widgetTargetIndex = index; widgetExactTarget = true; widgetSlot = model.nextWidgetSlot(); widgetPackage = null; widgetProfileSerial = null
+                    emptyCellIndex = null; sheet = "widgets"
+                }, onWallpaper = { emptyCellIndex = null; sheet = "settings:wallpaper" },
+                onCustomize = { emptyCellIndex = null; sheet = "settings" }, onClose = { emptyCellIndex = null })
         }
         addAppsAt?.let { from ->
             HomeAppsDialog(state.layout, state.apps, from, onDismiss = { addAppsAt = null }, onAdd = { ids ->
@@ -2373,15 +2384,22 @@ private fun AppPicker(apps: List<AppEntry>, dockSlot: Int?, onSelect: (AppEntry)
     }
 }
 
+/**
+ * What a widget offers beyond its frame, in a small menu beside it. The exact size stays folded
+ * away: dragging the frame is the usual way to change it.
+ */
 @Composable
 private fun WidgetActions(
     placement: WidgetPlacement,
+    title: String,
+    anchor: androidx.compose.ui.geometry.Rect?,
     canConfigure: Boolean,
     onConfigure: () -> Unit,
     isValid: (Int, Int) -> Boolean,
     onResize: (Int, Int) -> Unit,
     onStartResize: () -> Unit,
-    onMoveToPage: (Int) -> Boolean,
+    canMoveToPage: (Int) -> Boolean,
+    onMoveToPage: (Int) -> Unit,
     homePages: Int,
     onReplace: () -> Unit,
     onRemove: () -> Unit,
@@ -2389,58 +2407,68 @@ private fun WidgetActions(
     rows: Int = DEFAULT_HOME_ROWS,
     columns: Int = DEFAULT_HOME_COLUMNS,
 ) {
-    val sheetMaxHeight = with(LocalDensity.current) {
-        (LocalWindowInfo.current.containerSize.height * .88f).toDp()
-    }
-    var width by remember(placement.slot, placement.spanX) { mutableIntStateOf(placement.spanX) }
-    var height by remember(placement.slot, placement.spanY) { mutableIntStateOf(placement.spanY) }
-    val maxWidth = columns - placement.column
-    val maxHeight = rows - placement.row
-    val feasible = placement.page >= LEFT_HOME_PAGE && placement.row in 0 until rows && maxWidth >= 1
-    val valid = feasible && isValid(width, height)
-    Column(Modifier.fillMaxWidth().heightIn(max = sheetMaxHeight).verticalScroll(rememberScrollState())
-        .padding(horizontal = 24.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.widget_options), Modifier.weight(1f), style = MaterialTheme.typography.headlineSmall)
-            IconButton(onClick = onClose) { Icon(Icons.Rounded.Close, stringResource(R.string.close_widget_options)) }
-        }
-        if (canConfigure) ActionRow(Icons.Rounded.Settings, stringResource(R.string.widget_settings), onConfigure,
+    val width = placement.spanX
+    val height = placement.spanY
+    val feasible = placement.page >= LEFT_HOME_PAGE && placement.row in 0 until rows && columns - placement.column >= 1
+    var exactSize by rememberSaveable(placement.slot) { mutableStateOf(false) }
+    FloatingMenu(anchor, title, "widget-menu-${placement.slot}", onClose) {
+        if (canConfigure) MenuRow(Icons.Rounded.Settings, stringResource(R.string.widget_settings), onConfigure,
             Modifier.testTag("widget-settings-${placement.slot}"))
-        Text(stringResource(R.string.resize), style = MaterialTheme.typography.titleMedium)
-        Button(enabled = feasible, onClick = onStartResize, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(stringResource(R.string.resize_on_home)) }
-        if (!feasible) Text(stringResource(R.string.widget_resize_outside), color = MaterialTheme.colorScheme.error)
-        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
-            repeat(homePages) { page -> TextButton(onClick = { onMoveToPage(page) },
-                modifier = Modifier.testTag("widget-move-${placement.slot}-page-$page")) { Text(stringResource(R.string.move_to_page, page + 1)) } }
-        }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.width), Modifier.weight(1f))
-            IconButton(onClick = { if (feasible) width = (width - 1).coerceAtLeast(1) }) {
-                Icon(Icons.Rounded.Remove, stringResource(R.string.decrease_width))
+        if (feasible) MenuRow(Icons.Rounded.OpenInFull, stringResource(R.string.resize), onStartResize, Modifier.testTag("widget-resize-${placement.slot}"))
+        MenuRow(Icons.Rounded.SwapHoriz, stringResource(R.string.replace), onReplace, Modifier.testTag("widget-replace-${placement.slot}"))
+        if (homePages > 1) {
+            Row(Modifier.fillMaxWidth().padding(start = 16.dp, top = 12.dp, end = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Rounded.ViewCarousel, null, Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.width(14.dp))
+                Text(stringResource(R.string.widget_move_page), style = MaterialTheme.typography.bodyMedium)
             }
-            Text(androidx.compose.ui.res.pluralStringResource(R.plurals.columns, width, width), Modifier.width(88.dp), textAlign = TextAlign.Center)
-            IconButton(onClick = { if (feasible) width = (width + 1).coerceAtMost(maxWidth) }) {
-                Icon(Icons.Rounded.Add, stringResource(R.string.increase_width))
-            }
-        }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.height), Modifier.weight(1f))
-            IconButton(onClick = { if (feasible) height = (height - 1).coerceAtLeast(1) }) {
-                Icon(Icons.Rounded.Remove, stringResource(R.string.decrease_height))
-            }
-            Text(androidx.compose.ui.res.pluralStringResource(R.plurals.rows, height, height), Modifier.width(88.dp), textAlign = TextAlign.Center)
-            IconButton(onClick = { if (feasible) height = (height + 1).coerceAtMost(maxHeight) }) {
-                Icon(Icons.Rounded.Add, stringResource(R.string.increase_height))
+            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(start = 42.dp, end = 8.dp, top = 2.dp, bottom = 4.dp)) {
+                repeat(homePages) { page ->
+                    val here = page == placement.page
+                    val description = stringResource(R.string.move_to_page, page + 1)
+                    Box(Modifier.size(40.dp).clip(CircleShape)
+                        .background(if (here) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent)
+                        .clickable(enabled = !here && canMoveToPage(page)) { onMoveToPage(page) }
+                        .semantics { contentDescription = description }
+                        .testTag("widget-move-${placement.slot}-page-$page"), contentAlignment = Alignment.Center) {
+                        Text("${page + 1}", style = MaterialTheme.typography.bodyMedium,
+                            color = if (here || canMoveToPage(page)) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = .38f))
+                    }
+                }
             }
         }
-        if (!valid) Text(stringResource(R.string.resize_invalid), color = MaterialTheme.colorScheme.error)
-        Button(enabled = valid, onClick = { onResize(width, height); onClose() },
-            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(stringResource(R.string.apply_size)) }
-        ActionRow(Icons.Rounded.FindReplace, stringResource(R.string.replace), onReplace)
-        HorizontalDivider()
-        ActionRow(Icons.Rounded.DeleteOutline, stringResource(R.string.remove), onRemove, tint = MaterialTheme.colorScheme.error)
-        Spacer(Modifier.height(12.dp))
+        if (feasible) {
+            MenuRow(Icons.Rounded.Straighten, stringResource(R.string.widget_exact_size), { exactSize = !exactSize },
+                Modifier.testTag("widget-exact-size-${placement.slot}")) {
+                Text("$width × $height", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Icon(if (exactSize) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, null, Modifier.padding(start = 4.dp).size(18.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            if (exactSize) {
+                WidgetSizeStepper(stringResource(R.string.width), androidx.compose.ui.res.pluralStringResource(R.plurals.columns, width, width),
+                    stringResource(R.string.decrease_width), stringResource(R.string.increase_width),
+                    canDecrease = width > 1 && isValid(width - 1, height), canIncrease = placement.column + width < columns && isValid(width + 1, height),
+                    onDecrease = { onResize(width - 1, height) }, onIncrease = { onResize(width + 1, height) })
+                WidgetSizeStepper(stringResource(R.string.height), androidx.compose.ui.res.pluralStringResource(R.plurals.rows, height, height),
+                    stringResource(R.string.decrease_height), stringResource(R.string.increase_height),
+                    canDecrease = height > 1 && isValid(width, height - 1), canIncrease = placement.row + height < rows && isValid(width, height + 1),
+                    onDecrease = { onResize(width, height - 1) }, onIncrease = { onResize(width, height + 1) })
+            }
+        }
+        HorizontalDivider(Modifier.padding(vertical = 4.dp))
+        MenuRow(Icons.Rounded.DeleteOutline, stringResource(R.string.remove), onRemove, Modifier.testTag("widget-remove-${placement.slot}"),
+            tint = MaterialTheme.colorScheme.error)
+    }
+}
+
+@Composable
+private fun WidgetSizeStepper(label: String, value: String, decrease: String, increase: String,
+    canDecrease: Boolean, canIncrease: Boolean, onDecrease: () -> Unit, onIncrease: () -> Unit) {
+    Row(Modifier.fillMaxWidth().padding(start = 50.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(label, Modifier.weight(1f), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        IconButton(onClick = onDecrease, enabled = canDecrease, modifier = Modifier.size(36.dp)) { Icon(Icons.Rounded.Remove, decrease, Modifier.size(18.dp)) }
+        Text(value, Modifier.width(62.dp), style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
+        IconButton(onClick = onIncrease, enabled = canIncrease, modifier = Modifier.size(36.dp)) { Icon(Icons.Rounded.Add, increase, Modifier.size(18.dp)) }
     }
 }
 
