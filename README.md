@@ -6,7 +6,7 @@
 
 A native Android launcher built around a right-side dock and a home screen that makes room when you unfold your phone.
 
-**Version 1.1.6 · Android 12 or later.** Built and tested on the Galaxy Z Fold 7 (cover and inner displays) and a matching emulator. The left page shows Google News headlines or your own RSS feeds.
+**Version 1.1.7 · Android 12 or later.** Built and tested on the Galaxy Z Fold 7 (cover and inner displays) and a matching emulator. The left page shows Google News headlines, your own RSS feeds or an extra Home page.
 
 <p>
   <img src="docs/images/iduo-cover.png" width="49%" alt="Home on the cover screen with large folders and the right-side dock, beside Wallpaper and appearance settings">
@@ -16,7 +16,7 @@ A native Android launcher built around a right-side dock and a home screen that 
   <img src="docs/images/iduo-settings.png" width="49%" alt="Home and dock settings, with a live preview for the cover or inner screen">
 </p>
 
-**Start here:** [User guide](docs/user-guide.md) · [Troubleshooting](docs/troubleshooting.md) · [Release notes](docs/releases/1.1.6.md) · [Privacy policy](docs/privacy-policy.md)
+**Start here:** [User guide](docs/user-guide.md) · [Troubleshooting](docs/troubleshooting.md) · [Release notes](docs/releases/1.1.7.md) · [Privacy policy](docs/privacy-policy.md)
 
 ## Features
 
@@ -29,6 +29,7 @@ A native Android launcher built around a right-side dock and a home screen that 
 - A 4 × 4, 4 × 5 or 4 × 6 Home grid and four to eight dock apps; on the cover screen the dock can slide in from the edge or hide.
 - One Home for both screens, or a separate cover Home with its own apps, folders, widgets and up to five columns.
 - Android's own wallpaper on Home, set from a photo or the bundled dunes; third-party icon packs; light/dark/system or sunrise/sunset appearance; and layout export/import.
+- Frosted or Liquid glass for the dock, folders, news and All apps.
 - English, Czech, Slovak, Polish, German, Simplified Chinese, Japanese, and Korean, following the system language or chosen in **Language**.
 
 Android still controls the lock screen, notification panels, recents, and system app transitions.
