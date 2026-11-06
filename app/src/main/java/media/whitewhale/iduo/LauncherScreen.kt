@@ -2108,7 +2108,7 @@ private fun LargeFolderTile(folder: FolderEntry, apps: Map<String, AppEntry>, si
     val openLabel = stringResource(R.string.folder_open, folder.title)
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Box(Modifier.size(side.dp).clip(outline)
-            .folderGlass(outline, tint = LIQUID_LARGE_FOLDER_TINT, refract = true)
+            .folderGlass(outline)
             .clickable(onClickLabel = openLabel, onClick = onOpen)
             .dropRegion(drag, DropTarget.Folder(folder.id), page = page, folderId = folder.id)
             .testTag("folder-drop-${folder.id}")) {
