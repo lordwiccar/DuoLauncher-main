@@ -56,6 +56,8 @@ internal object WallpaperBlurState {
 
 /** How strongly panels with text are tinted under Liquid, for legibility on the blurred wallpaper. */
 internal const val LIQUID_PANEL_TINT = .26f
+/** Search floats over Home's own widgets, which can be dark: its text needs a stronger tint than a panel's. */
+internal const val LIQUID_SEARCH_TINT = .62f
 /** The dock's and a large folder's tint: nearly clear, so the wallpaper reads through. */
 internal const val LIQUID_DOCK_TINT = .07f
 internal const val LIQUID_LARGE_FOLDER_TINT = .2f
