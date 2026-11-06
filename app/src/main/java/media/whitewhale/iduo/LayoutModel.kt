@@ -72,7 +72,9 @@ fun homeGeometry(width: Float, fullHeight: Float, preset: LayoutPreset, labels: 
     val row = if (appRows > DEFAULT_HOME_ROWS - 2 && appRows * (tightRow + p.rowGap) > roomForRows)
         maxOf(tightRow, roomForRows / appRows) else tightRow + p.rowGap
     val gridSpace = height - widget - 18f - appRows * row - homeBottomSpace
-    val contentTop = (gridSpace / 2f).coerceIn(16f, 72f)
+    // A full grid sits centred in its small margins; a short one rests on the bottom of the page,
+    // where the thumb is, instead of leaving the room under it empty.
+    val contentTop = maxOf((gridSpace / 2f).coerceIn(16f, 72f), gridSpace - HOME_BOTTOM_MARGIN)
     // Search reclaims the redundant bottom controls' space for all four dock apps.
     // Extremely short windows still scroll rather than reduce touch targets below 48dp.
     // The status rail rests near contentTop and rises as far as the screen's top margin to make
@@ -101,6 +103,8 @@ fun homeGeometry(width: Float, fullHeight: Float, preset: LayoutPreset, labels: 
         gridFits = gridSpace >= 24f - .01f, statusTop = statusTop + topBar)
 }
 
+/** The air a grid that does not fill the page keeps above the page dots. */
+const val HOME_BOTTOM_MARGIN = 24f
 /** The highest the status rail goes, and the air it keeps above the dock. */
 private const val STATUS_MIN_TOP = 8f
 private const val STATUS_DOCK_GAP = 8f
