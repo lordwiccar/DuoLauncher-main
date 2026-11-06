@@ -1281,7 +1281,7 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
 
 /** Home rows on a wheel; layouts that cannot fit this screen stay visible but cannot be chosen. */
 @Composable private fun GridLayoutDialog(current: Int, columns: Int, maxRowsFit: Int, onDismiss: () -> Unit, onChoose: (Int) -> Unit) {
-    val options = (DEFAULT_HOME_ROWS..GRID_ROWS).toList()
+    val options = (MIN_HOME_ROWS..GRID_ROWS).toList()
     var chosen by remember { mutableIntStateOf(current) }
     fun fits(rows: Int) = rows <= maxOf(DEFAULT_HOME_ROWS, maxRowsFit)
     AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.grid_layout)) },

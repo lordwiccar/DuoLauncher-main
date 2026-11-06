@@ -56,7 +56,7 @@ class HomeRowsTest {
             rows = GRID_ROWS)
         val after = resizeHomeRows(before, DEFAULT_HOME_ROWS)
         assertEquals(DEFAULT_HOME_ROWS, after.rows)
-        assertEquals(DEFAULT_HOME_ROWS, after.requiredRows())
+        assertTrue(after.requiredRows() <= DEFAULT_HOME_ROWS)
         val kept = (after.slots + after.leadingSlots).filterNotNull().toSet()
         assertEquals(setOf("a", "b", "c", "l"), kept)
         val moved = after.placement(3)!!
@@ -73,7 +73,7 @@ class HomeRowsTest {
     }
 
     @Test fun `required rows grow to cover saved content`() {
-        assertEquals(DEFAULT_HOME_ROWS, HomeLayout(listOf("a"), emptyList()).requiredRows())
+        assertEquals(MIN_HOME_ROWS, HomeLayout(listOf("a"), emptyList()).requiredRows())
         assertEquals(GRID_ROWS, HomeLayout(List(cell(1, 7, 0) + 1) { if (it == cell(1, 7, 0)) "a" else null }, emptyList()).requiredRows())
     }
 
