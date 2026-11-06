@@ -1115,7 +1115,8 @@ fun LauncherScreen(
                         if (session != null && widgetDraft != null) {
                             session.provider?.let { widgets.add(widgetDraft, it, pickerSizing) }
                                 ?: session.builtinId?.let { widgets.setBuiltin(widgetDraft.copy(id = it)) }
-                            resizeAfterAdd = session.slot; widgetSession = null; sheet = ""; widgetPackage = null
+                            if (model.placement(session.slot) == null) resizeAfterAdd = session.slot
+                            widgetSession = null; sheet = ""; widgetPackage = null
                         } else {
                             leaveTemporaryWidgetPage(); widgetSession = null
                             widgetPlacementMessage = launcherActivity.getString(R.string.widget_no_room_there)
@@ -1177,7 +1178,7 @@ fun LauncherScreen(
                                     } }
                                     session.provider?.let { widgets.add(draft, it, pickerSizing, contentSize) }
                                         ?: session.builtinId?.let { widgets.setBuiltin(draft.copy(id = it)) }
-                                    if (session.candidate == null) resizeAfterAdd = session.slot
+                                    if (model.placement(session.slot) == null) resizeAfterAdd = session.slot
                                     widgetSession = null; sheet = ""; widgetPackage = null
                                 }
                             }, modifier = Modifier.testTag("widget-placement-apply")) { Text(stringResource(R.string.place)) }
