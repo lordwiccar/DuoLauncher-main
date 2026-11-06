@@ -400,6 +400,8 @@ fun LauncherScreen(
         }
     }
     val edgeWidth = with(LocalDensity.current) { 30.dp.toPx() }
+    // How far a finger may wander while holding a widget before it counts as moving it.
+    val widgetHoldWander = with(LocalDensity.current) { 24.dp.toPx() }
     val edgePointer = widgetSession?.takeIf { it.dragging }?.pointer ?: drag.pointer
     val edgeActive = (drag.active && drag.moved) || widgetSession?.dragging == true
     val edge = if (!edgeActive) 0 else dragEdgeDirection(edgePointer, drag.rootBounds, edgeWidth)
@@ -418,7 +420,7 @@ fun LauncherScreen(
     }
     fun finishDrag(cancelled: Boolean) {
         val source = drag.source ?: return
-        val moved = drag.moved
+        val moved = drag.moved && (source.target !is DropTarget.Widget || (drag.pointer - drag.origin).getDistance() > widgetHoldWander)
         val rawDestination = if (moved && !cancelled) drag.destination(drag.pointer, eligibleDragPages)?.target else null
         val destination = if (rawDestination is DropTarget.Home && source.target is DropTarget.Widget) {
             model.placement(source.target.index)?.let {
@@ -674,6 +676,13 @@ fun LauncherScreen(
                     if (state.doubleTapLock && pagerInputEnabled && pager.currentPage in firstHomePosition until visibleHomePages) launcherActivity.lockScreen()
                 }
             }
+            // A clock or date has nothing of its own to open, so a press of any length gets the frame
+            // a long press gives. The panel asks to be replaced, and a broken widget needs its menu.
+            val widgetPressed: (Int) -> Unit = { slot ->
+                widgetSlot = slot
+                if (model.placement(slot)?.id == CLOCK_WIDGET || model.placement(slot)?.id == DATE_WIDGET) resizeSlot = slot
+                else sheet = "widgetActions"
+            }
             val openHomeOptionsAt by rememberUpdatedState { point: Offset, width: Int ->
                 val page = pager.currentPage
                 val leftHalf = geometry.expanded && point.x < width / 2f
@@ -750,7 +759,7 @@ fun LauncherScreen(
                         libraryQuery = libraryQuery, onLibraryQuery = { libraryQuery = it },
                         onLaunch = onLaunch, onLaunchFrom = onLaunchFrom, onPinned = model::setPinned,
                         onTurnOnWork = { model.turnOnWork(it) },
-                        onActions = { selectedId = it.id }, onWidget = { widgetSlot = it; sheet = "widgetActions" },
+                        onActions = { selectedId = it.id }, onWidget = widgetPressed,
                         onFolder = { openFolderId = it },
                         onEmptyWidget = { emptyCellIndex = it },
                         onRefresh = model::refresh,
@@ -769,7 +778,7 @@ fun LauncherScreen(
                             HomePagePane(LEFT_HOME_PAGE, state, previewLayout.slots, previewLayout.leadingSlots, previewLayout.widgetPlacements, appsById, geometry, contentHeight,
                                 bottomSpace, widgets, drag, target, insertionTarget, showLargeWidget = false,
                                 onLaunch = onLaunchFrom, onActions = { selectedId = it.id },
-                                onWidget = { widgetSlot = it; sheet = "widgetActions" },
+                                onWidget = widgetPressed,
                                 onFolder = { openFolderId = it },
                                 onEmptyWidget = { emptyCellIndex = it },
                                 onRefresh = model::refresh, previewLeftSlots = previewLayout.leftSlots)
@@ -785,7 +794,7 @@ fun LauncherScreen(
                             HomePagePane(page, state, previewLayout.slots, previewLayout.leadingSlots, previewLayout.widgetPlacements, appsById, geometry, contentHeight,
                                 bottomSpace, widgets, drag, target, insertionTarget, showLargeWidget = false,
                                 onLaunch = onLaunchFrom, onActions = { selectedId = it.id },
-                                onWidget = { widgetSlot = it; sheet = "widgetActions" },
+                                onWidget = widgetPressed,
                                 onFolder = { openFolderId = it },
                                 onEmptyWidget = { emptyCellIndex = it },
                                 onRefresh = model::refresh, previewLeftSlots = previewLayout.leftSlots)
